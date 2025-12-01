@@ -1,0 +1,45 @@
+{
+  "builder_name": "parquet",
+  "citation": "",
+  "config_name": "default",
+  "dataset_name": "wdbc",
+  "dataset_size": 145594,
+  "description": "",
+  "download_checksums": {
+    "hf://datasets/hsevi/wdbc@2cd649157cdc38e5f79ef752cd43a9d794022f46/data/train-00000-of-00001-56dd71ab36b7a251.parquet": {
+      "num_bytes": 153943,
+      "checksum": null
+    }
+  },
+  "download_size": 153943,
+  "features": {
+    "data": {
+      "feature": {
+        "dtype": "float64",
+        "_type": "Value"
+      },
+      "_type": "Sequence"
+    },
+    "labels": {
+      "dtype": "float64",
+      "_type": "Value"
+    }
+  },
+  "homepage": "",
+  "license": "",
+  "size_in_bytes": 299537,
+  "splits": {
+    "train": {
+      "name": "train",
+      "num_bytes": 145594,
+      "num_examples": 569,
+      "dataset_name": "wdbc"
+    }
+  },
+  "version": {
+    "version_str": "0.0.0",
+    "major": 0,
+    "minor": 0,
+    "patch": 0
+  }
+}

@@ -1,0 +1,12 @@
+dataset,ch_best,ch_mean,ch_std,ami,alpha_best,t_best,gamma_best,s_best
+iris,555.6661,555.666,0.0,0.8032,N/A,N/A,N/A,N/A
+glass,28.3258,28.326,0.0,0.249,N/A,N/A,N/A,N/A
+wine,70.372,70.372,0.0,0.8619,N/A,N/A,N/A,N/A
+wdbc,257.6924,257.692,0.0,0.6767,N/A,N/A,N/A,N/A
+control_chart,341.5029,341.503,0.0,0.8059,N/A,N/A,N/A,N/A
+parkinsons,32.0304,32.03,0.0,0.2132,N/A,N/A,N/A,N/A
+vertebral,182.1842,182.184,0.0,0.3887,N/A,N/A,N/A,N/A
+breast_tissue,50.6638,50.664,0.0,0.4758,N/A,N/A,N/A,N/A
+seeds,247.3108,247.311,0.0,0.7367,N/A,N/A,N/A,N/A
+yeast,294.5884,294.588,0.0,0.2863,N/A,N/A,N/A,N/A
+segmentation,418.2762,418.276,0.0,0.6395,N/A,N/A,N/A,N/A

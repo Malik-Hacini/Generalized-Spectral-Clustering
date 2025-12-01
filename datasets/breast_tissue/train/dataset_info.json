@@ -1,0 +1,45 @@
+{
+  "builder_name": "parquet",
+  "citation": "",
+  "config_name": "default",
+  "dataset_name": "breast_tissue",
+  "dataset_size": 9038,
+  "description": "",
+  "download_checksums": {
+    "hf://datasets/hsevi/breast_tissue@7441555986078cacc27b0dacbbd33f86a69be4ba/data/train-00000-of-00001-bf1a52845739c81e.parquet": {
+      "num_bytes": 9751,
+      "checksum": null
+    }
+  },
+  "download_size": 9751,
+  "features": {
+    "data": {
+      "feature": {
+        "dtype": "float64",
+        "_type": "Value"
+      },
+      "_type": "Sequence"
+    },
+    "labels": {
+      "dtype": "float64",
+      "_type": "Value"
+    }
+  },
+  "homepage": "",
+  "license": "",
+  "size_in_bytes": 18789,
+  "splits": {
+    "train": {
+      "name": "train",
+      "num_bytes": 9038,
+      "num_examples": 106,
+      "dataset_name": "breast_tissue"
+    }
+  },
+  "version": {
+    "version_str": "0.0.0",
+    "major": 0,
+    "minor": 0,
+    "patch": 0
+  }
+}

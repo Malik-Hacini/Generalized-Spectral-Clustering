@@ -1,0 +1,45 @@
+{
+  "builder_name": "parquet",
+  "citation": "",
+  "config_name": "default",
+  "dataset_name": "wine",
+  "dataset_size": 20961,
+  "description": "",
+  "download_checksums": {
+    "hf://datasets/hsevi/wine@a47b0896b407ac23d7a84c1d1a72c23db24bc988/data/train-00000-of-00001-506c7c393c2ae908.parquet": {
+      "num_bytes": 14541,
+      "checksum": null
+    }
+  },
+  "download_size": 14541,
+  "features": {
+    "data": {
+      "feature": {
+        "dtype": "float64",
+        "_type": "Value"
+      },
+      "_type": "Sequence"
+    },
+    "labels": {
+      "dtype": "float64",
+      "_type": "Value"
+    }
+  },
+  "homepage": "",
+  "license": "",
+  "size_in_bytes": 35502,
+  "splits": {
+    "train": {
+      "name": "train",
+      "num_bytes": 20961,
+      "num_examples": 178,
+      "dataset_name": "wine"
+    }
+  },
+  "version": {
+    "version_str": "0.0.0",
+    "major": 0,
+    "minor": 0,
+    "patch": 0
+  }
+}

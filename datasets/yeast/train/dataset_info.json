@@ -1,0 +1,45 @@
+{
+  "builder_name": "parquet",
+  "citation": "",
+  "config_name": "default",
+  "dataset_name": "yeast",
+  "dataset_size": 114454,
+  "description": "",
+  "download_checksums": {
+    "hf://datasets/hsevi/yeast@5d978799854864e6d89b1a9e85d70b80c30bcd0e/data/train-00000-of-00001-3e19147a363635cd.parquet": {
+      "num_bytes": 20309,
+      "checksum": null
+    }
+  },
+  "download_size": 20309,
+  "features": {
+    "data": {
+      "feature": {
+        "dtype": "float64",
+        "_type": "Value"
+      },
+      "_type": "Sequence"
+    },
+    "labels": {
+      "dtype": "float64",
+      "_type": "Value"
+    }
+  },
+  "homepage": "",
+  "license": "",
+  "size_in_bytes": 134763,
+  "splits": {
+    "train": {
+      "name": "train",
+      "num_bytes": 114454,
+      "num_examples": 1484,
+      "dataset_name": "yeast"
+    }
+  },
+  "version": {
+    "version_str": "0.0.0",
+    "major": 0,
+    "minor": 0,
+    "patch": 0
+  }
+}

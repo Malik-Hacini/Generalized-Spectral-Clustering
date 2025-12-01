@@ -1,0 +1,45 @@
+{
+  "builder_name": "parquet",
+  "citation": "",
+  "config_name": "default",
+  "dataset_name": "control_chart",
+  "dataset_size": 299775,
+  "description": "",
+  "download_checksums": {
+    "hf://datasets/hsevi/control_chart@12d88490ac8bf338b83933871720e11459a1b592/data/train-00000-of-00001-b33218772a78dd0e.parquet": {
+      "num_bytes": 270551,
+      "checksum": null
+    }
+  },
+  "download_size": 270551,
+  "features": {
+    "data": {
+      "feature": {
+        "dtype": "float64",
+        "_type": "Value"
+      },
+      "_type": "Sequence"
+    },
+    "labels": {
+      "dtype": "int64",
+      "_type": "Value"
+    }
+  },
+  "homepage": "",
+  "license": "",
+  "size_in_bytes": 570326,
+  "splits": {
+    "train": {
+      "name": "train",
+      "num_bytes": 299775,
+      "num_examples": 600,
+      "dataset_name": "control_chart"
+    }
+  },
+  "version": {
+    "version_str": "0.0.0",
+    "major": 0,
+    "minor": 0,
+    "patch": 0
+  }
+}

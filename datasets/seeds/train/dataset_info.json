@@ -1,0 +1,45 @@
+{
+  "builder_name": "parquet",
+  "citation": "",
+  "config_name": "default",
+  "dataset_name": "seeds",
+  "dataset_size": 14491,
+  "description": "",
+  "download_checksums": {
+    "hf://datasets/hsevi/seeds@01fe5091b2a89bd20c65a278a15f1ee59d9562c0/data/train-00000-of-00001-41cc46a1c5e9d1d9.parquet": {
+      "num_bytes": 13370,
+      "checksum": null
+    }
+  },
+  "download_size": 13370,
+  "features": {
+    "data": {
+      "feature": {
+        "dtype": "float64",
+        "_type": "Value"
+      },
+      "_type": "Sequence"
+    },
+    "labels": {
+      "dtype": "float64",
+      "_type": "Value"
+    }
+  },
+  "homepage": "",
+  "license": "",
+  "size_in_bytes": 27861,
+  "splits": {
+    "train": {
+      "name": "train",
+      "num_bytes": 14491,
+      "num_examples": 210,
+      "dataset_name": "seeds"
+    }
+  },
+  "version": {
+    "version_str": "0.0.0",
+    "major": 0,
+    "minor": 0,
+    "patch": 0
+  }
+}

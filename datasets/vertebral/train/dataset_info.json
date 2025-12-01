@@ -1,0 +1,45 @@
+{
+  "builder_name": "parquet",
+  "citation": "",
+  "config_name": "default",
+  "dataset_name": "vertebral",
+  "dataset_size": 18872,
+  "description": "",
+  "download_checksums": {
+    "hf://datasets/hsevi/vertebral@b3d155a69d433104f478cad3a1f6374ab9fc8ea7/data/train-00000-of-00001-588a6951daa0a99a.parquet": {
+      "num_bytes": 11748,
+      "checksum": null
+    }
+  },
+  "download_size": 11748,
+  "features": {
+    "data": {
+      "feature": {
+        "dtype": "float64",
+        "_type": "Value"
+      },
+      "_type": "Sequence"
+    },
+    "labels": {
+      "dtype": "float64",
+      "_type": "Value"
+    }
+  },
+  "homepage": "",
+  "license": "",
+  "size_in_bytes": 30620,
+  "splits": {
+    "train": {
+      "name": "train",
+      "num_bytes": 18872,
+      "num_examples": 310,
+      "dataset_name": "vertebral"
+    }
+  },
+  "version": {
+    "version_str": "0.0.0",
+    "major": 0,
+    "minor": 0,
+    "patch": 0
+  }
+}

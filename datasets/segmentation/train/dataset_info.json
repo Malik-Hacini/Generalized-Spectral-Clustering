@@ -1,0 +1,45 @@
+{
+  "builder_name": "parquet",
+  "citation": "",
+  "config_name": "default",
+  "dataset_name": "segmentation",
+  "dataset_size": 384616,
+  "description": "",
+  "download_checksums": {
+    "hf://datasets/hsevi/segmentation@913ac479226b1d3fca2d51a959d221ed161b72b2/data/train-00000-of-00001-e2bdd047c640e8c8.parquet": {
+      "num_bytes": 165018,
+      "checksum": null
+    }
+  },
+  "download_size": 165018,
+  "features": {
+    "data": {
+      "feature": {
+        "dtype": "float64",
+        "_type": "Value"
+      },
+      "_type": "Sequence"
+    },
+    "labels": {
+      "dtype": "float64",
+      "_type": "Value"
+    }
+  },
+  "homepage": "",
+  "license": "",
+  "size_in_bytes": 549634,
+  "splits": {
+    "train": {
+      "name": "train",
+      "num_bytes": 384616,
+      "num_examples": 2310,
+      "dataset_name": "segmentation"
+    }
+  },
+  "version": {
+    "version_str": "0.0.0",
+    "major": 0,
+    "minor": 0,
+    "patch": 0
+  }
+}

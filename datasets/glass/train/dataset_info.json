@@ -1,0 +1,45 @@
+{
+  "builder_name": "parquet",
+  "citation": "",
+  "config_name": "default",
+  "dataset_name": "glass",
+  "dataset_size": 18244,
+  "description": "",
+  "download_checksums": {
+    "hf://datasets/hsevi/glass@1fdb665a93a068c04934f7b3ecf1ca5d7d170afc/data/train-00000-of-00001-a09be7215ac8e34a.parquet": {
+      "num_bytes": 11086,
+      "checksum": null
+    }
+  },
+  "download_size": 11086,
+  "features": {
+    "data": {
+      "feature": {
+        "dtype": "float64",
+        "_type": "Value"
+      },
+      "_type": "Sequence"
+    },
+    "labels": {
+      "dtype": "float64",
+      "_type": "Value"
+    }
+  },
+  "homepage": "",
+  "license": "",
+  "size_in_bytes": 29330,
+  "splits": {
+    "train": {
+      "name": "train",
+      "num_bytes": 18244,
+      "num_examples": 214,
+      "dataset_name": "glass"
+    }
+  },
+  "version": {
+    "version_str": "0.0.0",
+    "major": 0,
+    "minor": 0,
+    "patch": 0
+  }
+}

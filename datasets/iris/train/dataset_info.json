@@ -1,0 +1,45 @@
+{
+  "builder_name": "parquet",
+  "citation": "",
+  "config_name": "default",
+  "dataset_name": "iris",
+  "dataset_size": 6694,
+  "description": "",
+  "download_checksums": {
+    "hf://datasets/hsevi/iris@84727b1dac616966e8c029bfdc710c21be527f24/data/train-00000-of-00001-bd7b535ab4814187.parquet": {
+      "num_bytes": 1939,
+      "checksum": null
+    }
+  },
+  "download_size": 1939,
+  "features": {
+    "data": {
+      "feature": {
+        "dtype": "float64",
+        "_type": "Value"
+      },
+      "_type": "Sequence"
+    },
+    "labels": {
+      "dtype": "float64",
+      "_type": "Value"
+    }
+  },
+  "homepage": "",
+  "license": "",
+  "size_in_bytes": 8633,
+  "splits": {
+    "train": {
+      "name": "train",
+      "num_bytes": 6694,
+      "num_examples": 150,
+      "dataset_name": "iris"
+    }
+  },
+  "version": {
+    "version_str": "0.0.0",
+    "major": 0,
+    "minor": 0,
+    "patch": 0
+  }
+}

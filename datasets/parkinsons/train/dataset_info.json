@@ -1,0 +1,45 @@
+{
+  "builder_name": "parquet",
+  "citation": "",
+  "config_name": "default",
+  "dataset_name": "parkinsons",
+  "dataset_size": 37222,
+  "description": "",
+  "download_checksums": {
+    "hf://datasets/hsevi/parkinsons@75e9698022809cd5e63fd08cc46471e1ce42d834/data/train-00000-of-00001-ae24a97779a74181.parquet": {
+      "num_bytes": 38927,
+      "checksum": null
+    }
+  },
+  "download_size": 38927,
+  "features": {
+    "data": {
+      "feature": {
+        "dtype": "float64",
+        "_type": "Value"
+      },
+      "_type": "Sequence"
+    },
+    "labels": {
+      "dtype": "float64",
+      "_type": "Value"
+    }
+  },
+  "homepage": "",
+  "license": "",
+  "size_in_bytes": 76149,
+  "splits": {
+    "train": {
+      "name": "train",
+      "num_bytes": 37222,
+      "num_examples": 195,
+      "dataset_name": "parkinsons"
+    }
+  },
+  "version": {
+    "version_str": "0.0.0",
+    "major": 0,
+    "minor": 0,
+    "patch": 0
+  }
+}
