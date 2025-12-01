@@ -1,4 +1,4 @@
-# Generalized Spectral Clustering Experiments Pipeline
+# Generalized Spectral Clustering 
 
 This repository contains a GSC implementation in scikit-learn, alongside an experiment pipeline.
 
