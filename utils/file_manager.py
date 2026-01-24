@@ -2,72 +2,31 @@ import os
 import json
 import numpy as np
 import pandas as pd
+import scipy.sparse as sp
 from datasets import load_from_disk, Dataset, DatasetDict
 from utils.logger import get_logger
 
+def _is_graph_dataset(dataset_path: str) -> bool:
+    """Check if the dataset is a graph dataset by looking for graph.npz file."""
+    return os.path.isfile(os.path.join(dataset_path, 'graph.npz'))
 
-def load_dataset(path: str, name: str, split: str = "train", feature_cols=None, label_col: str = "labels"):
-    """
-    Load a clustering dataset from local disk storage and return feature and label arrays.
+def _load_graph(dataset_path: str):
+    """Load a graph dataset from a graph.npz file."""
+    graph_file = os.path.join(dataset_path, 'graph.npz')
+    data = np.load(graph_file, allow_pickle=True)
+    
+    adjacency_matrix = sp.csr_matrix(
+        (data['adj_data'], data['adj_indices'], data['adj_indptr']),
+        shape=tuple(data['adj_shape'])
+    )
+    labels = data['labels'] if 'labels' in data else None
 
-    This function loads datasets stored in Hugging Face format for use in clustering
-    experiments.
-    Parameters:
-    -----------
-    path : str
-        Base directory path containing datasets (e.g., "datasets")
-    name : str
-        Name of the specific dataset folder (e.g., "iris", "wine")
-    split : str, optional
-        Dataset split to load. Default: "train"
-        Falls back to "default" if split not found
-    feature_cols : list of str, optional
-        Names of feature columns to load. If None, loads all columns except label_col
-    label_col : str, optional
-        Name of the column containing true cluster labels. Default: "labels"
+    return adjacency_matrix, labels
 
-    Returns:
-    X : numpy.ndarray
-        Feature matrix of shape (n_samples, n_features)
-    y : numpy.ndarray
-        True cluster labels of shape (n_samples,)
-
-    Raises:
-    -------
-    ValueError
-        If dataset directory structure is invalid or split not found
-    FileNotFoundError
-        If dataset path does not exist
-
-    Examples:
-    ---------
-    >>> # Load iris dataset
-    >>> X, y = load_dataset("datasets", "iris")
-    >>> print(X.shape, y.shape)
-    (150, 4) (150,)
-
-    >>> # Load specific features only
-    >>> X, y = load_dataset("datasets", "wine", feature_cols=["feature1", "feature2"])
-
-    --------
-    Expected file structure:
-    ```
-    path/
-    └── name/
-        ├── dataset_info.json
-        ├── state.json
-        └── train/  (or split/ or default/)
-            ├── data-00000-of-00001.arrow
-            └── dataset_info.json
-    ```
-    The dataset must be stored in Hugging Face Dataset format with:
-    - dataset_info.json file
-    - Arrow format data files
-
-    ------
-    """
-
-    target_path = os.path.join(path, name)
+def _load_pointcloud(dataset_path: str, split: str, feature_cols, label_col: str):
+    """Load a point-cloud dataset from Hugging Face arrow format."""
+    target_path = dataset_path
+    
     if not os.path.isfile(os.path.join(target_path, "dataset_info.json")):
         candidate = os.path.join(target_path, split)
         if os.path.isdir(candidate):
@@ -77,14 +36,18 @@ def load_dataset(path: str, name: str, split: str = "train", feature_cols=None, 
             if os.path.isdir(candidate):
                 target_path = candidate
             else:
-                raise ValueError(f"No dataset found in '{target_path}'. "
-                                 f"Expected '{target_path}/{split}' or '{target_path}/default' to exist.")
+                raise ValueError(
+                    f"No dataset found in '{target_path}'. "
+                    f"Expected '{target_path}/{split}' or '{target_path}/default' to exist."
+                )
 
     ds = load_from_disk(target_path)
 
     if hasattr(ds, "get"):
         if split not in ds:
-            raise ValueError(f"Split '{split}' not found in dataset at {path}. Available splits: {list(ds.keys())}")
+            raise ValueError(
+                f"Split '{split}' not found in dataset. Available splits: {list(ds.keys())}"
+            )
         ds = ds[split]
 
     if feature_cols is None:
@@ -97,6 +60,102 @@ def load_dataset(path: str, name: str, split: str = "train", feature_cols=None, 
     y = batch[label_col]
 
     return X, y
+
+def load_dataset(path: str, name: str, split: str = "train", feature_cols=None, label_col: str = "labels"):
+    """
+    Load a dataset from local disk storage.
+    
+    Automatically detects the dataset type (graph or point-cloud) based on file structure
+    and returns the appropriate data format. 
+
+    Parameters
+    ----------
+    path : str
+        Base directory path containing datasets (e.g., "datasets")
+    name : str
+        Name of the specific dataset folder (e.g., "iris", "cora_ml")
+    split : str, optional
+        Dataset split to load. Default: "train"
+        Only used for point-cloud datasets; ignored for graph datasets.
+    feature_cols : list of str, optional
+        Names of feature columns to load. If None, loads all columns except label_col.
+        Only used for point-cloud datasets; ignored for graph datasets.
+    label_col : str, optional
+        Name of the column containing labels. Default: "labels"
+        Only used for point-cloud datasets; ignored for graph datasets.
+
+    Returns
+    -------
+    For point-cloud datasets:
+        X : numpy.ndarray
+            Feature matrix of shape (n_samples, n_features)
+        y : numpy.ndarray
+            Labels of shape (n_samples,)
+            
+    For graph datasets:
+        A : scipy.sparse.csr_matrix
+            Sparse adjacency matrix of shape (n_nodes, n_nodes)
+        y : numpy.ndarray or None
+            Node labels of shape (n_nodes,), or None if not available
+
+    Raises
+    ------
+    ValueError
+        If dataset directory structure is invalid or split not found
+    FileNotFoundError
+        If dataset path does not exist
+
+    Examples
+    --------
+    >>> # Load point-cloud dataset (e.g., iris)
+    >>> X, y = load_dataset("datasets", "iris")
+    >>> print(X.shape, y.shape)
+    (150, 4) (150,)
+
+    >>> # Load graph dataset (e.g., cora_ml)
+    >>> A, y = load_dataset("datasets", "cora_ml")
+    >>> print(A.shape)
+    (2995, 2995)
+
+    Notes
+    -----
+    Dataset type is detected automatically:
+    
+    - **Graph datasets**: Must contain a `graph.npz` file with sparse matrix components
+      (adj_data, adj_indices, adj_indptr, adj_shape) and optionally labels.
+      
+    - **Point-cloud datasets**: Must be in Hugging Face Dataset format with
+      dataset_info.json and Arrow format data files.
+    
+    File structures:
+    
+    Graph dataset::
+    
+        path/
+        └── name/
+            └── graph.npz
+            
+    Point-cloud dataset::
+    
+        path/
+        └── name/
+            ├── dataset_info.json
+            └── train/
+                └── data-00000-of-00001.arrow
+    """
+    dataset_path = os.path.join(path, name)
+    
+    if not os.path.isdir(dataset_path):
+        raise FileNotFoundError(f"Dataset directory not found: '{dataset_path}'")
+    
+    is_graph = _is_graph_dataset(dataset_path)
+    
+    if is_graph:
+        data, labels = _load_graph(dataset_path)
+    else:
+        data, labels = _load_pointcloud(dataset_path, split, feature_cols, label_col)
+    
+    return data, labels
 
 def save_dataset(data: np.ndarray, labels: np.ndarray,
                  path: str, name: str,
@@ -384,4 +443,4 @@ def _save_grid_search_files(experiment_dir: str, grid_results: dict):
             summary_df = pd.DataFrame(summary_rows)
             summary_file = os.path.join(dataset_dir, f"{dataset_name}_summary.csv")
             summary_df.to_csv(summary_file, index=False)
-    
+
