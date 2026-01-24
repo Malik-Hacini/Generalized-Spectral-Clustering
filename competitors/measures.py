@@ -15,30 +15,40 @@ Return value:
 
 import numpy as np
 import scipy.sparse as sp
-from scipy.sparse.linalg import matrix_power
+from functools import reduce
 from sklearn.neighbors import kneighbors_graph #type: ignore
 from .neighbors import log_neighbors
 
 def teleporting_undirected_measure(adjacency_matrix, alpha, t, epsilon=1e-8):
     """
     Builds the undirected vertex measure:
-    v = (((P)^t)^T)**alpha
-
-
+    nu = ((1/N) * 1^T * P^t)^alpha
+    
+    Uses power iteration for O(t * nnz) complexity instead of O(N²) matrix power.
+    Note: The t iterations are inherently sequential (each depends on previous).
+    The sparse mat-vec operations use optimized scipy/BLAS routines.
     """
     is_sparse = sp.issparse(adjacency_matrix)
     N = adjacency_matrix.shape[0]
-    degree_vec = adjacency_matrix.sum(axis=1).A1 if is_sparse else adjacency_matrix.sum(axis=1)
-    P = adjacency_matrix / degree_vec
-
-
-    P_t = matrix_power(P.copy(), t)
- 
-    nu = (np.array(((1/N) * np.ones((1, N)) @ P_t)).T.flatten())**alpha
+    
+    # Build row-stochastic matrix P = D^{-1} A
+    degree_vec = np.asarray(adjacency_matrix.sum(axis=1)).flatten()
+    degree_vec[degree_vec == 0] = 1  # Avoid division by zero
+    
+    if is_sparse:
+        P = sp.diags(1.0 / degree_vec) @ adjacency_matrix
+    else:
+        P = adjacency_matrix / degree_vec[:, np.newaxis]
+    
+    # Power iteration: v = (1/N) * 1^T * P^t
+    # Sequential iterations are unavoidable; each v @ P is O(nnz) optimized scipy
+    v = reduce(lambda v, _: v @ P, range(t), np.ones(N) / N)
+    
+    nu = np.power(v, alpha)
     nu[nu <= 0] = epsilon
-    nu_normalized = nu / np.sum(nu)
+    nu /= nu.sum()
 
-    return nu_normalized
+    return nu
 
 
 
