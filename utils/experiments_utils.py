@@ -3,18 +3,18 @@ import copy
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import dbcv
 import time
 import warnings
+import scipy.sparse as sp
 from itertools import product
 from joblib import Parallel, delayed
 from collections.abc import Iterable
 from sklearn import cluster # type: ignore
 from sklearn.preprocessing import StandardScaler # type: ignore
 from sklearn.metrics import normalized_mutual_info_score, adjusted_rand_score, adjusted_mutual_info_score, calinski_harabasz_score # type: ignore
-from scipy import stats
 from utils.file_manager import load_dataset, save_experiment_results
 from utils.logger import get_logger, set_logger_verbose
+from utils.modularity import modularity
 from competitors.disim import DiSim
 from competitors.dsc import DSC
 
@@ -93,7 +93,7 @@ def experiment(experiment_name, dataset_names, method_specs, config, load_path, 
     if not isinstance(metrics, (str,tuple,list)) :
         raise ValueError("Metrics must be a string (for a single metric) or a tuple/list of strings.")
 
-    valid_metrics = {"nmi", "ari", "ami", "ch", "dbcv"}
+    valid_metrics = {"nmi", "ari", "ami", "ch", "dbcv", "modularity"}
     invalid_metrics = set(metrics) - valid_metrics
     if invalid_metrics:
         raise ValueError(f"Invalid metrics: {invalid_metrics}. Valid metrics are: {valid_metrics}")
@@ -188,6 +188,7 @@ def clusterer(method_name, params):
             n_clusters=params.get("n_clusters", 3),
             n_neighbors=params.get("n_neighbors", 6),
             affinity=params.get("affinity", "nearest_neighbors"),
+            gamma=params.get("gamma", 1.0),
             laplacian_method=params.get("laplacian_method", "norm"),
             measure=params.get("measure", None),
             standard=params.get("standard", False),
@@ -571,6 +572,7 @@ def _process_method_on_dataset(dataset_name, method_spec, params, X, y, metrics)
     
 def _compute_clustering_scores(y_true, y_pred, metrics, X):
     """Compute clustering scores for specified metrics.
+    
     Available metrics:
 
     - Supervised :
@@ -578,8 +580,10 @@ def _compute_clustering_scores(y_true, y_pred, metrics, X):
         - "ari": Adjusted Rand Index
         - "ami": Adjusted Mutual Information
     - Unsupervised :
-        - "ch": Calinski-Harabasz index (requires data matrix X)
+        - "ch": Calinski-Harabasz index (for point clouds, requires dense X)
+        - "modularity": Newman modularity (for graphs, requires sparse adjacency X)
     """
+    
     scores = {}
 
     if y_true is None or len(np.unique(y_true)) <= 1:
@@ -602,12 +606,15 @@ def _compute_clustering_scores(y_true, y_pred, metrics, X):
         elif metric == "ami":
             score = adjusted_mutual_info_score(y_true, y_pred)
         elif metric == "ch":
-            if X is None:
-                score = 0.0  
+            if X is None or sp.issparse(X):
+                score = 0.0  # CH not applicable to graphs
             else:
                 score = calinski_harabasz_score(X, y_pred)
-        elif metric == "dbcv":
-            score = dbcv.dbcv(X, y_pred, check_duplicates=False)
+        elif metric == "modularity":
+            if X is None or not sp.issparse(X):
+                score = 0.0  # Modularity only for graphs
+            else:
+                score = modularity(X, y_pred)
         else:
             raise ValueError(f"Unknown metric: {metric}")
 
