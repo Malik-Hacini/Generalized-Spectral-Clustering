@@ -34,7 +34,12 @@ class Laplacian:
         self.is_sparse = issparse(self.adjacency)
         
         degree_vec = self.adjacency.sum(axis=1).A1 if self.is_sparse else self.adjacency.sum(axis=1)
-        P = self.adjacency / degree_vec
+        
+        # Handle zero-degree nodes: set their degree to 1 to avoid division by zero.
+        # These nodes contribute zero to transitions anyway (their rows are all zeros).
+        degree_vec_safe = degree_vec.copy()
+        degree_vec_safe[degree_vec_safe == 0] = 1.0
+        P = self.adjacency / degree_vec_safe
         if self.standard:
             v = degree_vec
             xi = np.zeros(self.N)

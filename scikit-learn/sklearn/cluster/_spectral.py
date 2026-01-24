@@ -449,6 +449,8 @@ class SpectralClustering(ClusterMixin, BaseEstimator):
            graph of nearest neighbors.
          - 'rbf': construct the affinity matrix using a radial basis function
            (RBF) kernel.
+         - 'rbf_nearest_neighbors': construct the affinity matrix using a radial
+           basis function (RBF) kernel, but only for the nearest neighbors.
          - 'precomputed': interpret ``X`` as a precomputed affinity matrix,
            where larger values indicate greater similarity between instances.
          - 'precomputed_nearest_neighbors': interpret ``X`` as a sparse graph
@@ -619,7 +621,12 @@ class SpectralClustering(ClusterMixin, BaseEstimator):
             callable,
             StrOptions(
                 set(KERNEL_PARAMS)
-                | {"nearest_neighbors", "precomputed", "precomputed_nearest_neighbors"}
+                | {
+                    "nearest_neighbors",
+                    "precomputed",
+                    "precomputed_nearest_neighbors",
+                    "rbf_nearest_neighbors",
+                }
             ),
         ],
         "n_neighbors": [Interval(Integral, 1, None, closed="left"), tuple],
@@ -724,7 +731,7 @@ class SpectralClustering(ClusterMixin, BaseEstimator):
                 "set ``affinity=precomputed``."
             )
 
-        #Resolve the n_neighbors parameter
+        # Resolve the n_neighbors parameter
         context_neighbors_kwargs = {"X" : X}
         self.n_neighbors = _resolve_callable_param(self.n_neighbors, context_neighbors_kwargs)
 
@@ -732,25 +739,27 @@ class SpectralClustering(ClusterMixin, BaseEstimator):
             connectivity = kneighbors_graph(
                 X, n_neighbors=self.n_neighbors, include_self=False, n_jobs=self.n_jobs,
             )
-            if self.standard:
-                self.affinity_matrix_ = 0.5 * (connectivity + connectivity.T)
-            else:
-                self.affinity_matrix_ = connectivity
-
+    
         elif self.affinity == "precomputed_nearest_neighbors":
            
             estimator = NearestNeighbors(
                 n_neighbors=self.n_neighbors, n_jobs=self.n_jobs, metric="precomputed"
             ).fit(X)
             connectivity = estimator.kneighbors_graph(X=X, mode="connectivity")
-            
-            if self.standard:
-                self.affinity_matrix_ = 0.5 * (connectivity + connectivity.T)
-            else:
-                self.affinity_matrix_ = connectivity
-                
+          
+        elif self.affinity == "rbf_nearest_neighbors":
+            connectivity = kneighbors_graph(
+                X,
+                n_neighbors=self.n_neighbors,
+                mode="distance",
+                include_self=False,
+                n_jobs=self.n_jobs,
+            )
+            connectivity.data = np.exp(-self.gamma * (connectivity.data**2))
+
         elif self.affinity == "precomputed":
-            self.affinity_matrix_ = X
+            connectivity = X
+
         else:
             params = self.kernel_params
             if params is None:
@@ -762,6 +771,13 @@ class SpectralClustering(ClusterMixin, BaseEstimator):
             self.affinity_matrix_ = pairwise_kernels(
                 X, metric=self.affinity, filter_params=True, **params
             )
+        
+        # Symmetrize the affinity matrix IFF using standard SC
+        if self.standard:
+                self.affinity_matrix_ = 0.5 * (connectivity + connectivity.T)
+        else:
+                self.affinity_matrix_ = connectivity
+
 
 
         random_state = check_random_state(self.random_state)
