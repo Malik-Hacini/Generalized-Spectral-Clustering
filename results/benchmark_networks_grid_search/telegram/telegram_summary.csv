@@ -1,0 +1,2 @@
+method,ami_mean_across_grid,ami_std_across_grid,ami_best_mean,ami_best_std
+K-Means,0.012,0.0,0.012,0.0

@@ -1,0 +1,44 @@
+{
+  "citeseer": {
+    "K-Means": {
+      "random_state": 42,
+      "n_it": 1,
+      "n_clusters": 6
+    }
+  },
+  "cora_ml": {
+    "K-Means": {
+      "random_state": 42,
+      "n_it": 1,
+      "n_clusters": 7
+    }
+  },
+  "telegram": {
+    "K-Means": {
+      "random_state": 42,
+      "n_it": 1,
+      "n_clusters": 4
+    }
+  },
+  "texas": {
+    "K-Means": {
+      "random_state": 42,
+      "n_it": 1,
+      "n_clusters": 5
+    }
+  },
+  "wisconsin": {
+    "K-Means": {
+      "random_state": 42,
+      "n_it": 1,
+      "n_clusters": 5
+    }
+  },
+  "cornell": {
+    "K-Means": {
+      "random_state": 42,
+      "n_it": 1,
+      "n_clusters": 5
+    }
+  }
+}
