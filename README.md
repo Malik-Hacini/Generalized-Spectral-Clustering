@@ -14,9 +14,9 @@ python -m venv sklearn-env
 source sklearn-env/bin/activate.fish
 ```
 
-Install build dependencies:
+Install all required dependencies:
 ```
-pip install wheel numpy scipy cython meson-python ninja pyamg pyarrow 
+pip install -r requirements.txt
 ```
 
 Install scikit-learn in editable mode:

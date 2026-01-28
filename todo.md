@@ -12,8 +12,7 @@ EXPERIMENTS :
 
 MISC : 
 
-- complexity : O(n^2 log n) , same for SC and GSC (w/o grid search)
-  - clean plots.
+- complexity : O(n^2 log n) , same for SC and GSC (w/o grid search) : BASICALLY DONE, cleanup the latex a bit.
 
 - Add github link to paper preprint.
 - Readme : add all packages needed for experiments install instructions
