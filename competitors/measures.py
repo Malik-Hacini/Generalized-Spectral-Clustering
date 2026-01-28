@@ -41,7 +41,6 @@ def teleporting_undirected_measure(adjacency_matrix, alpha, t, epsilon=1e-8):
         P = adjacency_matrix / degree_vec[:, np.newaxis]
     
     # Power iteration: v = (1/N) * 1^T * P^t
-    # Sequential iterations are unavoidable; each v @ P is O(nnz) optimized scipy
     v = reduce(lambda v, _: v @ P, range(t), np.ones(N) / N)
     
     nu = np.power(v, alpha)
