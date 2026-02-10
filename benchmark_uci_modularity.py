@@ -13,9 +13,9 @@ from competitors.disim import avg_deg_taus
 Basic experiment config:
 """
 save_path = "results"
-experiment_name = "benchmark_networks"
+experiment_name = "benchmark_uci"
 mode = "grid_search" # Either "score", "grid_search" or "viz" when all datasets are 2D.
-metrics = ("ami","map_equation") # Valid metrics: "ami", "ari", "nmi", "ch", "modularity", "map_equation"
+metrics = ("ami", "modularity") # Valid metrics: "ami", "ari", "nmi", "ch", "modularity", "map_equation"
 n_jobs = -1  # Number of parallel jobs (set to 1 for single-threaded execution, -1 to use all available cores)
 verbose = True
 
@@ -23,15 +23,14 @@ verbose = True
 Datasets and methods configuration:
 """
 load_path = "datasets"
-dataset_names = ["email_eu_core", "polblogs", "wiki_vote"]
+dataset_names = ["breast_tissue", "wine", "control_chart", "glass", "iris", "parkinsons", "seeds", "segmentation", "vertebral", "wdbc", "yeast"]
 method_specs = [
-    #("kmeans", "K-Means"),
     ("spectral", "SC-UN"),
     ("spectral", "SC-N"),
-    #("dsc", "DSC+"),
-    #("di_sim", "DI-SIM-R"),
-    #("di_sim", "DI-SIM-L"),
-    #("di_sim", "DI-SIM-C"),
+    ("dsc", "DSC+"),
+    ("di_sim", "DI-SIM-R"),
+    ("di_sim", "DI-SIM-L"),
+    ("di_sim", "DI-SIM-C"),
     ("spectral", "GSC-N"),
     ("spectral", "GSC-UN"), 
  # (Internal  name, Display name ) - see utils.experiments_utils.clusterer
@@ -56,10 +55,10 @@ Notes :
 default_params = {
     "n_neighbors": (log_neighbors, {"factor": 1}),
     "random_state": 42, #Used for kmeans initialization. Has negligible effect for spectral methods.
-    "affinity": "precomputed",
+    "affinity": "nearest_neighbors",
     "n_it": 1,  
     "assign_labels": "kmeans",
-    "measure": (teleporting_undirected_measure, {'alpha': np.arange(0, 1.5, 0.5), 't': range(0,10)}), # Grid search for GSC methods
+    "measure": (teleporting_undirected_measure, {'alpha': np.arange(0, 1.5, 0.1), 't': range(0,25)}), # Grid search for GSC methods
     "tau": (avg_deg_taus, {"s": np.arange(-1, 1, 0.5)}), # Grid search for DI-SIM methods
 }
 

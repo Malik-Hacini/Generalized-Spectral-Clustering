@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+sklearn-env/
+
+# Papers folder (research references)
+papers/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build artifacts from scikit-learn
+scikit-learn/build/
+scikit-learn/dist/
+scikit-learn/*.egg-info/
+scikit-learn/.eggs/
+
+CLAUDE.md

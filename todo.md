@@ -20,4 +20,10 @@ problem : no CH for gridsearch...  need an unsupervised metrics for real network
 
 replacement ideas :
 - Energy directly (i.e Rayleigh quotient)
-- modularity
+- modularity - testing
+- Ch on spectral embedding
+
+
+- ch on transition matrix (multiple iterations --> P^k) 
+ -problem : arbitray time choic : too close --> points in same cluster have no similiarty
+        - too far : points between clusters have no similarity

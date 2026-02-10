@@ -15,6 +15,7 @@ from sklearn.metrics import normalized_mutual_info_score, adjusted_rand_score, a
 from utils.file_manager import load_dataset, save_experiment_results
 from utils.logger import get_logger, set_logger_verbose
 from utils.modularity import modularity
+from utils.map_equation import map_equation
 from competitors.disim import DiSim
 from competitors.dsc import DSC
 
@@ -93,7 +94,7 @@ def experiment(experiment_name, dataset_names, method_specs, config, load_path, 
     if not isinstance(metrics, (str,tuple,list)) :
         raise ValueError("Metrics must be a string (for a single metric) or a tuple/list of strings.")
 
-    valid_metrics = {"nmi", "ari", "ami", "ch", "dbcv", "modularity"}
+    valid_metrics = {"nmi", "ari", "ami", "ch", "dbcv", "modularity", "map_equation"}
     invalid_metrics = set(metrics) - valid_metrics
     if invalid_metrics:
         raise ValueError(f"Invalid metrics: {invalid_metrics}. Valid metrics are: {valid_metrics}")
@@ -582,14 +583,12 @@ def _compute_clustering_scores(y_true, y_pred, metrics, X):
     - Unsupervised :
         - "ch": Calinski-Harabasz index (for point clouds, requires dense X)
         - "modularity": Newman modularity (for graphs, requires sparse adjacency X)
+        - "map_equation": Map equation code length (for graphs, requires sparse adjacency X)
     """
     
     scores = {}
 
-    if y_true is None or len(np.unique(y_true)) <= 1:
-        for metric in metrics:
-            scores[metric] = 0.0
-        return scores
+    supervised_available = y_true is not None and len(np.unique(y_true)) > 1
 
     n_clusters = len(np.unique(y_pred))
     if n_clusters <= 1:
@@ -600,11 +599,11 @@ def _compute_clustering_scores(y_true, y_pred, metrics, X):
 
     for metric in metrics:
         if metric == "nmi":
-            score = normalized_mutual_info_score(y_true, y_pred)
+            score = normalized_mutual_info_score(y_true, y_pred) if supervised_available else 0.0
         elif metric == "ari":
-            score = adjusted_rand_score(y_true, y_pred)
+            score = adjusted_rand_score(y_true, y_pred) if supervised_available else 0.0
         elif metric == "ami":
-            score = adjusted_mutual_info_score(y_true, y_pred)
+            score = adjusted_mutual_info_score(y_true, y_pred) if supervised_available else 0.0
         elif metric == "ch":
             if X is None or sp.issparse(X):
                 score = 0.0  # CH not applicable to graphs
@@ -615,6 +614,11 @@ def _compute_clustering_scores(y_true, y_pred, metrics, X):
                 score = 0.0  # Modularity only for graphs
             else:
                 score = modularity(X, y_pred)
+        elif metric == "map_equation":
+            if X is None or not sp.issparse(X):
+                score = 0.0  # Map equation only for graphs
+            else:
+                score = map_equation(X, y_pred)
         else:
             raise ValueError(f"Unknown metric: {metric}")
 
@@ -726,6 +730,8 @@ def _aggregate_grid_search_results(results, metrics):
     """Aggregate grid search results to compute mean, std, best, and best_params for each metric."""
     successful_results = [r for r in results if r is not None]
     error_count = len(results) - len(successful_results)
+
+    minimize_metrics = {"map_equation"}
     
     if not successful_results:
         return {'error': f"All {len(results)} parameter combinations failed"}
@@ -757,7 +763,10 @@ def _aggregate_grid_search_results(results, metrics):
                 metric_params.append(result['final_params'])
         
         if metric_scores:
-            best_idx = np.argmax(metric_scores)
+            if metric in minimize_metrics:
+                best_idx = np.argmin(metric_scores)
+            else:
+                best_idx = np.argmax(metric_scores)
             best_params = metric_params[best_idx]
             best_full_scores = successful_results[best_idx]['scores']
             best_score_dict = best_full_scores[metric]
