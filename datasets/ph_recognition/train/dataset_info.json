@@ -1,0 +1,24 @@
+{
+  "citation": "",
+  "description": "",
+  "features": {
+    "f0": {
+      "dtype": "float64",
+      "_type": "Value"
+    },
+    "f1": {
+      "dtype": "float64",
+      "_type": "Value"
+    },
+    "f2": {
+      "dtype": "float64",
+      "_type": "Value"
+    },
+    "labels": {
+      "dtype": "float64",
+      "_type": "Value"
+    }
+  },
+  "homepage": "",
+  "license": ""
+}
