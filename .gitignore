@@ -29,3 +29,7 @@ scikit-learn/*.egg-info/
 scikit-learn/.eggs/
 
 CLAUDE.md
+
+# OpenCode context (agent-specific, not shared)
+.opencode/
+.tmp/
