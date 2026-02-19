@@ -16,6 +16,7 @@ from utils.file_manager import load_dataset, save_experiment_results
 from utils.logger import get_logger, set_logger_verbose
 from utils.modularity import modularity
 from utils.map_equation import map_equation
+from utils.graph_CH import graph_calinski_harabasz
 from competitors.disim import DiSim
 from competitors.dsc import DSC
 
@@ -94,7 +95,7 @@ def experiment(experiment_name, dataset_names, method_specs, config, load_path, 
     if not isinstance(metrics, (str,tuple,list)) :
         raise ValueError("Metrics must be a string (for a single metric) or a tuple/list of strings.")
 
-    valid_metrics = {"nmi", "ari", "ami", "ch", "dbcv", "modularity", "map_equation"}
+    valid_metrics = {"nmi", "ari", "ami", "ch", "dbcv", "modularity", "map_equation", "graph_ch"}
     invalid_metrics = set(metrics) - valid_metrics
     if invalid_metrics:
         raise ValueError(f"Invalid metrics: {invalid_metrics}. Valid metrics are: {valid_metrics}")
@@ -584,6 +585,7 @@ def _compute_clustering_scores(y_true, y_pred, metrics, X):
         - "ch": Calinski-Harabasz index (for point clouds, requires dense X)
         - "modularity": Newman modularity (for graphs, requires sparse adjacency X)
         - "map_equation": Map equation code length (for graphs, requires sparse adjacency X)
+        - "graph_ch": Graph CH index via random walk distance (for graphs, requires sparse adjacency X)
     """
     
     scores = {}
@@ -619,6 +621,11 @@ def _compute_clustering_scores(y_true, y_pred, metrics, X):
                 score = 0.0  # Map equation only for graphs
             else:
                 score = map_equation(X, y_pred)
+        elif metric == "graph_ch":
+            if X is None or not sp.issparse(X):
+                score = 0.0  # Graph CH only for graphs
+            else:
+                score = graph_calinski_harabasz(X, y_pred)
         else:
             raise ValueError(f"Unknown metric: {metric}")
 

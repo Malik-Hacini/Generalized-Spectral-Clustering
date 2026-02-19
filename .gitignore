@@ -15,6 +15,9 @@ sklearn-env/
 # Papers folder (research references)
 papers/
 
+#results of experiments
+results/
+
 # IDE
 .vscode/
 .idea/
