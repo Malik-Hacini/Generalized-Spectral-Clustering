@@ -24,7 +24,7 @@ def teleporting_undirected_measure(adjacency_matrix, alpha, t, epsilon=1e-8):
     Builds the undirected vertex measure:
     nu = ((1/N) * 1^T * P^t)^alpha
     
-    Uses power iteration for O(t * nnz) complexity instead of O(N²) matrix power.
+    Uses power iteration for O(t * log(n)) complexity instead of O(N²) matrix power.
     Note: The t iterations are inherently sequential (each depends on previous).
     The sparse mat-vec operations use optimized scipy/BLAS routines.
     """
