@@ -1,13 +1,10 @@
 {
   "params": {
-    "N": 500,
+    "N": 600,
     "K": 3,
-    "p": 0.05,
-    "p_in": 0.8,
-    "p_out": 0.1,
-    "delta": 0.3
+    "p": 0.05
   },
-  "eta_values": [
+  "gamma_values": [
     0.0,
     0.2,
     0.4,
@@ -18,134 +15,220 @@
   "seeds": [
     42,
     123,
-    456
+    456,
+    789,
+    101112
   ],
   "datasets": [
     {
-      "eta": 0.0,
+      "gamma": 0.0,
       "seed": 42,
-      "name": "dsbm_eta0.0_seed42",
-      "edges": 4137,
-      "asymmetry": 0.9662449754862836
+      "name": "dsbm_gamma0.0_seed42",
+      "edges": 8988,
+      "asymmetry": 0.9699657278894286
     },
     {
-      "eta": 0.0,
+      "gamma": 0.0,
       "seed": 123,
-      "name": "dsbm_eta0.0_seed123",
-      "edges": 4224,
-      "asymmetry": 0.9673875542459656
+      "name": "dsbm_gamma0.0_seed123",
+      "edges": 8799,
+      "asymmetry": 0.9675673615753216
     },
     {
-      "eta": 0.0,
+      "gamma": 0.0,
       "seed": 456,
-      "name": "dsbm_eta0.0_seed456",
-      "edges": 4140,
-      "asymmetry": 0.9747156789207134
+      "name": "dsbm_gamma0.0_seed456",
+      "edges": 8974,
+      "asymmetry": 0.9645245424719682
     },
     {
-      "eta": 0.2,
+      "gamma": 0.0,
+      "seed": 789,
+      "name": "dsbm_gamma0.0_seed789",
+      "edges": 8904,
+      "asymmetry": 0.9683792816244233
+    },
+    {
+      "gamma": 0.0,
+      "seed": 101112,
+      "name": "dsbm_gamma0.0_seed101112",
+      "edges": 8949,
+      "asymmetry": 0.9681025994920153
+    },
+    {
+      "gamma": 0.2,
       "seed": 42,
-      "name": "dsbm_eta0.2_seed42",
-      "edges": 4125,
-      "asymmetry": 0.9652108248018566
+      "name": "dsbm_gamma0.2_seed42",
+      "edges": 9094,
+      "asymmetry": 0.9733053685617334
     },
     {
-      "eta": 0.2,
+      "gamma": 0.2,
       "seed": 123,
-      "name": "dsbm_eta0.2_seed123",
-      "edges": 4297,
-      "asymmetry": 0.9647808388184578
+      "name": "dsbm_gamma0.2_seed123",
+      "edges": 8875,
+      "asymmetry": 0.9724360746726665
     },
     {
-      "eta": 0.2,
+      "gamma": 0.2,
       "seed": 456,
-      "name": "dsbm_eta0.2_seed456",
-      "edges": 4088,
-      "asymmetry": 0.9710642509472175
+      "name": "dsbm_gamma0.2_seed456",
+      "edges": 8997,
+      "asymmetry": 0.9730213404900276
     },
     {
-      "eta": 0.4,
+      "gamma": 0.2,
+      "seed": 789,
+      "name": "dsbm_gamma0.2_seed789",
+      "edges": 8989,
+      "asymmetry": 0.9695370844871012
+    },
+    {
+      "gamma": 0.2,
+      "seed": 101112,
+      "name": "dsbm_gamma0.2_seed101112",
+      "edges": 8810,
+      "asymmetry": 0.9728983263097327
+    },
+    {
+      "gamma": 0.4,
       "seed": 42,
-      "name": "dsbm_eta0.4_seed42",
-      "edges": 4371,
-      "asymmetry": 0.9729130414580458
+      "name": "dsbm_gamma0.4_seed42",
+      "edges": 8862,
+      "asymmetry": 0.9794483325005091
     },
     {
-      "eta": 0.4,
+      "gamma": 0.4,
       "seed": 123,
-      "name": "dsbm_eta0.4_seed123",
-      "edges": 4103,
-      "asymmetry": 0.9725909354995979
+      "name": "dsbm_gamma0.4_seed123",
+      "edges": 9012,
+      "asymmetry": 0.9771799701913496
     },
     {
-      "eta": 0.4,
+      "gamma": 0.4,
       "seed": 456,
-      "name": "dsbm_eta0.4_seed456",
-      "edges": 4279,
-      "asymmetry": 0.9778109662477128
+      "name": "dsbm_gamma0.4_seed456",
+      "edges": 8908,
+      "asymmetry": 0.9742864751536872
     },
     {
-      "eta": 0.6,
+      "gamma": 0.4,
+      "seed": 789,
+      "name": "dsbm_gamma0.4_seed789",
+      "edges": 8979,
+      "asymmetry": 0.9775326465846772
+    },
+    {
+      "gamma": 0.4,
+      "seed": 101112,
+      "name": "dsbm_gamma0.4_seed101112",
+      "edges": 8988,
+      "asymmetry": 0.9738617339145247
+    },
+    {
+      "gamma": 0.6,
       "seed": 42,
-      "name": "dsbm_eta0.6_seed42",
-      "edges": 4493,
-      "asymmetry": 0.9723387971911112
+      "name": "dsbm_gamma0.6_seed42",
+      "edges": 9018,
+      "asymmetry": 0.9793656474857206
     },
     {
-      "eta": 0.6,
+      "gamma": 0.6,
       "seed": 123,
-      "name": "dsbm_eta0.6_seed123",
-      "edges": 4561,
-      "asymmetry": 0.9706135668684304
+      "name": "dsbm_gamma0.6_seed123",
+      "edges": 8958,
+      "asymmetry": 0.978791493059296
     },
     {
-      "eta": 0.6,
+      "gamma": 0.6,
       "seed": 456,
-      "name": "dsbm_eta0.6_seed456",
-      "edges": 4391,
-      "asymmetry": 0.9739222337627121
+      "name": "dsbm_gamma0.6_seed456",
+      "edges": 9049,
+      "asymmetry": 0.9792190804802456
     },
     {
-      "eta": 0.8,
+      "gamma": 0.6,
+      "seed": 789,
+      "name": "dsbm_gamma0.6_seed789",
+      "edges": 9059,
+      "asymmetry": 0.9824912604732874
+    },
+    {
+      "gamma": 0.6,
+      "seed": 101112,
+      "name": "dsbm_gamma0.6_seed101112",
+      "edges": 9038,
+      "asymmetry": 0.9776777134198654
+    },
+    {
+      "gamma": 0.8,
       "seed": 42,
-      "name": "dsbm_eta0.8_seed42",
-      "edges": 4796,
-      "asymmetry": 0.9683892697555966
+      "name": "dsbm_gamma0.8_seed42",
+      "edges": 8862,
+      "asymmetry": 0.9861042102462552
     },
     {
-      "eta": 0.8,
+      "gamma": 0.8,
       "seed": 123,
-      "name": "dsbm_eta0.8_seed123",
-      "edges": 4699,
-      "asymmetry": 0.9760267918241855
+      "name": "dsbm_gamma0.8_seed123",
+      "edges": 9067,
+      "asymmetry": 0.9846767777728541
     },
     {
-      "eta": 0.8,
+      "gamma": 0.8,
       "seed": 456,
-      "name": "dsbm_eta0.8_seed456",
-      "edges": 4781,
-      "asymmetry": 0.9760246183084783
+      "name": "dsbm_gamma0.8_seed456",
+      "edges": 9046,
+      "asymmetry": 0.9874761618923652
     },
     {
-      "eta": 1.0,
+      "gamma": 0.8,
+      "seed": 789,
+      "name": "dsbm_gamma0.8_seed789",
+      "edges": 8831,
+      "asymmetry": 0.9880680104106305
+    },
+    {
+      "gamma": 0.8,
+      "seed": 101112,
+      "name": "dsbm_gamma0.8_seed101112",
+      "edges": 8939,
+      "asymmetry": 0.9846793782858319
+    },
+    {
+      "gamma": 1.0,
       "seed": 42,
-      "name": "dsbm_eta1.0_seed42",
-      "edges": 5008,
-      "asymmetry": 0.975148945302182
+      "name": "dsbm_gamma1.0_seed42",
+      "edges": 8975,
+      "asymmetry": 0.9917885871562737
     },
     {
-      "eta": 1.0,
+      "gamma": 1.0,
       "seed": 123,
-      "name": "dsbm_eta1.0_seed123",
-      "edges": 5119,
-      "asymmetry": 0.9730148707864795
+      "name": "dsbm_gamma1.0_seed123",
+      "edges": 9019,
+      "asymmetry": 0.9907292999372467
     },
     {
-      "eta": 1.0,
+      "gamma": 1.0,
       "seed": 456,
-      "name": "dsbm_eta1.0_seed456",
-      "edges": 4975,
-      "asymmetry": 0.9745939828025375
+      "name": "dsbm_gamma1.0_seed456",
+      "edges": 8803,
+      "asymmetry": 0.9920795313185201
+    },
+    {
+      "gamma": 1.0,
+      "seed": 789,
+      "name": "dsbm_gamma1.0_seed789",
+      "edges": 8961,
+      "asymmetry": 0.9911119223407144
+    },
+    {
+      "gamma": 1.0,
+      "seed": 101112,
+      "name": "dsbm_gamma1.0_seed101112",
+      "edges": 9001,
+      "asymmetry": 0.9924736063497684
     }
   ]
 }

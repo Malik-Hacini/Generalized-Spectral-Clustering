@@ -1,4 +1,0 @@
-method,ami_mean_across_grid,ami_std_across_grid,ami_best_mean,ami_best_std,modularity_mean_across_grid,modularity_std_across_grid,modularity_best_mean,modularity_best_std
-SC-N,1.0,0.0,1.0,0.0,0.472,0.0,0.472,0.0
-GSC-N,0.996,0.006,1.0,0.0,0.472,0.0,0.472,0.0
-GSC-UN,0.7,0.458,1.0,0.0,0.33,0.216,0.472,0.0

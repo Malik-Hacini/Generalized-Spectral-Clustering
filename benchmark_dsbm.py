@@ -18,7 +18,7 @@ Basic experiment config:
 save_path = "results"
 experiment_name = "benchmark_dsbm"
 mode = "grid_search"
-metrics = ("ami", "graph_ch")
+metrics = ("ami", "graph_ch", "modularity", "map_equation")
 n_jobs = -1
 verbose = True
 
