@@ -15,6 +15,9 @@ sklearn-env/
 # Papers folder (research references)
 papers/
 
+
+#web scraping
+.firecrawl/
 #results of experiments
 results/
 
