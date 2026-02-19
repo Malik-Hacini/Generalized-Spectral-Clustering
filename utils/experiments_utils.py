@@ -14,9 +14,9 @@ from sklearn.preprocessing import StandardScaler # type: ignore
 from sklearn.metrics import normalized_mutual_info_score, adjusted_rand_score, adjusted_mutual_info_score, calinski_harabasz_score # type: ignore
 from utils.file_manager import load_dataset, save_experiment_results
 from utils.logger import get_logger, set_logger_verbose
-from utils.modularity import modularity
-from utils.map_equation import map_equation
-from utils.graph_CH import graph_calinski_harabasz
+from utils.metrics.modularity import modularity
+from utils.metrics.map_equation import map_equation
+from utils.metrics.graph_CH import graph_calinski_harabasz
 from competitors.disim import DiSim
 from competitors.dsc import DSC
 
@@ -564,7 +564,8 @@ def _process_method_on_dataset(dataset_name, method_spec, params, X, y, metrics)
 
         y_pred = y_pred.astype(int)
 
-        scores = _compute_clustering_scores(y, y_pred, metrics, X)
+        metric_params = params.get("metric_params", None)
+        scores = _compute_clustering_scores(y, y_pred, metrics, X, metric_params=metric_params)
 
         return y_pred, scores, None
 
@@ -572,7 +573,7 @@ def _process_method_on_dataset(dataset_name, method_spec, params, X, y, metrics)
         error = str(e)
         return None, None, error
     
-def _compute_clustering_scores(y_true, y_pred, metrics, X):
+def _compute_clustering_scores(y_true, y_pred, metrics, X, metric_params=None):
     """Compute clustering scores for specified metrics.
     
     Available metrics:
@@ -586,8 +587,20 @@ def _compute_clustering_scores(y_true, y_pred, metrics, X):
         - "modularity": Newman modularity (for graphs, requires sparse adjacency X)
         - "map_equation": Map equation code length (for graphs, requires sparse adjacency X)
         - "graph_ch": Graph CH index via random walk distance (for graphs, requires sparse adjacency X)
+    
+    Parameters
+    ----------
+    metric_params : dict, optional
+        Optional mapping of metric name to kwargs dict. Example:
+        {"graph_ch": {"filter_coeffs": {1: 0.5, 2: 0.5}, "weighted": False}}
+        If omitted, all metrics use their default parameters.
     """
     
+    if metric_params is None:
+        metric_params = {}
+    elif not isinstance(metric_params, dict):
+        raise ValueError("'metric_params' must be a dict mapping metric names to kwargs dicts")
+
     scores = {}
 
     supervised_available = y_true is not None and len(np.unique(y_true)) > 1
@@ -600,6 +613,12 @@ def _compute_clustering_scores(y_true, y_pred, metrics, X):
 
 
     for metric in metrics:
+        metric_kwargs = metric_params.get(metric, {})
+        if metric_kwargs is None:
+            metric_kwargs = {}
+        if not isinstance(metric_kwargs, dict):
+            raise ValueError(f"Metric parameters for '{metric}' must be a dict or None")
+
         if metric == "nmi":
             score = normalized_mutual_info_score(y_true, y_pred) if supervised_available else 0.0
         elif metric == "ari":
@@ -625,7 +644,7 @@ def _compute_clustering_scores(y_true, y_pred, metrics, X):
             if X is None or not sp.issparse(X):
                 score = 0.0  # Graph CH only for graphs
             else:
-                score = graph_calinski_harabasz(X, y_pred)
+                score = graph_calinski_harabasz(X, y_pred, **metric_kwargs)
         else:
             raise ValueError(f"Unknown metric: {metric}")
 
@@ -671,58 +690,71 @@ def _create_cluster_plot(X, y_pred, explicit_name, dataset_name, timing,
             horizontalalignment="left", verticalalignment="top",
             bbox=dict(boxstyle="round,pad=0.3", facecolor="white", alpha=0.8))
 
+def _is_callable_param_spec(value):
+    return isinstance(value, tuple) and len(value) == 2 and callable(value[0]) and isinstance(value[1], dict)
+
+
+def _is_grid_iterable(value):
+    if isinstance(value, (str, bytes, dict)):
+        return False
+    if not isinstance(value, Iterable):
+        return False
+    try:
+        return len(value) > 1
+    except TypeError:
+        return False
+
+
 def _resolve_grid_params(resolved_params):
-    """Resolve grid search parameters by expanding callables and creating parameter combinations."""
-    
-    # This is not very clean nor readable, but works. Difficulty is looking for the grid params in the args of callable params, then the normal grid params, without repeating code.
-    # Will try to refactor.
+    """Resolve grid-search parameters from resolved params.
+
+    Expands callable parameters of the form (func, kwargs) when kwargs contain
+    iterable grid arguments, and then builds a standard Cartesian product over
+    top-level grid parameters.
+    """
     expanded_params = {}
-    
-    # First pass: expand callable parameters with grid search kwargs
+
+    # First pass: expand callable parameters with grid kwargs in their kwargs dict.
     for param_name, param_value in resolved_params.items():
-        if isinstance(param_value, tuple) and len(param_value) == 2 and callable(param_value[0]) and isinstance(param_value[1], dict):
+        if _is_callable_param_spec(param_value):
             func, kwargs = param_value
-            
-            # Separate grid kwargs from fixed kwargs
             grid_kwargs = {}
             fixed_kwargs = {}
-            
+
             for arg, arg_value in kwargs.items():
-                if isinstance(arg_value, Iterable) and not isinstance(arg_value, str) and len(arg_value) > 1:
+                if _is_grid_iterable(arg_value):
                     grid_kwargs[arg] = arg_value
                 else:
                     fixed_kwargs[arg] = arg_value
-            
-            # If there are grid parameters in kwargs, create combinations
+
             if grid_kwargs:
                 grid_keys = list(grid_kwargs.keys())
                 grid_values = list(grid_kwargs.values())
                 combinations = list(product(*grid_values))
-                
-                # Create list of (func, kwargs_dict) tuples for each combination
+
                 func_combinations = []
                 for combination in combinations:
                     current_kwargs = fixed_kwargs.copy()
                     current_kwargs.update(dict(zip(grid_keys, combination)))
                     func_combinations.append((func, current_kwargs))
-                
+
                 expanded_params[param_name] = func_combinations
                 continue
-        
+
         expanded_params[param_name] = param_value
-    
-    #Second pass : treat normal params (not callables)
+
+    # Second pass: split into top-level grid params vs fixed/base params.
     grid_params = {}
     base_params = {}
-    
+
     for param_name, param_value in expanded_params.items():
-        if not(isinstance(param_value, tuple) and len(param_value) == 2 and callable(param_value[0]) and isinstance(param_value[1], dict)): #If not (callable, dict) 
-            # Previous condition needed because (callable, dict) fverifies this one while not being a grid param
-            if isinstance(param_value, Iterable) and not isinstance(param_value, str) and len(param_value) > 1: 
-                grid_params[param_name] = param_value
+        if _is_callable_param_spec(param_value):
+            base_params[param_name] = param_value
+        elif _is_grid_iterable(param_value):
+            grid_params[param_name] = param_value
         else:
-                base_params[param_name] = param_value
-        
+            base_params[param_name] = param_value
+
     if grid_params:
         param_names = list(grid_params.keys())
         param_values = list(grid_params.values())
@@ -730,7 +762,7 @@ def _resolve_grid_params(resolved_params):
     else:
         param_names = []
         combinations = []
-    
+
     return grid_params, base_params, param_names, combinations
 
 def _aggregate_grid_search_results(results, metrics):
@@ -799,6 +831,3 @@ def _ignore_warnings():
     warnings.filterwarnings("ignore",
         message="Graph is not fully connected, spectral embedding may not work as expected.",
         category=UserWarning)
-
-
-

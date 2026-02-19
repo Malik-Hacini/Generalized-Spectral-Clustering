@@ -116,11 +116,11 @@ class ExperimentConfig:
         """Filter parameters to only include those used by the method."""
         method_param_mapping = {
             "spectral": {"n_clusters", "n_neighbors", "affinity", "laplacian_method",
-                        "measure", "random_state", "callable_kwargs", "standard","eigen_solver","eigen_tol" "n_it"},
-            "kmeans": {"n_clusters", "random_state", "n_it"},
+                        "measure", "random_state", "callable_kwargs", "standard", "eigen_solver", "eigen_tol", "n_it", "metric_params"},
+            "kmeans": {"n_clusters", "random_state", "n_it", "metric_params"},
 
-            "dsc": {"n_clusters", "n_neighbors", "gamma", "max_iter", "tol", "epsilon", "random_state", "n_it"},
-            "di_sim": {"n_clusters", "n_neighbors", "tau", "embedding", "epsilon", "random_state", "n_it"},
+            "dsc": {"n_clusters", "n_neighbors", "gamma", "max_iter", "tol", "epsilon", "random_state", "n_it", "metric_params"},
+            "di_sim": {"n_clusters", "n_neighbors", "tau", "embedding", "epsilon", "random_state", "n_it", "metric_params"},
         }
 
         if method_implicit_name in method_param_mapping:

@@ -128,10 +128,6 @@ def graph_calinski_harabasz(A, labels, filter_coeffs=None, weighted=False, epsil
         inv_sqrt_phi = 1.0 / np.sqrt(np.maximum(phi, epsilon))
         Z = Z.multiply(inv_sqrt_phi[np.newaxis, :]) if sp.issparse(Z) else Z * inv_sqrt_phi[np.newaxis, :]
 
-    # Convert to dense for CH computation (Z rows are the node representations)
-    if sp.issparse(Z):
-        Z = Z.toarray()
-
     # Compute CH using efficient vectorised pairwise distance identity
     return _compute_ch_from_embeddings(Z, labels, n_clusters)
 
@@ -199,7 +195,7 @@ def _apply_polynomial_filter(P, filter_coeffs):
 def _estimate_stationary(P, epsilon, max_iter=1000, tol=1e-10):
     """Estimate stationary distribution via power iteration.
 
-    For directed graphs this may not converge; falls back to uniform.
+    For directed graphs this may not converge; returns the last iterate.
     """
     n = P.shape[0]
     pi = np.ones(n) / n
@@ -228,7 +224,7 @@ def _compute_ch_from_embeddings(Z, labels, n_clusters):
 
     Parameters
     ----------
-    Z : ndarray of shape (n, d)
+    Z : ndarray or scipy.sparse matrix of shape (n, d)
         Embedding matrix (rows are node representations).
     labels : ndarray of shape (n,)
         Cluster labels.
@@ -242,14 +238,19 @@ def _compute_ch_from_embeddings(Z, labels, n_clusters):
     """
     n = Z.shape[0]
 
-    # Precompute squared norms of each row
-    row_sq_norms = np.sum(Z ** 2, axis=1)  # shape (n,)
+    if sp.issparse(Z):
+        Z = Z.tocsr()
+        row_sq_norms = np.asarray(Z.multiply(Z).sum(axis=1)).ravel()  # shape (n,)
+        global_sum = np.asarray(Z.sum(axis=0)).ravel()
+    else:
+        Z = np.asarray(Z)
+        row_sq_norms = np.sum(Z ** 2, axis=1)  # shape (n,)
+        global_sum = np.sum(Z, axis=0)
 
     # Total sum of pairwise squared distances:
     # sum_{x,y} ||Z_x - Z_y||^2 = 2n * sum ||Z_x||^2 - 2 * ||sum Z_x||^2
-    total_sq_norm_sum = row_sq_norms.sum()
-    global_sum = Z.sum(axis=0)
-    global_sum_sq_norm = np.sum(global_sum ** 2)
+    total_sq_norm_sum = float(row_sq_norms.sum())
+    global_sum_sq_norm = float(np.dot(global_sum, global_sum))
     tss_pairwise = 2 * n * total_sq_norm_sum - 2 * global_sum_sq_norm
 
     # TSS = (1/2n) * sum_{x,y} ||Z_x - Z_y||^2
@@ -259,14 +260,17 @@ def _compute_ch_from_embeddings(Z, labels, n_clusters):
     wcss = 0.0
     unique_labels = np.unique(labels)
     for c in unique_labels:
-        mask = labels == c
-        n_c = mask.sum()
+        idx = np.where(labels == c)[0]
+        n_c = idx.size
         if n_c <= 1:
             continue
 
-        cluster_sq_norm_sum = row_sq_norms[mask].sum()
-        cluster_sum = Z[mask].sum(axis=0)
-        cluster_sum_sq_norm = np.sum(cluster_sum ** 2)
+        cluster_sq_norm_sum = float(row_sq_norms[idx].sum())
+        if sp.issparse(Z):
+            cluster_sum = np.asarray(Z[idx].sum(axis=0)).ravel()
+        else:
+            cluster_sum = np.sum(Z[idx], axis=0)
+        cluster_sum_sq_norm = float(np.dot(cluster_sum, cluster_sum))
 
         # sum_{x,y in C_c} ||Z_x - Z_y||^2 = 2*n_c * sum||Z_x||^2 - 2*||sum Z_x||^2
         wcss_c_pairwise = 2 * n_c * cluster_sq_norm_sum - 2 * cluster_sum_sq_norm
