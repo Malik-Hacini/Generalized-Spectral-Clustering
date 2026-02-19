@@ -13,8 +13,12 @@ MISC :
 
 - complexity : O(n^2 log n) , same for SC and GSC (w/o grid search) : BASICALLY DONE, cleanup the latex a bit.
 
+ - compare grid cost ( x S)and N growing.
+
 - Add github link to paper preprint.
 
+
+- analysis of datasets : connectivity, directionality, degree distribution.
 
 problem : no CH for gridsearch...  need an unsupervised metrics for real networks.
 

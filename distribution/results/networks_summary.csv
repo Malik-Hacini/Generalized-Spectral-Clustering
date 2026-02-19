@@ -1,0 +1,4 @@
+dataset,type,N,k_clusters,in_degree_mean,in_degree_std,in_degree_min,in_degree_max,reciprocity,cl_reciprocity,nnz,mean_out_degree
+email_eu_core,graph,1005,42,25.44,27.96,0,212,0.7185,0.5422,25571,25.44
+polblogs,graph,814,2,19.58,32.72,1,271,0.2897,0.8599,15939,19.58
+wiki_vote,graph,7115,5,14.57,31.73,0,457,0.0565,0.097,103689,14.57
