@@ -25,11 +25,65 @@ from metric_analysis.specs import resolve_metric_specs
 from metric_analysis.stats import compute_grid_correlations, summarize_metrics
 
 
+def _apply_profile_filter(grid_long_df: pd.DataFrame, profile_id: str | None) -> tuple[pd.DataFrame, str | None]:
+    """Filter profile-swept grids to a single profile when requested.
+
+    Returns
+    -------
+    (filtered_df, selected_profile_id)
+        selected_profile_id is None when no profile dimension exists.
+    """
+    if "profile_id" not in grid_long_df.columns:
+        return grid_long_df, None
+
+    present = sorted(
+        {
+            str(v)
+            for v in grid_long_df["profile_id"].dropna().unique().tolist()
+            if str(v).strip() != ""
+        }
+    )
+
+    if not present:
+        return grid_long_df, None
+
+    if profile_id is not None:
+        if profile_id not in present:
+            raise ValueError(
+                f"Requested profile_id '{profile_id}' not found. Available: {present}"
+            )
+        filtered = grid_long_df[grid_long_df["profile_id"] == profile_id].copy()
+        return filtered, profile_id
+
+    # If profile-swept Graph-CH is present and user did not choose a profile,
+    # fail loudly to avoid misleading pooled correlations.
+    graph_ch_rows = grid_long_df[grid_long_df["metric"] == "graph_ch"]
+    graph_ch_profiles = sorted(
+        {
+            str(v)
+            for v in graph_ch_rows["profile_id"].dropna().unique().tolist()
+            if str(v).strip() != ""
+        }
+    )
+
+    if len(graph_ch_profiles) > 1:
+        raise RuntimeError(
+            "Detected multiple graph_ch profiles in results. "
+            "Please set --profile-id to analyze a single filter profile. "
+            f"Available profiles: {graph_ch_profiles}"
+        )
+
+    selected = graph_ch_profiles[0] if graph_ch_profiles else present[0]
+    filtered = grid_long_df[grid_long_df["profile_id"] == selected].copy()
+    return filtered, selected
+
+
 def _write_index(
     out_dir: Path,
     summary_df: pd.DataFrame,
     metric_names: list[str],
     results_dir: Path,
+    selected_profile_id: str | None,
 ) -> None:
     ranked = summary_df.sort_values(
         ["mean_selected_minus_sc", "overall_spearman_aligned", "mean_selection_regret"],
@@ -49,6 +103,7 @@ def _write_index(
         "",
         f"- Results directory: `{results_dir}`",
         f"- Proxy metrics: `{', '.join(metric_names)}`",
+        f"- Profile filter: `{selected_profile_id}`" if selected_profile_id else "- Profile filter: none",
         "",
         "## Output structure",
         "",
@@ -106,6 +161,11 @@ def _parse_args() -> argparse.Namespace:
         default=None,
         help="Output directory (default: <results-dir>/metric_analysis)",
     )
+    parser.add_argument(
+        "--profile-id",
+        default=None,
+        help="Optional profile_id filter for profile-swept runs (e.g. delta_k01)",
+    )
     return parser.parse_args()
 
 
@@ -134,6 +194,12 @@ def main() -> None:
         gsc_method=args.gsc_method,
         sc_method=args.sc_method,
     )
+
+    grid_long_df, selected_profile_id = _apply_profile_filter(grid_long_df, args.profile_id)
+
+    if selected_profile_id:
+        baseline_keep = set(grid_long_df["dataset"].unique().tolist())
+        baseline_df = baseline_df[baseline_df["dataset"].isin(baseline_keep)].copy()
 
     selection_df = compute_dataset_selection(grid_long_df=grid_long_df, baseline_df=baseline_df)
     overall_corr_df, corr_by_gamma_df, corr_by_dataset_df = compute_grid_correlations(grid_long_df)
@@ -176,6 +242,7 @@ def main() -> None:
         "proxy_metrics": [spec.name for spec in metric_specs],
         "gsc_method": args.gsc_method,
         "sc_method": args.sc_method,
+        "profile_id": selected_profile_id,
         "n_grid_rows": int(len(grid_long_df)),
         "n_selection_rows": int(len(selection_df)),
     }
@@ -187,6 +254,7 @@ def main() -> None:
         summary_df=summary_df,
         metric_names=[spec.name for spec in metric_specs],
         results_dir=results_dir,
+        selected_profile_id=selected_profile_id,
     )
 
     print(f"Saved metric analysis to: {out_dir}")

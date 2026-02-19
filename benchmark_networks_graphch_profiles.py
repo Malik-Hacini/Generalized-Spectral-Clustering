@@ -1,10 +1,5 @@
-"""DSBM benchmark with Graph-CH filter-profile sweep.
+"""Network benchmark: Graph-CH filter-profile sweep (SC-N vs GSC-N)."""
 
-This benchmark is dedicated to evaluating Graph-CH as an unsupervised proxy for AMI
-under different polynomial filters g(P)=sum_k a_k P^k.
-"""
-
-import os
 import time
 
 import numpy as np
@@ -16,12 +11,6 @@ from utils.experiments_utils import experiment
 
 
 def _build_graph_ch_metric_params_grid() -> list[dict]:
-    """Create Graph-CH profile grid.
-
-    Profiles include:
-    - delta_k  : single-scale filters g(P)=P^k
-    - prefix_k : multiscale filters g(P)=sum_{j=1..k} P^j
-    """
     profiles: list[dict] = []
 
     delta_scales = [1, 2, 3, 4, 5, 6, 8, 10, 12]
@@ -39,7 +28,7 @@ def _build_graph_ch_metric_params_grid() -> list[dict]:
             }
         )
 
-    prefix_scales = [2, 3, 4, 5, 6, 8, 10, 12]
+    prefix_scales = [2,  4,  6, 8, 10, 12]
     for k in prefix_scales:
         profiles.append(
             {
@@ -57,30 +46,25 @@ def _build_graph_ch_metric_params_grid() -> list[dict]:
     return profiles
 
 
-# Basic experiment config
 save_path = "results"
-experiment_name = "benchmark_dsbm_graphch_profiles"
+experiment_name = "benchmark_networks_graphch_profiles"
 mode = "grid_search"
-metrics = ("ami", "graph_ch", "modularity", "map_equation")
+metrics = ("ami", "graph_ch")
 n_jobs = -1
 verbose = True
 
-# Datasets and methods configuration
-load_path = "DSBM_datasets"
-dataset_names = sorted(
-    [
-        name
-        for name in os.listdir(load_path)
-        if os.path.isdir(os.path.join(load_path, name)) and name.startswith("dsbm_gamma")
-    ]
-)
+load_path = "datasets"
+dataset_names = [
+    "email_eu_core",
+    "polblogs",
+    #"wiki_vote",
+]
 
 method_specs = [
     ("spectral", "SC-N"),
     ("spectral", "GSC-N"),
 ]
 
-# Parameters
 default_params = {
     "n_neighbors": (log_neighbors, {"factor": 1}),
     "random_state": 42,
@@ -89,19 +73,16 @@ default_params = {
     "assign_labels": "kmeans",
     "measure": (
         teleporting_undirected_measure,
-        {"alpha": np.arange(0.0, 2.0, 0.5), "t": range(0, 11)},
+        {"alpha": np.arange(0, 3, 0.2), "t": range(0, 20)},
     ),
-    # Grid-search over Graph-CH filter profiles (forwarded to metric via metric_params).
     "metric_params": _build_graph_ch_metric_params_grid(),
 }
 
 dataset_params = []
-
 method_params = [
     ("SC-N", {"laplacian_method": "norm", "standard": True, "measure": None}),
     ("GSC-N", {"laplacian_method": "norm"}),
 ]
-
 method_dataset_params = []
 
 config = ExperimentConfig(
@@ -113,9 +94,8 @@ config = ExperimentConfig(
 
 
 if __name__ == "__main__":
-    print(f"Running {len(dataset_names)} DSBM datasets")
+    print(f"Datasets: {dataset_names}")
     print(f"Graph-CH profiles: {len(default_params['metric_params'])}")
-
     start = time.time()
     experiment(
         experiment_name=experiment_name,

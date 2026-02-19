@@ -43,6 +43,27 @@ def _parse_measure_params(entry: dict) -> tuple[float, float]:
     return alpha, t
 
 
+def _parse_profile_params(entry: dict) -> tuple[str | None, str | None, float | None]:
+    metric_params = entry.get("metric_params", None)
+    if not isinstance(metric_params, dict):
+        return None, None, None
+
+    profile_id = metric_params.get("profile_id", None)
+    profile_family = metric_params.get("profile_family", None)
+    profile_scale = metric_params.get("profile_scale", None)
+
+    profile_id = str(profile_id) if profile_id is not None else None
+    profile_family = str(profile_family) if profile_family is not None else None
+
+    if profile_scale is not None:
+        try:
+            profile_scale = float(profile_scale)
+        except Exception:
+            profile_scale = None
+
+    return profile_id, profile_family, profile_scale
+
+
 def _extract_metric_value(entry: dict, metric_name: str) -> float:
     if metric_name not in entry:
         raise KeyError(metric_name)
@@ -146,6 +167,7 @@ def load_grid_and_baselines(
                 ) from exc
 
             alpha, t = _parse_measure_params(entry)
+            profile_id, profile_family, profile_scale = _parse_profile_params(entry)
 
             for spec in metric_specs:
                 try:
@@ -169,6 +191,9 @@ def load_grid_and_baselines(
                         "metric_optimize": spec.optimize,
                         "metric_raw": float(metric_raw),
                         "metric_aligned": spec.aligned_value(float(metric_raw)),
+                        "profile_id": profile_id,
+                        "profile_family": profile_family,
+                        "profile_scale": profile_scale,
                     }
                 )
                 seen_metric_counter[spec.name] += 1

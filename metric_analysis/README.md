@@ -1,41 +1,53 @@
 # Metric Analysis
 
-This package runs proxy-metric analysis for DSBM benchmark outputs.
+Utilities for AMI-proxy analysis of GSC grid-search results.
 
-It evaluates how well proxy metrics (e.g. `graph_ch`, `modularity`, `map_equation`)
-track AMI on the GSC grid and how well they select hyperparameters `(alpha, t)`
-without label access.
+The package supports:
+- DSBM proxy analysis (`graph_ch`, `modularity`, `map_equation`)
+- merging split DSBM runs into one all-metrics tree
+- network-specific analyses:
+  - Graph-CH filter-profile comparison
+  - modularity/map-equation comparison
+  - best-Graph-CH-vs-others comparison
 
-## Usage
+## DSBM workflow
 
-Run on an existing grid-search benchmark directory:
+If Graph-CH and (modularity/map-equation) were run separately, merge first:
 
 ```bash
-source .venv/bin/activate
-python -m metric_analysis.cli \
-  --results-dir results/benchmark_dsbm_grid_search \
-  --proxy-metrics graph_ch modularity map_equation
+python -m metric_analysis.merge_benchmark_runs \
+  --graphch-root results/benchmark_dsbm_graphch_profiles_grid_search \
+  --modmap-root results/benchmark_dsbm_grid_search \
+  --output-root results/benchmark_dsbm_all_metrics_profiles_grid_search
 ```
 
-Custom output directory:
+Analyze with a single Graph-CH profile (required for profile-swept runs):
 
 ```bash
 python -m metric_analysis.cli \
-  --results-dir results/benchmark_dsbm_grid_search \
+  --results-dir results/benchmark_dsbm_all_metrics_profiles_grid_search \
   --proxy-metrics graph_ch modularity map_equation \
-  --out-dir results/benchmark_dsbm_grid_search/metric_analysis_all
+  --profile-id delta_k01
 ```
 
-## Output structure
+## Network workflow
 
-- `manifests/run_config.json`: run metadata
-- `tables/*.csv`: raw and aggregated statistics
-- `figures/per_metric/<metric>/*.pdf`: metric-specific plots
-- `figures/cross_metric/*.pdf`: cross-metric comparisons
-- `index.md`: human-readable summary and reading order
+Run these analyses on finished benchmark outputs:
+
+```bash
+python -m metric_analysis.networks_graphch_profiles_analysis \
+  --results-dir results/benchmark_networks_graphch_profiles_grid_search
+
+python -m metric_analysis.networks_other_metrics_analysis \
+  --results-dir results/benchmark_networks_other_metrics_grid_search
+
+python -m metric_analysis.networks_compare_best_graphch \
+  --graphch-analysis-dir results/benchmark_networks_graphch_profiles_grid_search/analysis_graphch_profiles \
+  --other-analysis-dir results/benchmark_networks_other_metrics_grid_search/analysis_other_metrics \
+  --out-dir results/benchmark_networks_metric_comparison
+```
 
 ## Notes
 
-- For `map_equation` (minimize), the analysis also uses an aligned value (`-map_equation`)
-  for fair correlation comparison against maximize-type metrics.
-- Selection is done by maximizing aligned proxy value.
+- `map_equation` is minimized; aligned score is `-map_equation` for fair correlation comparisons.
+- In profile-swept Graph-CH runs, pooling all profiles in one correlation is misleading; use `--profile-id`.

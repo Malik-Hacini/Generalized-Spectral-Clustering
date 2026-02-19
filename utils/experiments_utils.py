@@ -598,6 +598,14 @@ def _compute_clustering_scores(y_true, y_pred, metrics, X, metric_params=None):
     
     if metric_params is None:
         metric_params = {}
+    elif isinstance(metric_params, list):
+        if len(metric_params) == 1 and isinstance(metric_params[0], dict):
+            metric_params = metric_params[0]
+        else:
+            raise ValueError(
+                "'metric_params' must resolve to a dict at scoring time. "
+                "If you pass a list for grid search, it must be expanded by the grid resolver."
+            )
     elif not isinstance(metric_params, dict):
         raise ValueError("'metric_params' must be a dict mapping metric names to kwargs dicts")
 
