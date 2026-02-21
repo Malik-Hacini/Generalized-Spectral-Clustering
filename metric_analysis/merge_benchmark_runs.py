@@ -23,21 +23,46 @@ import pandas as pd
 
 
 DATASET_RE = re.compile(r"^dsbm_gamma(?P<gamma>\d+(?:\.\d+)?)_seed(?P<seed>\d+)$")
+ETA_RE = re.compile(r"eta(?P<eta>\d+(?:\.\d+)?)")
+SEED_RE = re.compile(r"seed(?P<seed>\d+)")
 METRICS = ("ami", "graph_ch", "modularity", "map_equation")
 MINIMIZE_METRICS = {"map_equation"}
 
 
 def _dataset_names(root: Path) -> list[str]:
-    names: list[tuple[float, int, str]] = []
-    for entry in root.iterdir():
-        if not entry.is_dir():
+    target = "GSC-N_all_results.json"
+    names: list[str] = []
+    seen: set[str] = set()
+
+    for p in root.rglob(target):
+        method_dir = p.parent
+        if method_dir.name != "GSC-N":
             continue
-        m = DATASET_RE.match(entry.name)
-        if m is None:
+        dataset_dir = method_dir.parent
+        rel_name = dataset_dir.relative_to(root).as_posix()
+        if rel_name in seen:
             continue
-        names.append((float(m.group("gamma")), int(m.group("seed")), entry.name))
-    names.sort(key=lambda x: (x[0], x[1]))
-    return [name for _, _, name in names]
+        seen.add(rel_name)
+        names.append(rel_name)
+
+    def _sort_key(name: str, idx: int) -> tuple[int, float, int, str]:
+        base = Path(name).name
+        m = DATASET_RE.match(base)
+        if m is not None:
+            return 0, float(m.group("gamma")), int(m.group("seed")), name
+
+        eta = ETA_RE.search(base)
+        seed = SEED_RE.search(base)
+        if eta is not None:
+            seed_value = int(seed.group("seed")) if seed is not None else idx
+            return 1, float(eta.group("eta")), seed_value, name
+
+        seed_value = int(seed.group("seed")) if seed is not None else idx
+        return 2, float(idx), seed_value, name
+
+    indexed_names = list(enumerate(names))
+    indexed_names.sort(key=lambda item: _sort_key(item[1], item[0]))
+    return [name for _, name in indexed_names]
 
 
 def _json_load(path: Path):
@@ -190,7 +215,7 @@ def merge_runs(
             summary_rows.append(_compute_summary_row(method_name, merged_all))
 
         summary_df = pd.DataFrame(summary_rows)
-        summary_df.to_csv(out_dataset / f"{dataset}_summary.csv", index=False)
+        summary_df.to_csv(out_dataset / f"{out_dataset.name}_summary.csv", index=False)
 
     source_param_candidates = sorted(graphch_root.glob("*_params.json"))
     if source_param_candidates:

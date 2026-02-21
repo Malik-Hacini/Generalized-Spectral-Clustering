@@ -30,11 +30,11 @@ def style_matplotlib() -> None:
     )
 
 
-def _mean_ci(df: pd.DataFrame, value_col: str) -> pd.DataFrame:
-    grouped = df.groupby("gamma")[value_col].agg(["mean", "std", "count"]).reset_index()
+def _mean_ci(df: pd.DataFrame, value_col: str, axis_col: str = "gamma") -> pd.DataFrame:
+    grouped = df.groupby(axis_col)[value_col].agg(["mean", "std", "count"]).reset_index()
     grouped["std"] = grouped["std"].fillna(0.0)
     grouped["ci95"] = 1.96 * grouped["std"] / np.sqrt(grouped["count"].clip(lower=1))
-    return grouped.sort_values("gamma")
+    return grouped.sort_values(axis_col)
 
 
 def _ensure_parent(path: Path) -> None:
@@ -98,7 +98,11 @@ def plot_metric_ami_vs_proxy(
     plt.close(fig)
 
 
-def plot_metric_corr_by_gamma(metric_corr_by_gamma_df: pd.DataFrame, out_path: Path) -> None:
+def plot_metric_corr_by_gamma(
+    metric_corr_by_gamma_df: pd.DataFrame,
+    out_path: Path,
+    axis_label: str = "gamma",
+) -> None:
     """Correlation-vs-gamma curve for one metric."""
     _ensure_parent(out_path)
 
@@ -148,10 +152,12 @@ def plot_metric_corr_by_gamma(metric_corr_by_gamma_df: pd.DataFrame, out_path: P
 
     ax.axhline(0.0, color="#666666", linestyle="--", linewidth=1.0)
     ax.set_ylim(-1.05, 1.05)
-    ax.set_xticks(np.linspace(0.0, 1.0, 6))
-    ax.set_xlabel("Gamma")
+    ax.set_xlabel(axis_label)
     ax.set_ylabel("Correlation with AMI")
-    ax.set_title(f"{metric_display}: AMI correlation by gamma ({'maximize' if objective == 'max' else 'minimize'} objective)")
+    ax.set_title(
+        f"{metric_display}: AMI correlation by {axis_label} "
+        f"({'maximize' if objective == 'max' else 'minimize'} objective)"
+    )
     ax.legend(frameon=False, ncol=2)
 
     fig.tight_layout()
@@ -159,7 +165,11 @@ def plot_metric_corr_by_gamma(metric_corr_by_gamma_df: pd.DataFrame, out_path: P
     plt.close(fig)
 
 
-def plot_metric_gamma_vs_ami(metric_selection_df: pd.DataFrame, out_path: Path) -> None:
+def plot_metric_gamma_vs_ami(
+    metric_selection_df: pd.DataFrame,
+    out_path: Path,
+    axis_label: str = "gamma",
+) -> None:
     """Plot SC baseline vs GSC selected/oracle AMI by gamma for one metric."""
     _ensure_parent(out_path)
 
@@ -175,7 +185,7 @@ def plot_metric_gamma_vs_ami(metric_selection_df: pd.DataFrame, out_path: Path) 
     ]
 
     for col, label, color, linestyle in series:
-        stats = _mean_ci(metric_selection_df, col)
+        stats = _mean_ci(metric_selection_df, col, axis_col="gamma")
         ax.plot(
             stats["gamma"],
             stats["mean"],
@@ -195,10 +205,12 @@ def plot_metric_gamma_vs_ami(metric_selection_df: pd.DataFrame, out_path: Path) 
                 linewidth=0.0,
             )
 
-    ax.set_title(f"AMI vs directionality ({metric_display} proxy, {'max' if objective == 'max' else 'min'} objective)")
-    ax.set_xlabel("Gamma")
+    ax.set_title(
+        f"AMI vs {axis_label} "
+        f"({metric_display} proxy, {'max' if objective == 'max' else 'min'} objective)"
+    )
+    ax.set_xlabel(axis_label)
     ax.set_ylabel("AMI")
-    ax.set_xticks(np.linspace(0.0, 1.0, 6))
     ax.legend(frameon=False)
 
     fig.tight_layout()
@@ -206,12 +218,16 @@ def plot_metric_gamma_vs_ami(metric_selection_df: pd.DataFrame, out_path: Path) 
     plt.close(fig)
 
 
-def plot_metric_regret_by_gamma(metric_selection_df: pd.DataFrame, out_path: Path) -> None:
+def plot_metric_regret_by_gamma(
+    metric_selection_df: pd.DataFrame,
+    out_path: Path,
+    axis_label: str = "gamma",
+) -> None:
     """Plot selection regret by gamma for one metric."""
     _ensure_parent(out_path)
 
     metric_display = str(metric_selection_df["metric_display"].iloc[0])
-    stats = _mean_ci(metric_selection_df, "selection_regret")
+    stats = _mean_ci(metric_selection_df, "selection_regret", axis_col="gamma")
 
     fig, ax = plt.subplots(figsize=(8.4, 4.8))
     ax.plot(stats["gamma"], stats["mean"], marker="o", linewidth=2.0, color="#2ca02c")
@@ -224,10 +240,9 @@ def plot_metric_regret_by_gamma(metric_selection_df: pd.DataFrame, out_path: Pat
         linewidth=0.0,
     )
     ax.axhline(0.0, color="#666666", linestyle="--", linewidth=1.0)
-    ax.set_xticks(np.linspace(0.0, 1.0, 6))
-    ax.set_xlabel("Gamma")
+    ax.set_xlabel(axis_label)
     ax.set_ylabel("AMI_oracle - AMI_selected")
-    ax.set_title(f"Selection regret by directionality ({metric_display})")
+    ax.set_title(f"Selection regret by {axis_label} ({metric_display})")
 
     fig.tight_layout()
     fig.savefig(out_path, bbox_inches="tight")

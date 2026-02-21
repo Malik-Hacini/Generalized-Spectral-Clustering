@@ -2,6 +2,8 @@
 
 Utilities for AMI-proxy analysis of GSC grid-search results.
 
+For DIGRAC benchmark run/analysis commands, see `BENCHMARKS_DIGRAC.md`.
+
 The package supports:
 - DSBM proxy analysis (`graph_ch`, `modularity`, `map_equation`)
 - merging split DSBM runs into one all-metrics tree

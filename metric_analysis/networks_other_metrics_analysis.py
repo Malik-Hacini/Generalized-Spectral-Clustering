@@ -49,11 +49,17 @@ def _safe_corr(x: np.ndarray, y: np.ndarray) -> tuple[float, float]:
 
 def _dataset_dirs(results_dir: Path, gsc_method: str) -> list[Path]:
     out = []
-    for d in sorted(results_dir.iterdir()):
-        if not d.is_dir():
+    seen = set()
+    target = f"{gsc_method}_all_results.json"
+    for p in sorted(results_dir.rglob(target)):
+        method_dir = p.parent
+        if method_dir.name != gsc_method:
             continue
-        if (d / gsc_method / f"{gsc_method}_all_results.json").exists():
-            out.append(d)
+        dataset_dir = method_dir.parent
+        if dataset_dir in seen:
+            continue
+        seen.add(dataset_dir)
+        out.append(dataset_dir)
     return out
 
 
@@ -80,6 +86,7 @@ def load_data(results_dir: Path, metrics: list[str], gsc_method: str, sc_method:
     selection_rows = []
 
     for d in _dataset_dirs(results_dir, gsc_method):
+        dataset_name = d.relative_to(results_dir).as_posix()
         gsc_path = d / gsc_method / f"{gsc_method}_all_results.json"
         sc_path = d / sc_method / f"{sc_method}_all_results.json"
         gsc_all = json.loads(gsc_path.read_text())
@@ -101,7 +108,7 @@ def load_data(results_dir: Path, metrics: list[str], gsc_method: str, sc_method:
                 aligned = _aligned(metric, raw)
 
                 row = {
-                    "dataset": d.name,
+                    "dataset": dataset_name,
                     "metric": metric,
                     "metric_display": METRIC_SPECS[metric]["display"],
                     "metric_optimize": METRIC_SPECS[metric]["optimize"],
@@ -133,7 +140,7 @@ def load_data(results_dir: Path, metrics: list[str], gsc_method: str, sc_method:
 
             selection_rows.append(
                 {
-                    "dataset": d.name,
+                    "dataset": dataset_name,
                     "metric": metric,
                     "metric_display": METRIC_SPECS[metric]["display"],
                     "metric_optimize": METRIC_SPECS[metric]["optimize"],
@@ -267,7 +274,7 @@ def _plot_metric_dataset_bars(selection_df: pd.DataFrame, metric: str, out_path:
     ax.bar(x + width, data["gsc_ami_oracle"], width=width, label="GSC-N oracle", color="#d62728")
 
     ax.set_xticks(x)
-    ax.set_xticklabels(data["dataset"], rotation=0)
+    ax.set_xticklabels(data["dataset"], rotation=25, ha="right")
     ax.set_ylabel("AMI")
     ax.set_title(f"{METRIC_SPECS[metric]['display']}: selected vs oracle vs SC")
     ax.legend(frameon=False)

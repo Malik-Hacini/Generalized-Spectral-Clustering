@@ -78,12 +78,31 @@ def _apply_profile_filter(grid_long_df: pd.DataFrame, profile_id: str | None) ->
     return filtered, selected
 
 
+def _infer_axis_label(grid_long_df: pd.DataFrame) -> str:
+    if "axis_name" not in grid_long_df.columns:
+        return "gamma"
+
+    names = sorted(
+        {
+            str(v)
+            for v in grid_long_df["axis_name"].dropna().unique().tolist()
+            if str(v).strip() != ""
+        }
+    )
+    if not names:
+        return "gamma"
+    if len(names) == 1:
+        return "dataset index" if names[0] == "dataset_index" else names[0]
+    return "axis"
+
+
 def _write_index(
     out_dir: Path,
     summary_df: pd.DataFrame,
     metric_names: list[str],
     results_dir: Path,
     selected_profile_id: str | None,
+    axis_label: str,
 ) -> None:
     ranked = summary_df.sort_values(
         ["mean_selected_minus_sc", "overall_spearman_aligned", "mean_selection_regret"],
@@ -103,6 +122,7 @@ def _write_index(
         "",
         f"- Results directory: `{results_dir}`",
         f"- Proxy metrics: `{', '.join(metric_names)}`",
+        f"- Axis: `{axis_label}`",
         f"- Profile filter: `{selected_profile_id}`" if selected_profile_id else "- Profile filter: none",
         "",
         "## Output structure",
@@ -196,6 +216,7 @@ def main() -> None:
     )
 
     grid_long_df, selected_profile_id = _apply_profile_filter(grid_long_df, args.profile_id)
+    axis_label = _infer_axis_label(grid_long_df)
 
     if selected_profile_id:
         baseline_keep = set(grid_long_df["dataset"].unique().tolist())
@@ -227,9 +248,21 @@ def main() -> None:
         metric_dir.mkdir(parents=True, exist_ok=True)
 
         plot_metric_ami_vs_proxy(metric_grid, metric_overall_row, metric_dir / f"ami_vs_{metric_name}.pdf")
-        plot_metric_corr_by_gamma(metric_corr_gamma, metric_dir / f"corr_by_gamma_{metric_name}.pdf")
-        plot_metric_gamma_vs_ami(metric_selection, metric_dir / f"gamma_vs_ami_selected_by_{metric_name}.pdf")
-        plot_metric_regret_by_gamma(metric_selection, metric_dir / f"selection_regret_by_gamma_{metric_name}.pdf")
+        plot_metric_corr_by_gamma(
+            metric_corr_gamma,
+            metric_dir / f"corr_by_gamma_{metric_name}.pdf",
+            axis_label=axis_label,
+        )
+        plot_metric_gamma_vs_ami(
+            metric_selection,
+            metric_dir / f"gamma_vs_ami_selected_by_{metric_name}.pdf",
+            axis_label=axis_label,
+        )
+        plot_metric_regret_by_gamma(
+            metric_selection,
+            metric_dir / f"selection_regret_by_gamma_{metric_name}.pdf",
+            axis_label=axis_label,
+        )
 
     plot_cross_metric_overall_corr(summary_df, cross_fig_dir / "overall_corr_comparison.pdf")
     plot_cross_metric_regret(summary_df, cross_fig_dir / "selection_regret_comparison.pdf")
@@ -243,6 +276,7 @@ def main() -> None:
         "gsc_method": args.gsc_method,
         "sc_method": args.sc_method,
         "profile_id": selected_profile_id,
+        "axis": axis_label,
         "n_grid_rows": int(len(grid_long_df)),
         "n_selection_rows": int(len(selection_df)),
     }
@@ -255,6 +289,7 @@ def main() -> None:
         metric_names=[spec.name for spec in metric_specs],
         results_dir=results_dir,
         selected_profile_id=selected_profile_id,
+        axis_label=axis_label,
     )
 
     print(f"Saved metric analysis to: {out_dir}")

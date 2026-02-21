@@ -13,24 +13,55 @@ from metric_analysis.specs import MetricSpec
 
 
 DATASET_RE = re.compile(r"^dsbm_gamma(?P<gamma>\d+(?:\.\d+)?)_seed(?P<seed>\d+)$")
+ETA_RE = re.compile(r"eta(?P<eta>\d+(?:\.\d+)?)")
+SEED_RE = re.compile(r"seed(?P<seed>\d+)")
 
 
-def iter_gamma_dataset_dirs(results_dir: Path):
-    """Iterate over DSBM dataset directories sorted by (gamma, seed)."""
-    rows = []
-    for path in results_dir.iterdir():
-        if not path.is_dir():
+def _iter_dataset_dirs(results_dir: Path, gsc_method: str):
+    """Yield dataset directories that contain GSC grid-search outputs.
+
+    Supports nested dataset directories (e.g., when dataset names contain path
+    separators such as ``digrac_directed/<name>``).
+    """
+    seen: set[Path] = set()
+    rows: list[tuple[str, Path]] = []
+    target = f"{gsc_method}_all_results.json"
+
+    for result_file in results_dir.rglob(target):
+        method_dir = result_file.parent
+        if method_dir.name != gsc_method:
             continue
-        match = DATASET_RE.match(path.name)
-        if match is None:
+        dataset_dir = method_dir.parent
+        if dataset_dir in seen:
             continue
-        gamma = float(match.group("gamma"))
-        seed = int(match.group("seed"))
-        rows.append((gamma, seed, path))
+        seen.add(dataset_dir)
+        rel = dataset_dir.relative_to(results_dir).as_posix()
+        rows.append((rel, dataset_dir))
 
-    rows.sort(key=lambda x: (x[0], x[1]))
-    for gamma, seed, path in rows:
-        yield path, gamma, seed
+    rows.sort(key=lambda x: x[0])
+    for rel, dataset_dir in rows:
+        yield dataset_dir, rel
+
+
+def _infer_axis_seed(dataset_name: str, fallback_seed: int) -> tuple[float, int, str]:
+    """Infer analysis axis value/seed from dataset naming conventions.
+
+    Returns
+    -------
+    axis_value, seed, axis_name
+        ``axis_name`` is one of: ``gamma``, ``eta``, ``dataset_index``.
+    """
+    match = DATASET_RE.match(dataset_name)
+    if match is not None:
+        return float(match.group("gamma")), int(match.group("seed")), "gamma"
+
+    eta_match = ETA_RE.search(dataset_name)
+    seed_match = SEED_RE.search(dataset_name)
+    seed = int(seed_match.group("seed")) if seed_match is not None else fallback_seed
+    if eta_match is not None:
+        return float(eta_match.group("eta")), seed, "eta"
+
+    return float(fallback_seed), seed, "dataset_index"
 
 
 def _parse_measure_params(entry: dict) -> tuple[float, float]:
@@ -124,15 +155,29 @@ def load_grid_and_baselines(
     missing_metric_counter = {spec.name: 0 for spec in metric_specs}
     seen_metric_counter = {spec.name: 0 for spec in metric_specs}
 
-    for dataset_dir, gamma, seed in iter_gamma_dataset_dirs(results_dir):
+    discovered = list(_iter_dataset_dirs(results_dir, gsc_method=gsc_method))
+    parsed = []
+    for i, (dataset_dir, dataset_rel_name) in enumerate(discovered):
+        axis_value, seed, axis_name = _infer_axis_seed(dataset_dir.name, fallback_seed=i)
+        parsed.append((axis_value, seed, axis_name, dataset_rel_name, dataset_dir))
+
+    parsed.sort(key=lambda x: (x[0], x[1], x[3]))
+
+    for axis_value, seed, axis_name, dataset_name, dataset_dir in parsed:
+        gamma = float(axis_value)
+
         summary_path = dataset_dir / f"{dataset_dir.name}_summary.csv"
+        if not summary_path.exists():
+            fallback_summaries = sorted(dataset_dir.glob("*_summary.csv"))
+            summary_path = fallback_summaries[0] if fallback_summaries else None
+
         gsc_results_path = dataset_dir / gsc_method / f"{gsc_method}_all_results.json"
 
         if not gsc_results_path.exists():
             continue
 
         sc_ami = None
-        if summary_path.exists():
+        if summary_path is not None and summary_path.exists():
             summary_df = pd.read_csv(summary_path)
             sc_rows = summary_df[summary_df["method"] == sc_method]
             if not sc_rows.empty:
@@ -146,9 +191,10 @@ def load_grid_and_baselines(
 
         baseline_rows.append(
             {
-                "dataset": dataset_dir.name,
+                "dataset": dataset_name,
                 "gamma": gamma,
                 "seed": seed,
+                "axis_name": axis_name,
                 "sc_ami": float(sc_ami),
             }
         )
@@ -178,9 +224,10 @@ def load_grid_and_baselines(
 
                 grid_rows.append(
                     {
-                        "dataset": dataset_dir.name,
+                        "dataset": dataset_name,
                         "gamma": gamma,
                         "seed": seed,
+                        "axis_name": axis_name,
                         "gsc_method": gsc_method,
                         "grid_index": grid_index,
                         "alpha": alpha,
@@ -204,12 +251,8 @@ def load_grid_and_baselines(
             "Ensure grid-search benchmark results exist and include the requested metrics."
         )
 
-    grid_long_df = pd.DataFrame(grid_rows).sort_values(
-        ["metric", "gamma", "seed", "dataset", "grid_index"]
-    )
-    baseline_df = pd.DataFrame(baseline_rows).drop_duplicates(subset=["dataset"]).sort_values(
-        ["gamma", "seed", "dataset"]
-    )
+    grid_long_df = pd.DataFrame(grid_rows).sort_values(["metric", "gamma", "seed", "dataset", "grid_index"])
+    baseline_df = pd.DataFrame(baseline_rows).drop_duplicates(subset=["dataset"]).sort_values(["gamma", "seed", "dataset"])
 
     missing_msgs = []
     for metric_name, count in missing_metric_counter.items():
