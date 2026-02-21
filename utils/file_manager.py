@@ -441,6 +441,5 @@ def _save_grid_search_files(experiment_dir: str, grid_results: dict):
 
         if summary_rows:
             summary_df = pd.DataFrame(summary_rows)
-            summary_file = os.path.join(dataset_dir, f"{dataset_name}_summary.csv")
+            summary_file = os.path.join(dataset_dir, f"{os.path.basename(dataset_dir)}_summary.csv")
             summary_df.to_csv(summary_file, index=False)
-
