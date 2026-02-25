@@ -505,9 +505,13 @@ def _run_single_task(task, mode):
     all_labels = []
      
     for i in range(n_it):
+        iteration_params = params.copy()
+        base_random_state = params.get("random_state", 42)
+        if base_random_state is not None:
+            iteration_params["random_state"] = base_random_state + i
 
         y_pred, iteration_scores, iteration_error = _process_method_on_dataset(
-            dataset_name, method_spec, params, X, y, metrics=metrics)
+            dataset_name, method_spec, iteration_params, X, y, metrics=metrics)
         
         if iteration_error:
             logger.error(f"Error processing {explicit_name} on {dataset_name}: {iteration_error}")
@@ -819,10 +823,15 @@ def _aggregate_grid_search_results(results, metrics):
             best_score_dict = best_full_scores[metric]
             best_labels = successful_results[best_idx].get('predicted_labels', [])
             
+            std_across_grid = round(np.std(metric_scores), 4)
+            
             aggregated[metric] = {
                 'mean_across_grid': round(np.mean(metric_scores), 4),
-                'std_across_grid': round(np.std(metric_scores), 4),
-                'best': best_score_dict, 
+                'std_across_grid': std_across_grid,
+                'best': {
+                    'mean': best_score_dict['mean'] if isinstance(best_score_dict, dict) else best_score_dict,
+                    'std': std_across_grid,
+                },
                 'best_params': best_params,
                 'best_scores': best_full_scores,
                 'best_predicted_labels': best_labels,  # Include best labels
