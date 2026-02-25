@@ -321,6 +321,10 @@ def _run_grid_search_experiment(dataset_names, method_specs, config, load_path, 
             
             dataset_results[explicit_name] = method_results
             
+            if 'error' in method_results:
+                logger.error(f"  {explicit_name} on {dataset_name}: {method_results['error']}")
+                continue
+
             logger.info(f"  Completed {method_results['successful_combinations']} combinations in {timing:.2f}s")
             
             if len(metrics) == 1:
