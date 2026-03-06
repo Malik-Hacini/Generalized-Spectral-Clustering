@@ -25,3 +25,60 @@ def directed_sbm(block_sizes: list, P: np.ndarray, seed: int = 42):
     for i, size in enumerate(block_sizes):
         y.extend([i] * size)
     return nx.adjacency_matrix(G), y
+
+
+def core_periphery_disbm(
+  block_sizes:list,
+  p_core:float,
+  p_periphery:float,
+  p_core_periphery:float,
+  p_periphery_core:float,
+  seed:int=42
+):
+  """
+  Generate a core-periphery DSBM graph with specified probabilities for core-core, periphery-periphery, and core-periphery connections.
+  :param block_sizes: List of sizes, the first block is the core, the others are periphery blocks
+  :param p_core: Probability of edges within the core
+  :param p_periphery: Probability of edges within the periphery
+  :param p_core_periphery: Probability of edges from core to periphery
+  :param p_periphery_core: Probability of edges from periphery to core
+
+  Generally, we expect p_core > p_core_periphery >> p_periphery > p_periphery_core for a strong core-periphery structure.
+
+  :return: Directed SBM graph and ground truth labels
+  """
+
+  K = len(block_sizes)
+  P = np.full((K, K), p_periphery)  # Start with periphery probability
+  P[0, 0] = p_core  # Core-core
+  P[0, 1:] = p_core_periphery  # Core to periphery
+  P[1:, 0] = p_periphery_core  # Periphery to core
+  for i in range(1, K):
+    P[i,i] = p_periphery  # Periphery-periphery
+  return directed_sbm(block_sizes, P, seed)
+
+
+def chain_sbm(
+  block_sizes:list,
+  p_intra:float,
+  p_forward:float,
+  p_backward:float,
+):
+  """
+  Generate a chain-structured DSBM graph where each block is connected to the next with a forward probability and to the previous with a backward probability.
+  :param block_sizes: List of sizes for each block
+  :param p_intra: Probability of edges within each block
+  :param p_forward: Probability of edges from block i to block i+1
+  :param p_backward: Probability of edges from block i to block i-1
+
+  Generally, we expect p_intra > p_forward >> p_backward for a strong chain structure.
+
+  :return: Directed SBM graph and ground truth labels
+  """
+
+  K = len(block_sizes)
+  P = np.full((K, K), p_backward)  # Start with backward probability
+  np.fill_diagonal(P, p_intra)  # Intra-block
+  for i in range(K - 1):
+    P[i, i + 1] = p_forward  # Forward connection
+  return directed_sbm(block_sizes, P)
