@@ -96,3 +96,37 @@ def uniform_measure(adjacency_matrix):
     N = adjacency_matrix.shape[0]
     nu = np.ones(N) / N
     return nu
+
+def perron_vector_measure(adjacency_matrix, epsilon=1e-8):
+    """
+    Builds the Perron vector vertex measure:
+    nu = leading left eigenvector of P
+
+    For undirected graphs, this reduces to the degree measure.
+
+    For directed graphs, this captures the stationary distribution of a random walk defined by P.
+
+    Arguments:
+    - adjacency_matrix: The adjacency matrix of the graph
+    - epsilon: A small value to avoid division by zero
+    """
+    is_sparse = sp.issparse(adjacency_matrix)
+    N = adjacency_matrix.shape[0]
+
+    # Build row-stochastic matrix P = D^{-1} A
+    degree_vec = np.asarray(adjacency_matrix.sum(axis=1)).flatten()
+    degree_vec[degree_vec == 0] = 1  # Avoid division by zero
+
+    if is_sparse:
+        P = sp.diags(1.0 / degree_vec) @ adjacency_matrix
+    else:
+        P = adjacency_matrix / degree_vec[:, np.newaxis]
+
+    # Compute leading left eigenvector (Perron vector)
+    eigenvalues, left_eigenvectors = sp.linalg.eigs(P.T, k=1, which='LM')
+    nu = np.real(left_eigenvectors[:, 0])
+
+    nu[nu <= 0] = epsilon
+    nu /= nu.sum()
+
+    return nu
