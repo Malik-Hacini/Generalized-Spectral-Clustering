@@ -7,7 +7,7 @@ import time
 import numpy as np
 
 from competitors.disim import avg_deg_taus
-from competitors.measures import teleporting_undirected_measure
+from competitors.measures import teleporting_undirected_measure, degree_measure, uniform_measure
 from competitors.neighbors import log_neighbors
 from utils.config import ExperimentConfig
 from utils.experiments_utils import experiment
@@ -50,6 +50,10 @@ method_specs = [
     ("di_sim", "DI-SIM-C"),
     ("spectral", "GSC-N"),
     ("spectral", "GSC-UN"),
+    ("spectral", "deg-GSC-N"),
+    ("spectral", "deg-GSC-UN"),
+    ("spectral", "uniform-GSC-N"),
+    ("spectral", "uniform-GSC-UN"),
     # (Internal  name, Display name ) - see utils.experiments_utils.clusterer
 ]
 
@@ -64,7 +68,7 @@ Parameter hierarchy (lowest to highest precedence):
 Notes :
     - The number of clusters is automatically extracted via the dataset's labels.
     - measure and n_neighbors can be specified as (func, args_dict) tuples for custom strategies.
-        - Do not pecify context parameters in args_dict (data or adjacency matrix), they are provided by the pipeline.
+        - Do not specify context parameters in args_dict (data or adjacency matrix), they are provided by the pipeline.
     - To optimize a parameter via grid search, you can specify it as an iterable (e.g. list or np.arange).
     - The pipeline automatically searches through the product space of all parameters.
 """
@@ -117,6 +121,10 @@ method_params = [
     ),
     ("GSC-N", {"laplacian_method": "norm"}),
     ("GSC-UN", {"laplacian_method": "unnorm"}),
+    ("deg-GSC-N", {"laplacian_method": "norm", "measure": (degree_measure, {"gamma": 0.5})}),
+    ("deg-GSC-UN", {"laplacian_method": "unnorm", "measure": (degree_measure, {"gamma": 0.5})}),
+    ("uniform-GSC-N", {"laplacian_method": "norm", "measure": (uniform_measure, {})}),
+    ("uniform-GSC-UN", {"laplacian_method": "unnorm", "measure": (uniform_measure, {})}),
 ]
 
 method_dataset_params = []
