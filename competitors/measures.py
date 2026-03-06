@@ -50,7 +50,7 @@ def teleporting_undirected_measure(adjacency_matrix, alpha, t, epsilon=1e-8):
     return nu
 
 
-def degree_measure(adjacency_matrix, gamma, epsilon=1e-8):
+def degree_measure(adjacency_matrix, gamma=0.5, epsilon=1e-8):
     """
     Builds the degree based vertex measure:
     nu = gamma degree_in + (1-gamma) degree_out
