@@ -7,7 +7,12 @@ import time
 import numpy as np
 
 from competitors.disim import avg_deg_taus
-from competitors.measures import teleporting_undirected_measure, degree_measure, uniform_measure, perron_vector_measure
+from competitors.measures import (
+    teleporting_undirected_measure,
+    degree_measure,
+    uniform_measure,
+    perron_vector_measure,
+)
 from competitors.neighbors import log_neighbors
 from utils.config import ExperimentConfig
 from utils.experiments_utils import experiment
@@ -32,14 +37,17 @@ dataset_names = [
     "breast_tissue",
     "wine",
     "control_chart",
-    "glass",
+    # "glass",
     "iris",
-    "parkinsons",
+    # "parkinsons",
     "seeds",
     "segmentation",
-    "vertebral",
+    # "vertebral",
     "wdbc",
-    "yeast",
+    "olivetti_faces",
+    "mnist64",
+    "ph_recognition",
+    # "yeast",
 ]
 method_specs = [
     ("spectral", "SC-UN"),
@@ -83,7 +91,7 @@ default_params = {
     "assign_labels": "kmeans",
     "measure": (
         teleporting_undirected_measure,
-        {"alpha": np.arange(0, 2, 0.1), "t": range(0, 25)},
+        {"alpha": np.arange(0, 1.5, 0.1), "t": range(0, 25)},
     ),  # Grid search for GSC methods
     "tau": (
         avg_deg_taus,
@@ -123,12 +131,33 @@ method_params = [
     ),
     ("GSC-N", {"laplacian_method": "norm"}),
     ("GSC-UN", {"laplacian_method": "unnorm"}),
-    ("deg-GSC-N", {"laplacian_method": "norm", "measure": (degree_measure, {})}),
-    ("deg-GSC-UN", {"laplacian_method": "unnorm", "measure": (degree_measure, {})}),
+    (
+        "deg-GSC-N",
+        {
+            "laplacian_method": "norm",
+            "measure": (degree_measure, {"gamma": np.arange(0, 1, 0.05)}),
+        },
+    ),
+    (
+        "deg-GSC-UN",
+        {
+            "laplacian_method": "unnorm",
+            "measure": (degree_measure, {"gamma": np.arange(0, 1, 0.05)}),
+        },
+    ),
     ("uniform-GSC-N", {"laplacian_method": "norm", "measure": (uniform_measure, {})}),
-    ("uniform-GSC-UN", {"laplacian_method": "unnorm", "measure": (uniform_measure, {})}),
-    ("perron-GSC-N", {"laplacian_method": "norm", "measure": (perron_vector_measure, {})}),
-    ("perron-GSC-UN", {"laplacian_method": "unnorm", "measure": (perron_vector_measure, {})}),
+    (
+        "uniform-GSC-UN",
+        {"laplacian_method": "unnorm", "measure": (uniform_measure, {})},
+    ),
+    (
+        "perron-GSC-N",
+        {"laplacian_method": "norm", "measure": (perron_vector_measure, {})},
+    ),
+    (
+        "perron-GSC-UN",
+        {"laplacian_method": "unnorm", "measure": (perron_vector_measure, {})},
+    ),
 ]
 
 method_dataset_params = []
