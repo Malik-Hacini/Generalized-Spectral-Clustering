@@ -34,8 +34,13 @@ scikit-learn/dist/
 scikit-learn/*.egg-info/
 scikit-learn/.eggs/
 
+agents.md
 CLAUDE.md
 
+# test folders
+metric_analysis/
+complexity_analysis/
+latex/
 # OpenCode context (agent-specific, not shared)
 .opencode/
 .tmp/
