@@ -115,8 +115,8 @@ class ExperimentConfig:
     def _filter_params_for_method(self, params, method_implicit_name):
         """Filter parameters to only include those used by the method."""
         method_param_mapping = {
-            "spectral": {"n_clusters", "n_neighbors", "affinity", "laplacian_method",
-                        "measure", "random_state", "callable_kwargs", "standard", "eigen_solver", "eigen_tol", "n_it", "metric_params"},
+            "spectral": {"n_clusters", "n_neighbors", "affinity", "gamma", "laplacian_method",
+                        "measure", "random_state", "callable_kwargs", "standard", "eigen_solver", "eigen_tol", "n_it", "metric_params", "precomputed_connectivity"},
             "kmeans": {"n_clusters", "random_state", "n_it", "metric_params"},
 
             "dsc": {"n_clusters", "n_neighbors", "gamma", "max_iter", "tol", "epsilon", "random_state", "n_it", "metric_params"},

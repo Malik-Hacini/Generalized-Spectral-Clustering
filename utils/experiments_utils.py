@@ -1,8 +1,8 @@
-import copy
 import os
 import time
 import warnings
 from collections.abc import Iterable
+from inspect import signature
 from itertools import product
 
 import matplotlib.pyplot as plt
@@ -17,6 +17,7 @@ from sklearn.metrics import (  # type: ignore
     calinski_harabasz_score,
     normalized_mutual_info_score,
 )
+from sklearn.neighbors import kneighbors_graph  # type: ignore
 from sklearn.preprocessing import StandardScaler  # type: ignore
 
 from competitors.disim import DiSim
@@ -26,6 +27,8 @@ from utils.logger import get_logger, set_logger_verbose
 from utils.metrics.graph_CH import graph_calinski_harabasz
 from utils.metrics.map_equation import map_equation
 from utils.metrics.modularity import modularity
+
+from sklearn.utils._param_validation import _resolve_callable_param  # type: ignore
 
 
 def experiment(
@@ -237,7 +240,7 @@ def clusterer(method_name, params):
         - random_state: Random state for reproducibility (default: 42)
     """
     if method_name == "spectral":
-        return cluster.SpectralClustering(
+        estimator = cluster.SpectralClustering(
             n_clusters=params.get("n_clusters", 3),
             n_neighbors=params.get("n_neighbors", 6),
             affinity=params.get("affinity", "nearest_neighbors"),
@@ -248,8 +251,10 @@ def clusterer(method_name, params):
             assign_labels=params.get("assign_labels", "kmeans"),
             random_state=params.get("random_state", 42),
             eigen_solver=params.get("eigen_solver", "arpack"),
+            precomputed_connectivity=params.get("precomputed_connectivity", None),
             # eigen_tol=params.get("eigen_tol", None)
         )
+        return estimator
 
     elif method_name == "di_sim":
         return DiSim(
@@ -317,6 +322,7 @@ def _run_grid_search_experiment(
             continue
 
         dataset_results = {}
+        graph_cache = {}
 
         for implicit_name, explicit_name in method_specs:
             logger.info(f"Running grid search for: {explicit_name}")
@@ -352,24 +358,29 @@ def _run_grid_search_experiment(
                 )
                 continue
 
-            tasks = []
+            task_specs = []
             for combination in combinations:
                 current_params = base_params.copy()
                 current_params.update(dict(zip(param_names, combination)))
 
-                task_config = copy.deepcopy(config)
-                if explicit_name not in task_config.method_dataset_params_dict:
-                    task_config.method_dataset_params_dict[explicit_name] = {}
+                task_specs.append(
+                    {
+                        "implicit_name": implicit_name,
+                        "X": X,
+                        "params": current_params,
+                    }
+                )
 
-                # Update the internal parameters at the highest precedence, so task_config.get_final_params() correctly extracts those params.
-                task_config.method_dataset_params_dict[explicit_name][
-                    dataset_name
-                ] = current_params
+            _prepare_spectral_grid_cache(task_specs, graph_cache)
 
+            tasks = []
+            for task_spec in task_specs:
+                current_params = task_spec["params"]
                 task = {
                     "dataset_name": dataset_name,
                     "method_spec": (implicit_name, explicit_name),
-                    "config": task_config,
+                    "config": config,
+                    "resolved_params": current_params,
                     "X": X,
                     "y": y,
                     "metrics": metrics,
@@ -419,6 +430,23 @@ def _run_grid_search_experiment(
     return grid_results, all_parameters
 
 
+def _prepare_spectral_grid_cache(task_specs, graph_cache):
+    if not task_specs:
+        return
+
+    for task_spec in task_specs:
+        if not _should_cache_spectral_connectivity(
+            task_spec["implicit_name"], task_spec["X"], task_spec["params"]
+        ):
+            continue
+
+        _, precomputed_connectivity = _get_spectral_connectivity_cache_entry(
+            task_spec["X"], task_spec["params"], graph_cache
+        )
+        task_spec["params"]["precomputed_connectivity"] = precomputed_connectivity
+        task_spec["params"]["_cache_spectral_connectivity"] = True
+
+
 def _format_best_metric_log(metric, best_score_info):
     """Format best grid-search metric output for terminal logging."""
     label = f"Best {metric.upper()}: {best_score_info['mean']:.3f} ± {best_score_info['std']:.3f}"
@@ -431,6 +459,69 @@ def _format_best_metric_log(metric, best_score_info):
         return label
 
     return f"{label} (AMI: {linked_ami:.3f})"
+
+
+def _should_cache_spectral_connectivity(implicit_name, X, params):
+    if implicit_name != "spectral":
+        return False
+    if X is None or sp.issparse(X):
+        return False
+    return params["affinity"] in {
+        "nearest_neighbors",
+        "rbf_nearest_neighbors",
+    }
+
+
+def _resolve_callable_param_local(param, context_kwargs=None):
+    if _resolve_callable_param is not None:
+        return _resolve_callable_param(param, context_kwargs)
+
+    if not isinstance(param, tuple):
+        return param
+
+    param_func, args_dict = param
+    if context_kwargs is None:
+        context_kwargs = {}
+    final_kwargs = {**context_kwargs, **args_dict}
+    accepted = set(signature(param_func).parameters.keys())
+    filtered_kwargs = {k: v for k, v in final_kwargs.items() if k in accepted}
+    return param_func(**filtered_kwargs)
+
+
+def _build_spectral_connectivity(X, params):
+    resolved_n_neighbors = _resolve_callable_param_local(params["n_neighbors"], {"X": X})
+    affinity = params["affinity"]
+    if affinity == "nearest_neighbors":
+        return kneighbors_graph(
+            X,
+            n_neighbors=resolved_n_neighbors,
+            include_self=False,
+        )
+
+    gamma = params["gamma"]
+    connectivity = kneighbors_graph(
+        X,
+        n_neighbors=resolved_n_neighbors,
+        mode="distance",
+        include_self=False,
+    )
+    connectivity.data = np.exp(-float(gamma) * (connectivity.data**2))
+    return connectivity
+
+
+def _get_spectral_connectivity_cache_entry(X, params, graph_cache):
+    resolved_n_neighbors = _resolve_callable_param_local(params["n_neighbors"], {"X": X})
+    affinity = params["affinity"]
+    cache_key = (
+        affinity,
+        int(resolved_n_neighbors),
+        float(params["gamma"]) if affinity == "rbf_nearest_neighbors" else None,
+    )
+
+    if cache_key not in graph_cache:
+        graph_cache[cache_key] = _build_spectral_connectivity(X, params)
+
+    return cache_key, graph_cache[cache_key]
 
 
 def _run_score_experiment(
@@ -612,10 +703,18 @@ def _run_single_task(task, mode):
     y = task["y"]
     metrics = task["metrics"]
     implicit_name, explicit_name = method_spec
-    params = config.get_final_params(y, dataset_name, explicit_name, implicit_name)
+    params = task.get("resolved_params")
+    if params is None:
+        params = config.get_final_params(y, dataset_name, explicit_name, implicit_name)
+    else:
+        params = params.copy()
+
+    cache_spectral_connectivity = params.pop("_cache_spectral_connectivity", None)
+    if cache_spectral_connectivity is None:
+        params.pop("precomputed_connectivity", None)
 
     try:
-        n_it = params.get("n_it", 1)
+        n_it = params["n_it"]
         assert isinstance(n_it, int) and n_it > 0
     except Exception as e:
         logger.error(
@@ -628,7 +727,7 @@ def _run_single_task(task, mode):
 
     for i in range(n_it):
         iteration_params = params.copy()
-        base_random_state = params.get("random_state", 42)
+        base_random_state = params["random_state"]
         if base_random_state is not None:
             iteration_params["random_state"] = base_random_state + i
 

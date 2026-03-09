@@ -638,6 +638,7 @@ class SpectralClustering(ClusterMixin, BaseEstimator):
         "degree": [Interval(Real, 0, None, closed="left")],
         "coef0": [Interval(Real, None, None, closed="neither")],
         "kernel_params": [dict, None],
+        "precomputed_connectivity": ["array-like", "sparse matrix", None],
         "n_jobs": [Integral, None],
         "verbose": ["verbose"],
         "standard": [bool],
@@ -664,6 +665,7 @@ class SpectralClustering(ClusterMixin, BaseEstimator):
         degree=3,
         coef0=1,
         kernel_params=None,
+        precomputed_connectivity=None,
         n_jobs=None,
         verbose=False,
         standard=False,
@@ -683,6 +685,7 @@ class SpectralClustering(ClusterMixin, BaseEstimator):
         self.degree = degree
         self.coef0 = coef0
         self.kernel_params = kernel_params
+        self.precomputed_connectivity = precomputed_connectivity
         self.n_jobs = n_jobs
         self.verbose = verbose
         self.standard = standard
@@ -731,51 +734,70 @@ class SpectralClustering(ClusterMixin, BaseEstimator):
                 "set ``affinity=precomputed``."
             )
 
-        # Resolve the n_neighbors parameter
-        context_neighbors_kwargs = {"X" : X}
-        self.n_neighbors = _resolve_callable_param(self.n_neighbors, context_neighbors_kwargs)
-
-        if self.affinity == "nearest_neighbors":
-            connectivity = kneighbors_graph(
-                X, n_neighbors=self.n_neighbors, include_self=False, n_jobs=self.n_jobs,
-            )
-    
-        elif self.affinity == "precomputed_nearest_neighbors":
-           
-            estimator = NearestNeighbors(
-                n_neighbors=self.n_neighbors, n_jobs=self.n_jobs, metric="precomputed"
-            ).fit(X)
-            connectivity = estimator.kneighbors_graph(X=X, mode="connectivity")
-          
-        elif self.affinity == "rbf_nearest_neighbors":
-            connectivity = kneighbors_graph(
-                X,
-                n_neighbors=self.n_neighbors,
-                mode="distance",
-                include_self=False,
-                n_jobs=self.n_jobs,
-            )
-            connectivity.data = np.exp(-self.gamma * (connectivity.data**2))
-
-        elif self.affinity == "precomputed":
-            connectivity = X
+        connectivity = None
+        precomputed_connectivity = self.precomputed_connectivity
+        if precomputed_connectivity is not None and self.affinity in {
+            "nearest_neighbors",
+            "rbf_nearest_neighbors",
+        }:
+            if precomputed_connectivity.shape[0] != X.shape[0] or precomputed_connectivity.shape[1] != X.shape[0]:
+                raise ValueError(
+                    "precomputed_connectivity must have shape (n_samples, n_samples) matching X."
+                )
+            connectivity = precomputed_connectivity
 
         else:
-            params = self.kernel_params
-            if params is None:
-                params = {}
-            if not callable(self.affinity):
-                params["gamma"] = self.gamma
-                params["degree"] = self.degree
-                params["coef0"] = self.coef0
-            self.affinity_matrix_ = pairwise_kernels(
-                X, metric=self.affinity, filter_params=True, **params
+            context_neighbors_kwargs = {"X": X}
+            resolved_n_neighbors = _resolve_callable_param(
+                self.n_neighbors, context_neighbors_kwargs
             )
+
+            if self.affinity == "nearest_neighbors":
+                connectivity = kneighbors_graph(
+                    X,
+                    n_neighbors=resolved_n_neighbors,
+                    include_self=False,
+                    n_jobs=self.n_jobs,
+                )
+
+            elif self.affinity == "precomputed_nearest_neighbors":
+                estimator = NearestNeighbors(
+                    n_neighbors=resolved_n_neighbors,
+                    n_jobs=self.n_jobs,
+                    metric="precomputed",
+                ).fit(X)
+                connectivity = estimator.kneighbors_graph(X=X, mode="connectivity")
+
+            elif self.affinity == "rbf_nearest_neighbors":
+                connectivity = kneighbors_graph(
+                    X,
+                    n_neighbors=resolved_n_neighbors,
+                    mode="distance",
+                    include_self=False,
+                    n_jobs=self.n_jobs,
+                )
+                connectivity.data = np.exp(-self.gamma * (connectivity.data**2))
+
+            elif self.affinity == "precomputed":
+                connectivity = X
+
+            else:
+                params = self.kernel_params
+                if params is None:
+                    params = {}
+                if not callable(self.affinity):
+                    params["gamma"] = self.gamma
+                    params["degree"] = self.degree
+                    params["coef0"] = self.coef0
+                self.affinity_matrix_ = pairwise_kernels(
+                    X, metric=self.affinity, filter_params=True, **params
+                )
         
         # Symmetrize the affinity matrix IFF using standard SC
-        if self.standard:
+        if connectivity is not None:
+            if self.standard:
                 self.affinity_matrix_ = 0.5 * (connectivity + connectivity.T)
-        else:
+            else:
                 self.affinity_matrix_ = connectivity
 
 
@@ -787,7 +809,7 @@ class SpectralClustering(ClusterMixin, BaseEstimator):
         
         #Resolve the measure parameter
         context_measure_kwargs = {"X": X, "adjacency_matrix": self.affinity_matrix_}
-        self.measure = _resolve_callable_param(self.measure, context_measure_kwargs)
+        resolved_measure = _resolve_callable_param(self.measure, context_measure_kwargs)
         
         
         # We now obtain the real valued solution matrix to the
@@ -805,7 +827,7 @@ class SpectralClustering(ClusterMixin, BaseEstimator):
             drop_first=False,
             standard=self.standard,
             laplacian_method=self.laplacian_method,
-            measure=self.measure,
+            measure=resolved_measure,
         )
         if self.verbose:
             print(f"Computing label assignment using {self.assign_labels}")
@@ -857,4 +879,3 @@ class SpectralClustering(ClusterMixin, BaseEstimator):
             "precomputed_nearest_neighbors",
         ]
         return tags
-
