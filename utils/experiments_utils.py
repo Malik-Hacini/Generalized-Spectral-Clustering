@@ -331,17 +331,31 @@ def _run_grid_search_experiment(dataset_names, method_specs, config, load_path, 
                 target_metric = list(metrics)[0]
                 if target_metric in method_results:
                     best_score_info = method_results[target_metric]['best']
-                    logger.info(f"  → Best {target_metric.upper()}: {best_score_info['mean']:.3f} ± {best_score_info['std']:.3f}")
+                    logger.info(f"  → {_format_best_metric_log(target_metric, best_score_info):s}")
             else:
                 logger.info("  → Best scores:")
                 for target_metric in metrics:
                     if target_metric in method_results:
                         best_score_info = method_results[target_metric]['best']
-                        logger.info(f"    • {target_metric.upper()}: {best_score_info['mean']:.3f} ± {best_score_info['std']:.3f}")
+                        logger.info(f"    • {_format_best_metric_log(target_metric, best_score_info):s}")
         
         grid_results[dataset_name] = dataset_results
     
     return grid_results, all_parameters
+
+
+def _format_best_metric_log(metric, best_score_info):
+    """Format best grid-search metric output for terminal logging."""
+    label = f"Best {metric.upper()}: {best_score_info['mean']:.3f} ± {best_score_info['std']:.3f}"
+
+    if metric == "ami":
+        return label
+
+    linked_ami = best_score_info.get('linked_ami_mean')
+    if linked_ami is None:
+        return label
+
+    return f"{label} (AMI: {linked_ami:.3f})"
 
 def _run_score_experiment(dataset_names, method_specs, config, load_path, metrics, n_jobs):
     """Run clustering score experiments in parallel across datasets and methods."""
@@ -825,17 +839,24 @@ def _aggregate_grid_search_results(results, metrics):
             best_params = metric_params[best_idx]
             best_full_scores = successful_results[best_idx]['scores']
             best_score_dict = best_full_scores[metric]
+            linked_ami_score = best_full_scores.get('ami') if metric != 'ami' else None
             best_labels = successful_results[best_idx].get('predicted_labels', [])
             
             std_across_grid = round(np.std(metric_scores), 4)
+
+            best_payload = {
+                'mean': best_score_dict['mean'] if isinstance(best_score_dict, dict) else best_score_dict,
+                'std': std_across_grid,
+            }
+            if linked_ami_score is not None:
+                best_payload['linked_ami_mean'] = (
+                    linked_ami_score['mean'] if isinstance(linked_ami_score, dict) else linked_ami_score
+                )
             
             aggregated[metric] = {
                 'mean_across_grid': round(np.mean(metric_scores), 4),
                 'std_across_grid': std_across_grid,
-                'best': {
-                    'mean': best_score_dict['mean'] if isinstance(best_score_dict, dict) else best_score_dict,
-                    'std': std_across_grid,
-                },
+                'best': best_payload,
                 'best_params': best_params,
                 'best_scores': best_full_scores,
                 'best_predicted_labels': best_labels,  # Include best labels

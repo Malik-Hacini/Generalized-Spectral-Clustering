@@ -1,13 +1,3 @@
-DSBM Models :
-
-- GWENDAL generation
-- Understand digrac generation
-   - the different families
-- Test digrac generation on graph_ch/modularity
-   - gsc vs sc (and others also if interesting)
-   - analyze correlation metric/ami
-
-
 Real Networks :
 
 - Fix lead lag data (nan or infinity for now)
@@ -27,5 +17,4 @@ Complexity :
  
 Codebase : 
 
-- report ami max related to a metric max in experiment terminal output
 - Refactor benchmarks in a folder... with clean imports (maybe a module ?)
