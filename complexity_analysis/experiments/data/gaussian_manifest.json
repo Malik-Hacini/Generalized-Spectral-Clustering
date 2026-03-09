@@ -1,0 +1,317 @@
+[
+  {
+    "path": "/home/tag/Desktop/Generalized-Spectral-Clustering/complexity_analysis/experiments/data/gaussian_N500_d4_seed42.npz",
+    "n_samples": 500,
+    "n_features": 4,
+    "n_clusters": 3,
+    "cluster_std": 2.5,
+    "connectivity_n_neighbors": 7,
+    "seed": 42
+  },
+  {
+    "path": "/home/tag/Desktop/Generalized-Spectral-Clustering/complexity_analysis/experiments/data/gaussian_N500_d10_seed42.npz",
+    "n_samples": 500,
+    "n_features": 10,
+    "n_clusters": 3,
+    "cluster_std": 2.5,
+    "connectivity_n_neighbors": 7,
+    "seed": 42
+  },
+  {
+    "path": "/home/tag/Desktop/Generalized-Spectral-Clustering/complexity_analysis/experiments/data/gaussian_N500_d2_seed42.npz",
+    "n_samples": 500,
+    "n_features": 2,
+    "n_clusters": 3,
+    "cluster_std": 2.5,
+    "connectivity_n_neighbors": 7,
+    "seed": 42
+  },
+  {
+    "path": "/home/tag/Desktop/Generalized-Spectral-Clustering/complexity_analysis/experiments/data/gaussian_N500_d8_seed42.npz",
+    "n_samples": 500,
+    "n_features": 8,
+    "n_clusters": 3,
+    "cluster_std": 2.5,
+    "connectivity_n_neighbors": 7,
+    "seed": 42
+  },
+  {
+    "path": "/home/tag/Desktop/Generalized-Spectral-Clustering/complexity_analysis/experiments/data/gaussian_N500_d12_seed42.npz",
+    "n_samples": 500,
+    "n_features": 12,
+    "n_clusters": 3,
+    "cluster_std": 2.5,
+    "connectivity_n_neighbors": 7,
+    "seed": 42
+  },
+  {
+    "path": "/home/tag/Desktop/Generalized-Spectral-Clustering/complexity_analysis/experiments/data/gaussian_N500_d16_seed42.npz",
+    "n_samples": 500,
+    "n_features": 16,
+    "n_clusters": 3,
+    "cluster_std": 2.5,
+    "connectivity_n_neighbors": 7,
+    "seed": 42
+  },
+  {
+    "path": "/home/tag/Desktop/Generalized-Spectral-Clustering/complexity_analysis/experiments/data/gaussian_N500_d24_seed42.npz",
+    "n_samples": 500,
+    "n_features": 24,
+    "n_clusters": 3,
+    "cluster_std": 2.5,
+    "connectivity_n_neighbors": 7,
+    "seed": 42
+  },
+  {
+    "path": "/home/tag/Desktop/Generalized-Spectral-Clustering/complexity_analysis/experiments/data/gaussian_N1000_d4_seed42.npz",
+    "n_samples": 1000,
+    "n_features": 4,
+    "n_clusters": 3,
+    "cluster_std": 2.5,
+    "connectivity_n_neighbors": 7,
+    "seed": 42
+  },
+  {
+    "path": "/home/tag/Desktop/Generalized-Spectral-Clustering/complexity_analysis/experiments/data/gaussian_N1000_d10_seed42.npz",
+    "n_samples": 1000,
+    "n_features": 10,
+    "n_clusters": 3,
+    "cluster_std": 2.5,
+    "connectivity_n_neighbors": 7,
+    "seed": 42
+  },
+  {
+    "path": "/home/tag/Desktop/Generalized-Spectral-Clustering/complexity_analysis/experiments/data/gaussian_N1000_d2_seed42.npz",
+    "n_samples": 1000,
+    "n_features": 2,
+    "n_clusters": 3,
+    "cluster_std": 2.5,
+    "connectivity_n_neighbors": 7,
+    "seed": 42
+  },
+  {
+    "path": "/home/tag/Desktop/Generalized-Spectral-Clustering/complexity_analysis/experiments/data/gaussian_N1000_d8_seed42.npz",
+    "n_samples": 1000,
+    "n_features": 8,
+    "n_clusters": 3,
+    "cluster_std": 2.5,
+    "connectivity_n_neighbors": 7,
+    "seed": 42
+  },
+  {
+    "path": "/home/tag/Desktop/Generalized-Spectral-Clustering/complexity_analysis/experiments/data/gaussian_N1000_d12_seed42.npz",
+    "n_samples": 1000,
+    "n_features": 12,
+    "n_clusters": 3,
+    "cluster_std": 2.5,
+    "connectivity_n_neighbors": 7,
+    "seed": 42
+  },
+  {
+    "path": "/home/tag/Desktop/Generalized-Spectral-Clustering/complexity_analysis/experiments/data/gaussian_N1000_d16_seed42.npz",
+    "n_samples": 1000,
+    "n_features": 16,
+    "n_clusters": 3,
+    "cluster_std": 2.5,
+    "connectivity_n_neighbors": 7,
+    "seed": 42
+  },
+  {
+    "path": "/home/tag/Desktop/Generalized-Spectral-Clustering/complexity_analysis/experiments/data/gaussian_N1000_d24_seed42.npz",
+    "n_samples": 1000,
+    "n_features": 24,
+    "n_clusters": 3,
+    "cluster_std": 2.5,
+    "connectivity_n_neighbors": 7,
+    "seed": 42
+  },
+  {
+    "path": "/home/tag/Desktop/Generalized-Spectral-Clustering/complexity_analysis/experiments/data/gaussian_N2000_d4_seed42.npz",
+    "n_samples": 2000,
+    "n_features": 4,
+    "n_clusters": 3,
+    "cluster_std": 2.5,
+    "connectivity_n_neighbors": 8,
+    "seed": 42
+  },
+  {
+    "path": "/home/tag/Desktop/Generalized-Spectral-Clustering/complexity_analysis/experiments/data/gaussian_N2000_d10_seed42.npz",
+    "n_samples": 2000,
+    "n_features": 10,
+    "n_clusters": 3,
+    "cluster_std": 2.5,
+    "connectivity_n_neighbors": 8,
+    "seed": 42
+  },
+  {
+    "path": "/home/tag/Desktop/Generalized-Spectral-Clustering/complexity_analysis/experiments/data/gaussian_N2000_d2_seed42.npz",
+    "n_samples": 2000,
+    "n_features": 2,
+    "n_clusters": 3,
+    "cluster_std": 2.5,
+    "connectivity_n_neighbors": 8,
+    "seed": 42
+  },
+  {
+    "path": "/home/tag/Desktop/Generalized-Spectral-Clustering/complexity_analysis/experiments/data/gaussian_N2000_d8_seed42.npz",
+    "n_samples": 2000,
+    "n_features": 8,
+    "n_clusters": 3,
+    "cluster_std": 2.5,
+    "connectivity_n_neighbors": 8,
+    "seed": 42
+  },
+  {
+    "path": "/home/tag/Desktop/Generalized-Spectral-Clustering/complexity_analysis/experiments/data/gaussian_N2000_d12_seed42.npz",
+    "n_samples": 2000,
+    "n_features": 12,
+    "n_clusters": 3,
+    "cluster_std": 2.5,
+    "connectivity_n_neighbors": 8,
+    "seed": 42
+  },
+  {
+    "path": "/home/tag/Desktop/Generalized-Spectral-Clustering/complexity_analysis/experiments/data/gaussian_N2000_d16_seed42.npz",
+    "n_samples": 2000,
+    "n_features": 16,
+    "n_clusters": 3,
+    "cluster_std": 2.5,
+    "connectivity_n_neighbors": 8,
+    "seed": 42
+  },
+  {
+    "path": "/home/tag/Desktop/Generalized-Spectral-Clustering/complexity_analysis/experiments/data/gaussian_N2000_d24_seed42.npz",
+    "n_samples": 2000,
+    "n_features": 24,
+    "n_clusters": 3,
+    "cluster_std": 2.5,
+    "connectivity_n_neighbors": 8,
+    "seed": 42
+  },
+  {
+    "path": "/home/tag/Desktop/Generalized-Spectral-Clustering/complexity_analysis/experiments/data/gaussian_N5000_d4_seed42.npz",
+    "n_samples": 5000,
+    "n_features": 4,
+    "n_clusters": 3,
+    "cluster_std": 2.5,
+    "connectivity_n_neighbors": 9,
+    "seed": 42
+  },
+  {
+    "path": "/home/tag/Desktop/Generalized-Spectral-Clustering/complexity_analysis/experiments/data/gaussian_N5000_d10_seed42.npz",
+    "n_samples": 5000,
+    "n_features": 10,
+    "n_clusters": 3,
+    "cluster_std": 2.5,
+    "connectivity_n_neighbors": 9,
+    "seed": 42
+  },
+  {
+    "path": "/home/tag/Desktop/Generalized-Spectral-Clustering/complexity_analysis/experiments/data/gaussian_N5000_d2_seed42.npz",
+    "n_samples": 5000,
+    "n_features": 2,
+    "n_clusters": 3,
+    "cluster_std": 2.5,
+    "connectivity_n_neighbors": 9,
+    "seed": 42
+  },
+  {
+    "path": "/home/tag/Desktop/Generalized-Spectral-Clustering/complexity_analysis/experiments/data/gaussian_N5000_d8_seed42.npz",
+    "n_samples": 5000,
+    "n_features": 8,
+    "n_clusters": 3,
+    "cluster_std": 2.5,
+    "connectivity_n_neighbors": 9,
+    "seed": 42
+  },
+  {
+    "path": "/home/tag/Desktop/Generalized-Spectral-Clustering/complexity_analysis/experiments/data/gaussian_N5000_d12_seed42.npz",
+    "n_samples": 5000,
+    "n_features": 12,
+    "n_clusters": 3,
+    "cluster_std": 2.5,
+    "connectivity_n_neighbors": 9,
+    "seed": 42
+  },
+  {
+    "path": "/home/tag/Desktop/Generalized-Spectral-Clustering/complexity_analysis/experiments/data/gaussian_N5000_d16_seed42.npz",
+    "n_samples": 5000,
+    "n_features": 16,
+    "n_clusters": 3,
+    "cluster_std": 2.5,
+    "connectivity_n_neighbors": 9,
+    "seed": 42
+  },
+  {
+    "path": "/home/tag/Desktop/Generalized-Spectral-Clustering/complexity_analysis/experiments/data/gaussian_N5000_d24_seed42.npz",
+    "n_samples": 5000,
+    "n_features": 24,
+    "n_clusters": 3,
+    "cluster_std": 2.5,
+    "connectivity_n_neighbors": 9,
+    "seed": 42
+  },
+  {
+    "path": "/home/tag/Desktop/Generalized-Spectral-Clustering/complexity_analysis/experiments/data/gaussian_N10000_d4_seed42.npz",
+    "n_samples": 10000,
+    "n_features": 4,
+    "n_clusters": 3,
+    "cluster_std": 2.5,
+    "connectivity_n_neighbors": 10,
+    "seed": 42
+  },
+  {
+    "path": "/home/tag/Desktop/Generalized-Spectral-Clustering/complexity_analysis/experiments/data/gaussian_N10000_d10_seed42.npz",
+    "n_samples": 10000,
+    "n_features": 10,
+    "n_clusters": 3,
+    "cluster_std": 2.5,
+    "connectivity_n_neighbors": 10,
+    "seed": 42
+  },
+  {
+    "path": "/home/tag/Desktop/Generalized-Spectral-Clustering/complexity_analysis/experiments/data/gaussian_N10000_d2_seed42.npz",
+    "n_samples": 10000,
+    "n_features": 2,
+    "n_clusters": 3,
+    "cluster_std": 2.5,
+    "connectivity_n_neighbors": 10,
+    "seed": 42
+  },
+  {
+    "path": "/home/tag/Desktop/Generalized-Spectral-Clustering/complexity_analysis/experiments/data/gaussian_N10000_d8_seed42.npz",
+    "n_samples": 10000,
+    "n_features": 8,
+    "n_clusters": 3,
+    "cluster_std": 2.5,
+    "connectivity_n_neighbors": 10,
+    "seed": 42
+  },
+  {
+    "path": "/home/tag/Desktop/Generalized-Spectral-Clustering/complexity_analysis/experiments/data/gaussian_N10000_d12_seed42.npz",
+    "n_samples": 10000,
+    "n_features": 12,
+    "n_clusters": 3,
+    "cluster_std": 2.5,
+    "connectivity_n_neighbors": 10,
+    "seed": 42
+  },
+  {
+    "path": "/home/tag/Desktop/Generalized-Spectral-Clustering/complexity_analysis/experiments/data/gaussian_N10000_d16_seed42.npz",
+    "n_samples": 10000,
+    "n_features": 16,
+    "n_clusters": 3,
+    "cluster_std": 2.5,
+    "connectivity_n_neighbors": 10,
+    "seed": 42
+  },
+  {
+    "path": "/home/tag/Desktop/Generalized-Spectral-Clustering/complexity_analysis/experiments/data/gaussian_N10000_d24_seed42.npz",
+    "n_samples": 10000,
+    "n_features": 24,
+    "n_clusters": 3,
+    "cluster_std": 2.5,
+    "connectivity_n_neighbors": 10,
+    "seed": 42
+  }
+]
