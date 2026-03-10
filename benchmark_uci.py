@@ -23,7 +23,7 @@ Basic experiment config:
 save_path = "results"
 experiment_name = "benchmark_uci"
 mode = "grid_search"  # Either "score", "grid_search" or "viz" when all datasets are 2D.
-metrics = ("ami", "ch")  # Valid metrics: "ami", "ari", "nmi", "ch"
+metrics = ("ami", "ch", "graph_ch")  # Valid metrics: "ami", "ari", "nmi", "ch"
 n_jobs = (
     -1
 )  # Number of parallel jobs (set to 1 for single-threaded execution, -1 to use all available cores)
