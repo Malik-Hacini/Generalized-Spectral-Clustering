@@ -19,18 +19,43 @@ from functools import reduce
 from sklearn.neighbors import kneighbors_graph #type: ignore
 from .neighbors import log_neighbors
 
-def teleporting_undirected_measure(adjacency_matrix, alpha, t, epsilon=1e-8):
+def teleporting_undirected_measure(adjacency_matrix, alpha, t,initialize_measure= None , epsilon=1e-8):
     """
     Builds the undirected vertex measure:
-    nu = ((1/N) * 1^T * P^t)^alpha
+    nu = (mu^T * P^t)^alpha
 
+
+    Parameters
+    ----------
+    adjacency_matrix : scipy.sparse matrix or numpy.ndarray
+        Adjacency matrix of shape (n, n). Can be directed or undirected.
+    alpha : float
+        Exponent for the measure. alpha=0 corresponds to the uniform measure, alpha=1 corresponds to the t-step diffusion measure.
+    t : int
+        Number of steps for the diffusion process. t=0 corresponds to the initial measure (e.g. uniform), t=1 corresponds to the one-step transition matrix, and higher t captures longer range interactions.
+    initialize_measure : function, optional
+        A function that takes the adjacency matrix and returns an initial measure vector of shape (n,). If None, defaults to the uniform measure. This allows for more flexible strategies (e.g. degree-based initialization).
+    epsilon : float, optional
+        A small value to avoid numerical issues (e.g. zero entries in the measure). Default is 1e-8.
+
+    Returns
+    -------
+    nu : numpy.ndarray of shape (n,)
+        The computed vertex measure vector.
+
+    ----
     Uses power iteration for O(t * log(n)) complexity instead of O(N²) matrix power.
     Note: The t iterations are inherently sequential (each depends on previous).
     The sparse mat-vec operations use optimized scipy/BLAS routines.
     """
+
     is_sparse = sp.issparse(adjacency_matrix)
     N = adjacency_matrix.shape[0]
 
+    if initialize_measure is not None:
+        mu = initialize_measure(adjacency_matrix)
+    else:
+        mu = np.ones(N) / N
     # Build row-stochastic matrix P = D^{-1} A
     degree_vec = np.asarray(adjacency_matrix.sum(axis=1)).flatten()
     degree_vec[degree_vec == 0] = 1  # Avoid division by zero
@@ -40,8 +65,8 @@ def teleporting_undirected_measure(adjacency_matrix, alpha, t, epsilon=1e-8):
     else:
         P = adjacency_matrix / degree_vec[:, np.newaxis]
 
-    # Power iteration: v = (1/N) * 1^T * P^t
-    v = reduce(lambda v, _: v @ P, range(t), np.ones(N) / N)
+    # Power iteration: v = mu^T * P^t
+    v = reduce(lambda v, _: v @ P, range(t), mu)
 
     nu = np.power(v, alpha)
     nu[nu <= 0] = epsilon
