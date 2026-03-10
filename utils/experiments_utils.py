@@ -156,19 +156,19 @@ def experiment(
             logger.info(f"Parallel execution with {n_jobs} jobs")
 
     if mode == "score":
-        results_dict, all_parameters = _run_score_experiment(
+        results_dict, all_parameters, runtimes = _run_score_experiment(
             dataset_names, method_specs, config, load_path, metrics, n_jobs
         )
         fig, grid_results = None, None
 
     elif mode == "viz":
-        fig, all_parameters = _run_viz_experiment(
+        fig, all_parameters, runtimes = _run_viz_experiment(
             dataset_names, method_specs, config, load_path, metrics
         )
         results_dict, grid_results = None, None
 
     else:  # mode == "grid_search"
-        grid_results, all_parameters = _run_grid_search_experiment(
+        grid_results, all_parameters, runtimes = _run_grid_search_experiment(
             dataset_names, method_specs, config, load_path, metrics, n_jobs
         )
         fig, results_dict = None, None
@@ -182,6 +182,7 @@ def experiment(
             metric_dfs=results_dict,
             figure=fig,
             grid_results=grid_results,
+            runtimes=runtimes,
         )
         logger.success(
             f"{mode.capitalize().replace('_',' ')} experiment '{experiment_name}' completed and saved successfully to '{save_path}'."
@@ -307,6 +308,7 @@ def _run_grid_search_experiment(
 
     grid_results = {}
     all_parameters = {dataset_name: {} for dataset_name in dataset_names}
+    runtimes = {dataset_name: {} for dataset_name in dataset_names}
 
     for i, dataset_name in enumerate(dataset_names):
         if i > 0:
@@ -326,6 +328,7 @@ def _run_grid_search_experiment(
 
         for implicit_name, explicit_name in method_specs:
             logger.info(f"Running grid search for: {explicit_name}")
+            start_time = time.time()
 
             resolved_params = config.get_final_params(
                 y, dataset_name, explicit_name, implicit_name
@@ -387,13 +390,11 @@ def _run_grid_search_experiment(
                 }
                 tasks.append(task)
 
-            start_time = time.time()
             results = Parallel(n_jobs=n_jobs, verbose=parallel_verbose)(
                 delayed(_run_single_task)(task, mode="grid_search") for task in tasks
             )
-            timing = time.time() - start_time
+            runtime_seconds = time.time() - start_time
             method_results = _aggregate_grid_search_results(results, metrics)
-            method_results["timing"] = timing
             method_results["grid_param_names"] = param_names
             method_results["all_grid_results"] = results
 
@@ -405,8 +406,11 @@ def _run_grid_search_experiment(
                 )
                 continue
 
+            method_results["runtime_seconds"] = runtime_seconds
+            runtimes[dataset_name][explicit_name] = {"runtime_seconds": runtime_seconds}
+
             logger.info(
-                f"  Completed {method_results['successful_combinations']} combinations in {timing:.2f}s"
+                f"  Completed {method_results['successful_combinations']} combinations in {runtime_seconds:.2f}s"
             )
 
             if len(metrics) == 1:
@@ -427,7 +431,7 @@ def _run_grid_search_experiment(
 
         grid_results[dataset_name] = dataset_results
 
-    return grid_results, all_parameters
+    return grid_results, all_parameters, runtimes
 
 
 def _prepare_spectral_grid_cache(task_specs, graph_cache):
@@ -570,6 +574,7 @@ def _run_score_experiment(
         dfs[metric] = pd.DataFrame(index=dataset_names, columns=all_cols, dtype=float)
 
     all_parameters = {dataset_name: {} for dataset_name in dataset_names}
+    runtimes = {dataset_name: {} for dataset_name in dataset_names}
 
     for result in results:
         if result is not None:
@@ -577,6 +582,7 @@ def _run_score_experiment(
             explicit_name = result["explicit_name"]
             scores = result["scores"]
             final_params = result["final_params"]
+            runtime_seconds = result["runtime_seconds"]
 
             for metric in metrics:
                 score_data = scores.get(metric, {"mean": 0.0, "std": 0.0})
@@ -587,12 +593,13 @@ def _run_score_experiment(
                 dfs[metric].loc[dataset_name, f"{explicit_name}_std"] = std_val
 
             all_parameters[dataset_name][explicit_name] = final_params
+            runtimes[dataset_name][explicit_name] = {"runtime_seconds": runtime_seconds}
 
     results_dict = {}
     for metric in metrics:
         results_dict[metric] = dfs[metric]
 
-    return results_dict, all_parameters
+    return results_dict, all_parameters, runtimes
 
 
 def _run_viz_experiment(dataset_names, method_specs, config, load_path, metrics):
@@ -601,6 +608,7 @@ def _run_viz_experiment(dataset_names, method_specs, config, load_path, metrics)
     num_datasets = len(dataset_names)
     num_methods = len(method_specs)
     all_parameters = {}
+    runtimes = {dataset_name: {} for dataset_name in dataset_names}
 
     plt.figure(figsize=(num_methods * 3 + 1, num_datasets * 3 + 1))
     plt.subplots_adjust(
@@ -682,14 +690,18 @@ def _run_viz_experiment(dataset_names, method_specs, config, load_path, metrics)
             for metric in metrics:
                 score_value = scores.get(metric, 0.0)
                 score_strs.append(f"{metric.upper()}={score_value:.1f}")
-            logger.info(f"{explicit_name}: {', '.join(score_strs)} in {t1-t0:.2f}s")
+            runtime_seconds = t1 - t0
+            runtimes[dataset_name][explicit_name] = {"runtime_seconds": runtime_seconds}
+            logger.info(
+                f"{explicit_name} on {dataset_name}: {', '.join(score_strs)} in {runtime_seconds:.2f}s"
+            )
 
             plot_num += 1
 
     fig = plt.gcf()
     plt.show()
 
-    return fig, all_parameters
+    return fig, all_parameters, runtimes
 
 
 def _run_single_task(task, mode):
@@ -724,6 +736,7 @@ def _run_single_task(task, mode):
 
     all_scores = []
     all_labels = []
+    start_time = time.time()
 
     for i in range(n_it):
         iteration_params = params.copy()
@@ -755,6 +768,8 @@ def _run_single_task(task, mode):
     else:
         scores = {metric: {"mean": 0.0, "std": 0.0} for metric in metrics}
 
+    runtime_seconds = time.time() - start_time
+
     if mode == "score" and logger.verbose:
         score_strs = []
         for metric in metrics:
@@ -762,13 +777,16 @@ def _run_single_task(task, mode):
             std_value = scores[metric]["std"]
             score_strs.append(f"{metric.upper()}={mean_value:.1f}±{std_value:.1f}")
 
-        logger.info(f"{explicit_name} on {dataset_name}: {', '.join(score_strs)}")
+        logger.info(
+            f"{explicit_name} on {dataset_name}: {', '.join(score_strs)} in {runtime_seconds:.2f}s"
+        )
 
     result = {
         "scores": scores,
         "final_params": params,
         "error": None,
         "predicted_labels": all_labels,
+        "runtime_seconds": runtime_seconds,
     }
 
     if mode == "score":

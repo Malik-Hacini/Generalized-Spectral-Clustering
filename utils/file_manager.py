@@ -241,7 +241,8 @@ def save_dataset(data: np.ndarray, labels: np.ndarray,
 def save_experiment_results(mode: str, experiment_name: str, save_path: str, 
                            parameters: dict = None,
                            metric_dfs: dict = None, figure = None, 
-                           grid_results: dict = None) -> None:
+                           grid_results: dict = None,
+                           runtimes: dict = None) -> None:
     """
     Save experiment results in organized directory structure for all modes.
 
@@ -333,6 +334,9 @@ def save_experiment_results(mode: str, experiment_name: str, save_path: str,
             json.dump(parameters, f, indent=2, default=str)
         
         logger.info(f"  Parameters saved: {params_filename}")
+
+    if runtimes:
+        _save_runtime_files(experiment_dir, experiment_name, runtimes)
     
 def _save_score_files(experiment_dir: str, experiment_name: str, metric_dfs: dict):
     """Save score mode specific files."""
@@ -355,6 +359,27 @@ def _save_viz_files(experiment_dir: str, experiment_name: str, figure):
     
     logger.info(f"  Visualization saved: {plot_filename}")
 
+def _save_runtime_files(experiment_dir: str, experiment_name: str, runtimes: dict):
+    """Save method-on-dataset runtimes."""
+
+    logger = get_logger()
+    runtime_df = pd.DataFrame(
+        {
+            dataset_name: {
+                method_name: method_runtime["runtime_seconds"]
+                for method_name, method_runtime in dataset_runtimes.items()
+            }
+            for dataset_name, dataset_runtimes in runtimes.items()
+        }
+    ).T
+    runtime_df.index.name = "dataset"
+
+    runtime_filename = f"{experiment_name}_runtimes.csv"
+    runtime_path = os.path.join(experiment_dir, runtime_filename)
+    runtime_df.to_csv(runtime_path, index=True)
+
+    logger.info(f"  Runtimes saved: {runtime_filename}")
+
 def _save_grid_search_files(experiment_dir: str, grid_results: dict):
     """Save grid search mode specific files."""
     
@@ -372,6 +397,7 @@ def _save_grid_search_files(experiment_dir: str, grid_results: dict):
                 continue
                 
             summary_row = {'method': method_name}
+            summary_row['runtime_seconds'] = round(method_results['runtime_seconds'], 4)
             
             for key, value in method_results.items():
                 if isinstance(value, dict) and 'best' in value:
