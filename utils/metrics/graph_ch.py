@@ -10,6 +10,8 @@ def graph_calinski_harabasz(A, labels, t=1, filter_coeffs=None):
     is_sparse = sp.issparse(A)
     coeffs = {t: 1.0} if filter_coeffs is None else filter_coeffs
     Z = _build_diffusion_embedding(A, coeffs, is_sparse)
+    if is_sparse:
+        Z = sp.csr_matrix(Z).toarray()  # type: ignore
 
     return calinski_harabasz_score(Z, labels)
 
