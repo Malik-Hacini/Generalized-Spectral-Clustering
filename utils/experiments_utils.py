@@ -19,16 +19,15 @@ from sklearn.metrics import (  # type: ignore
 )
 from sklearn.neighbors import kneighbors_graph  # type: ignore
 from sklearn.preprocessing import StandardScaler  # type: ignore
+from sklearn.utils._param_validation import _resolve_callable_param  # type: ignore
 
 from competitors.disim import DiSim
 from competitors.dsc import DSC
 from utils.file_manager import load_dataset, save_experiment_results
 from utils.logger import get_logger, set_logger_verbose
-from utils.metrics.graph_CH import graph_calinski_harabasz
+from utils.metrics.graph_ch import graph_calinski_harabasz
 from utils.metrics.map_equation import map_equation
 from utils.metrics.modularity import modularity
-
-from sklearn.utils._param_validation import _resolve_callable_param  # type: ignore
 
 
 def experiment(
@@ -493,7 +492,9 @@ def _resolve_callable_param_local(param, context_kwargs=None):
 
 
 def _build_spectral_connectivity(X, params):
-    resolved_n_neighbors = _resolve_callable_param_local(params["n_neighbors"], {"X": X})
+    resolved_n_neighbors = _resolve_callable_param_local(
+        params["n_neighbors"], {"X": X}
+    )
     affinity = params["affinity"]
     if affinity == "nearest_neighbors":
         return kneighbors_graph(
@@ -514,7 +515,9 @@ def _build_spectral_connectivity(X, params):
 
 
 def _get_spectral_connectivity_cache_entry(X, params, graph_cache):
-    resolved_n_neighbors = _resolve_callable_param_local(params["n_neighbors"], {"X": X})
+    resolved_n_neighbors = _resolve_callable_param_local(
+        params["n_neighbors"], {"X": X}
+    )
     affinity = params["affinity"]
     cache_key = (
         affinity,
@@ -852,10 +855,11 @@ def _compute_clustering_scores(y_true, y_pred, metrics, X, metric_params=None):
     ----------
     metric_params : dict, optional
         Optional mapping of metric name to kwargs dict. Example:
-        {"graph_ch": {"filter_coeffs": {1: 0.5, 2: 0.5}, "weighted": False}}
+        {"graph_ch": {"t": 3}}
         If omitted, all metrics use their default parameters.
     """
 
+    logger = get_logger()
     if metric_params is None:
         metric_params = {}
     elif isinstance(metric_params, list):
@@ -874,56 +878,56 @@ def _compute_clustering_scores(y_true, y_pred, metrics, X, metric_params=None):
     scores = {}
 
     supervised_available = y_true is not None and len(np.unique(y_true)) > 1
+    is_graph = X is not None and sp.issparse(X)
+    is_point_cloud = X is not None and not is_graph
 
-    n_clusters = len(np.unique(y_pred))
-    if n_clusters <= 1:
-        for metric in metrics:
-            scores[metric] = 0.0
-        return scores
+    supervised_metrics = {"nmi", "ari", "ami"}
+    point_cloud_metrics = {"ch"}
+    graph_metrics = {"modularity", "map_equation", "graph_ch"}
+
+    metric_available = {
+        **{metric: supervised_available for metric in supervised_metrics},
+        **{metric: is_point_cloud for metric in point_cloud_metrics},
+        **{metric: is_graph for metric in graph_metrics},
+    }
 
     for metric in metrics:
-        metric_kwargs = metric_params.get(metric, {})
-        if metric_kwargs is None:
-            metric_kwargs = {}
-        if not isinstance(metric_kwargs, dict):
-            raise ValueError(f"Metric parameters for '{metric}' must be a dict or None")
+        try:
+            metric_kwargs = metric_params.get(metric, {})
+            if metric_kwargs is None:
+                metric_kwargs = {}
+            if not isinstance(metric_kwargs, dict):
+                raise ValueError(f"Metric parameters for '{metric}' must be a dict or None")
 
-        if metric == "nmi":
-            score = (
-                normalized_mutual_info_score(y_true, y_pred)
-                if supervised_available
-                else 0.0
-            )
-        elif metric == "ari":
-            score = adjusted_rand_score(y_true, y_pred) if supervised_available else 0.0
-        elif metric == "ami":
-            score = (
-                adjusted_mutual_info_score(y_true, y_pred)
-                if supervised_available
-                else 0.0
-            )
-        elif metric == "ch":
-            if X is None or sp.issparse(X):
-                score = 0.0  # CH not applicable to graphs
-            else:
+            if metric not in metric_available:
+                raise ValueError(f"Unknown metric: {metric}")
+
+            if not metric_available[metric]:
+                if metric in supervised_metrics:
+                    reason = "supervised metric requires ground-truth labels with at least two classes"
+                elif metric in point_cloud_metrics:
+                    reason = "point-cloud metric requires dense input"
+                else:
+                    reason = "graph metric requires a sparse adjacency matrix"
+                raise ValueError(reason)
+
+            if metric == "nmi":
+                score = normalized_mutual_info_score(y_true, y_pred)
+            elif metric == "ari":
+                score = adjusted_rand_score(y_true, y_pred)
+            elif metric == "ami":
+                score = adjusted_mutual_info_score(y_true, y_pred)
+            elif metric == "ch":
                 score = calinski_harabasz_score(X, y_pred)
-        elif metric == "modularity":
-            if X is None or not sp.issparse(X):
-                score = 0.0  # Modularity only for graphs
-            else:
+            elif metric == "modularity":
                 score = modularity(X, y_pred)
-        elif metric == "map_equation":
-            if X is None or not sp.issparse(X):
-                score = 0.0  # Map equation only for graphs
-            else:
+            elif metric == "map_equation":
                 score = map_equation(X, y_pred)
-        elif metric == "graph_ch":
-            if X is None or not sp.issparse(X):
-                score = 0.0  # Graph CH only for graphs
             else:
                 score = graph_calinski_harabasz(X, y_pred, **metric_kwargs)
-        else:
-            raise ValueError(f"Unknown metric: {metric}")
+        except Exception as e:
+            logger.error(f"Metric '{metric}' failed: {e}; returning 0.0.")
+            score = 0.0
 
         scores[metric] = round(score, 4)
 
