@@ -1,53 +1,122 @@
-from .file_manager import save_dataset
-from sys import setrecursionlimit
 import os
-os.environ['MPLBACKEND'] = 'Qt5Agg'
+from sys import setrecursionlimit
+
+from .file_manager import save_dataset
+
+os.environ["MPLBACKEND"] = "Qt5Agg"
 import matplotlib.pyplot as plt
 
 setrecursionlimit(10000000)
 
+
 class PointCollector:
     """An interactive 2D dataset builder, running on matplotlib."""
-    def __init__(self,save):
-        self.save=save
+
+    def __init__(self, save):
+        self.save = save
         self.points = {color: [] for color in self.color_map.values()}
-        self.current_color = 'blue'
+        self.current_color = "blue"
         self.is_drawing = False
         self.eraser_mode = False
         self.counter_mode = False
         self.fig, self.ax = plt.subplots()
-        self.scatter_plots = {color: self.ax.plot([], [], 'o', color=color)[0] for color in self.color_map.values()}
+        self.scatter_plots = {
+            color: self.ax.plot([], [], "o", color=color)[0]
+            for color in self.color_map.values()
+        }
         self.create_legend()
 
     @property
     def color_map(self):
         return {
-            '1': 'blue', '2': 'green', '3': 'red', '4': 'cyan',
-            '5': 'magenta', '6': 'yellow', '7': 'black',
-            '8': 'orange', '9': 'purple'
+            "1": "blue",
+            "2": "green",
+            "3": "red",
+            "4": "cyan",
+            "5": "magenta",
+            "6": "yellow",
+            "7": "black",
+            "8": "orange",
+            "9": "purple",
         }
 
     def create_legend(self):
         self.legend_patches = [
-            plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=color, markersize=6, label=f'{key}')
+            plt.Line2D(
+                [0],
+                [0],
+                marker="o",
+                color="w",
+                markerfacecolor=color,
+                markersize=6,
+                label=f"{key}",
+            )
             for key, color in self.color_map.items()
         ]
         if self.save:
-            self.save_patch = plt.Line2D([0], [0], linestyle="None", marker="", color='black', label="Press '0' to save")
-        self.erase_patch = plt.Line2D([0], [0], linestyle="None", marker="", color='black', label="Press 'E' to enable zone eraser")
-        self.erase_all_patch = plt.Line2D([0], [0], linestyle="None", marker="", color='black', label="Press 'R' to reset")
-        self.counter_patch = plt.Line2D([0], [0], linestyle="None", marker="", color='black', label="Press 'C' to enable counter")
+            self.save_patch = plt.Line2D(
+                [0],
+                [0],
+                linestyle="None",
+                marker="",
+                color="black",
+                label="Press '0' to save",
+            )
+        self.erase_patch = plt.Line2D(
+            [0],
+            [0],
+            linestyle="None",
+            marker="",
+            color="black",
+            label="Press 'E' to enable zone eraser",
+        )
+        self.erase_all_patch = plt.Line2D(
+            [0],
+            [0],
+            linestyle="None",
+            marker="",
+            color="black",
+            label="Press 'R' to reset",
+        )
+        self.counter_patch = plt.Line2D(
+            [0],
+            [0],
+            linestyle="None",
+            marker="",
+            color="black",
+            label="Press 'C' to enable counter",
+        )
 
         # Place the color legend outside the plot at the top left of the figure, horizontally
-        self.legend1 = self.fig.legend(handles=self.legend_patches, loc='upper left', bbox_to_anchor=(0.1, 0.95), markerscale=1, ncol=len(self.legend_patches))
+        self.legend1 = self.fig.legend(
+            handles=self.legend_patches,
+            loc="upper left",
+            bbox_to_anchor=(0.1, 0.95),
+            markerscale=1,
+            ncol=len(self.legend_patches),
+        )
 
         # Place the save and erase instruction legend outside the plot at the top right of the figure
         if self.save:
-            feature_handles=[self.save_patch, self.erase_patch, self.erase_all_patch, self.counter_patch]
+            feature_handles = [
+                self.save_patch,
+                self.erase_patch,
+                self.erase_all_patch,
+                self.counter_patch,
+            ]
         else:
-            feature_handles=[self.erase_patch, self.erase_all_patch, self.counter_patch]
+            feature_handles = [
+                self.erase_patch,
+                self.erase_all_patch,
+                self.counter_patch,
+            ]
 
-        self.legend2 = self.fig.legend(handles=feature_handles, loc='upper right', bbox_to_anchor=(0.9, 1), frameon=False)
+        self.legend2 = self.fig.legend(
+            handles=feature_handles,
+            loc="upper right",
+            bbox_to_anchor=(0.9, 1),
+            frameon=False,
+        )
         self.erase_label = self.legend2.get_texts()[1]
         self.erase_all_label = self.legend2.get_texts()[2]
         self.counter_label = self.legend2.get_texts()[3]
@@ -59,12 +128,29 @@ class PointCollector:
         if self.legend3 is not None:
             self.legend3.remove()
 
-        if self.counter_mode and any(len(points) > 0 for points in self.points.values()):
+        if self.counter_mode and any(
+            len(points) > 0 for points in self.points.values()
+        ):
             self.counter_patches = [
-                plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=color, markersize=6, label=f'{len(points)}')
-                for color, points in self.points.items() if points
+                plt.Line2D(
+                    [0],
+                    [0],
+                    marker="o",
+                    color="w",
+                    markerfacecolor=color,
+                    markersize=6,
+                    label=f"{len(points)}",
+                )
+                for color, points in self.points.items()
+                if points
             ]
-            self.legend3 = self.fig.legend(handles=self.counter_patches, loc='upper left', bbox_to_anchor=(0, 0.85), markerscale=1, ncol=1)
+            self.legend3 = self.fig.legend(
+                handles=self.counter_patches,
+                loc="upper left",
+                bbox_to_anchor=(0, 0.85),
+                markerscale=1,
+                ncol=1,
+            )
             self.fig.canvas.draw()
 
     def on_press(self, event):
@@ -94,7 +180,11 @@ class PointCollector:
     def erase_point(self, event):
         erase_radius = 0.005
         for color, points in self.points.items():
-            self.points[color] = [(x, y) for x, y in points if (x - event.xdata)**2 + (y - event.ydata)**2 > erase_radius**2]
+            self.points[color] = [
+                (x, y)
+                for x, y in points
+                if (x - event.xdata) ** 2 + (y - event.ydata) ** 2 > erase_radius**2
+            ]
         if self.counter_mode:
             self.create_counter_legend()
 
@@ -106,7 +196,9 @@ class PointCollector:
 
     def update_plot(self):
         for color, line in self.scatter_plots.items():
-            x_data, y_data = zip(*self.points[color]) if self.points[color] else ([], [])
+            x_data, y_data = (
+                zip(*self.points[color]) if self.points[color] else ([], [])
+            )
             line.set_data(x_data, y_data)
         self.ax.draw_artist(self.ax.patch)
         for line in self.scatter_plots.values():
@@ -119,7 +211,10 @@ class PointCollector:
         labels = []
         for color, points in self.points.items():
             data.extend(points)
-            labels.extend([int(key) for key, val in self.color_map.items() if val == color] * len(points))
+            labels.extend(
+                [int(key) for key, val in self.color_map.items() if val == color]
+                * len(points)
+            )
         return data, labels
 
     def change_color(self, key):
@@ -146,12 +241,13 @@ class PointCollector:
                 self.legend3 = None
         self.fig.canvas.draw()
 
+
 def build_dataset(save=False, name=None, path=None):
     """Interactive 2D dataset builder using matplotlib.
-    
+
     Create labeled 2D datasets by drawing points with different colors representing clusters.
     Use number keys (1-9) to switch between cluster colors, and various hotkeys for editing.
-    
+
     Parameters:
     -----------
     save : bool, optional
@@ -161,13 +257,13 @@ def build_dataset(save=False, name=None, path=None):
     path : str, optional
         Directory path to save dataset (required if save=True). Example: 'datasets'
 
-    ----------    
+    ----------
     Returns:
     data : numpy.ndarray
         Array of 2D points with shape (n_points, 2)
     labels : numpy.ndarray
         Cluster labels for each point with shape (n_points,)
-        
+
     Controls:
     ---------
     - Keys 1-9: Switch cluster colors
@@ -175,38 +271,36 @@ def build_dataset(save=False, name=None, path=None):
     - Key E: Toggle eraser mode
     - Key R: Reset/clear all points
     - Key C: Toggle point counter display
-    
+
     Notes:
     ------
     Saved datasets can be loaded using load_dataset() from utils.file_manager.
     """
     collector = PointCollector(save)
 
-    collector.fig.canvas.mpl_connect('button_press_event', collector.on_press)
-    collector.fig.canvas.mpl_connect('button_release_event', collector.on_release)
-    collector.fig.canvas.mpl_connect('motion_notify_event', collector.on_motion)
+    collector.fig.canvas.mpl_connect("button_press_event", collector.on_press)
+    collector.fig.canvas.mpl_connect("button_release_event", collector.on_release)
+    collector.fig.canvas.mpl_connect("motion_notify_event", collector.on_motion)
 
     def on_key(event):
         if event.key in collector.color_map:
             collector.change_color(event.key)
-        elif event.key == '0' and save:
+        elif event.key == "0" and save:
             data, labels = collector.generate_data_and_labels()
             save_dataset(data, labels, path=path, name=name)
-        elif event.key.lower() == 'e':
+        elif event.key.lower() == "e":
             collector.toggle_eraser()
-        elif event.key.lower() == 'r':
+        elif event.key.lower() == "r":
             collector.erase_all_points()
-        elif event.key.lower() == 'c':
+        elif event.key.lower() == "c":
             collector.toggle_counter()
 
-    collector.fig.canvas.mpl_connect('key_press_event', on_key)
+    collector.fig.canvas.mpl_connect("key_press_event", on_key)
 
-    collector.ax.set_xticks([])  
-    collector.ax.set_yticks([])  
+    collector.ax.set_xticks([])
+    collector.ax.set_yticks([])
 
-    
     plt.show()
-    
-    data,labels=collector.generate_data_and_labels()
-    return data,labels
-    
+
+    data, labels = collector.generate_data_and_labels()
+    return data, labels

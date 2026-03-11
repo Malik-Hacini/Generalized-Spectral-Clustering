@@ -64,7 +64,9 @@ class ExperimentConfig:
         Get final parameters for a specific dataset-method combination
     """
 
-    def __init__(self, default_params, dataset_params, method_params, method_dataset_params):
+    def __init__(
+        self, default_params, dataset_params, method_params, method_dataset_params
+    ):
         self.default_params = default_params
         self.dataset_params_dict = dict(dataset_params) if dataset_params else {}
         self.method_params_dict = dict(method_params) if method_params else {}
@@ -74,7 +76,9 @@ class ExperimentConfig:
             for method_name, dataset_param_list in method_dataset_params:
                 self.method_dataset_params_dict[method_name] = dict(dataset_param_list)
 
-    def get_final_params(self, labels, dataset_name, method_explicit_name, method_implicit_name=None):
+    def get_final_params(
+        self, labels, dataset_name, method_explicit_name, method_implicit_name=None
+    ):
         """Get final parameters with hierarchy: default < dataset < method < method_dataset.
 
         Applies the parameter hierarchy and optionally filters parameters for specific methods.
@@ -101,26 +105,61 @@ class ExperimentConfig:
         if method_explicit_name in self.method_params_dict:
             params.update(self.method_params_dict[method_explicit_name])
 
-        if (method_explicit_name in self.method_dataset_params_dict and
-            dataset_name in self.method_dataset_params_dict[method_explicit_name]):
-            params.update(self.method_dataset_params_dict[method_explicit_name][dataset_name])
+        if (
+            method_explicit_name in self.method_dataset_params_dict
+            and dataset_name in self.method_dataset_params_dict[method_explicit_name]
+        ):
+            params.update(
+                self.method_dataset_params_dict[method_explicit_name][dataset_name]
+            )
 
         if method_implicit_name:
-             params= self._filter_params_for_method(params, method_implicit_name)
+            params = self._filter_params_for_method(params, method_implicit_name)
 
         params["n_clusters"] = len(set(labels))
         return params
 
-
     def _filter_params_for_method(self, params, method_implicit_name):
         """Filter parameters to only include those used by the method."""
         method_param_mapping = {
-            "spectral": {"n_clusters", "n_neighbors", "affinity", "gamma", "laplacian_method",
-                        "measure", "random_state", "callable_kwargs", "standard", "eigen_solver", "eigen_tol", "n_it", "metric_params", "precomputed_connectivity"},
+            "spectral": {
+                "n_clusters",
+                "n_neighbors",
+                "affinity",
+                "gamma",
+                "laplacian_method",
+                "measure",
+                "random_state",
+                "callable_kwargs",
+                "standard",
+                "eigen_solver",
+                "eigen_tol",
+                "n_it",
+                "metric_params",
+                "precomputed_connectivity",
+            },
             "kmeans": {"n_clusters", "random_state", "n_it", "metric_params"},
-
-            "dsc": {"n_clusters", "n_neighbors", "gamma", "max_iter", "tol", "epsilon", "random_state", "n_it", "metric_params"},
-            "di_sim": {"n_clusters", "n_neighbors", "tau", "embedding", "epsilon", "random_state", "n_it", "metric_params"},
+            "dsc": {
+                "n_clusters",
+                "n_neighbors",
+                "gamma",
+                "max_iter",
+                "tol",
+                "epsilon",
+                "random_state",
+                "n_it",
+                "metric_params",
+            },
+            "di_sim": {
+                "n_clusters",
+                "n_neighbors",
+                "tau",
+                "embedding",
+                "epsilon",
+                "random_state",
+                "n_it",
+                "metric_params",
+            },
         }
 
         if method_implicit_name in method_param_mapping:

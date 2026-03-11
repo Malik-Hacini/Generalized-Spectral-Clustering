@@ -13,13 +13,18 @@ Return value:
    - Must return a numpy.ndarray vector of shape (N,)
 """
 
+from functools import reduce
+
 import numpy as np
 import scipy.sparse as sp
-from functools import reduce
-from sklearn.neighbors import kneighbors_graph #type: ignore
+from sklearn.neighbors import kneighbors_graph  # type: ignore
+
 from .neighbors import log_neighbors
 
-def teleporting_undirected_measure(adjacency_matrix, alpha, t,initialize_measure= None , epsilon=1e-8):
+
+def teleporting_undirected_measure(
+    adjacency_matrix, alpha, t, initialize_measure=None, epsilon=1e-8
+):
     """
     Builds the undirected vertex measure:
     nu = (mu^T * P^t)^alpha
@@ -122,6 +127,7 @@ def uniform_measure(adjacency_matrix):
     nu = np.ones(N) / N
     return nu
 
+
 def perron_vector_measure(adjacency_matrix, epsilon=1e-8):
     """
     Builds the Perron vector vertex measure:
@@ -148,7 +154,7 @@ def perron_vector_measure(adjacency_matrix, epsilon=1e-8):
         P = adjacency_matrix / degree_vec[:, np.newaxis]
 
     # Compute leading left eigenvector (Perron vector)
-    eigenvalues, left_eigenvectors = sp.linalg.eigs(P.T, k=1, which='LM')
+    eigenvalues, left_eigenvectors = sp.linalg.eigs(P.T, k=1, which="LM")
     nu = np.real(left_eigenvectors[:, 0])
 
     nu[nu <= 0] = epsilon

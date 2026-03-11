@@ -1,32 +1,37 @@
-import os
 import json
+import os
+
 import numpy as np
 import pandas as pd
 import scipy.sparse as sp
-from datasets import load_from_disk, Dataset, DatasetDict
+
+from datasets import Dataset, DatasetDict, load_from_disk
 from utils.logger import get_logger
+
 
 def _is_graph_dataset(dataset_path: str) -> bool:
     """Check if the dataset is a graph dataset by looking for graph.npz file."""
-    return os.path.isfile(os.path.join(dataset_path, 'graph.npz'))
+    return os.path.isfile(os.path.join(dataset_path, "graph.npz"))
+
 
 def _load_graph(dataset_path: str):
     """Load a graph dataset from a graph.npz file."""
-    graph_file = os.path.join(dataset_path, 'graph.npz')
+    graph_file = os.path.join(dataset_path, "graph.npz")
     data = np.load(graph_file, allow_pickle=True)
-    
+
     adjacency_matrix = sp.csr_matrix(
-        (data['adj_data'], data['adj_indices'], data['adj_indptr']),
-        shape=tuple(data['adj_shape'])
+        (data["adj_data"], data["adj_indices"], data["adj_indptr"]),
+        shape=tuple(data["adj_shape"]),
     )
-    labels = data['labels'] if 'labels' in data else None
+    labels = data["labels"] if "labels" in data else None
 
     return adjacency_matrix, labels
+
 
 def _load_pointcloud(dataset_path: str, split: str, feature_cols, label_col: str):
     """Load a point-cloud dataset from Hugging Face arrow format."""
     target_path = dataset_path
-    
+
     if not os.path.isfile(os.path.join(target_path, "dataset_info.json")):
         candidate = os.path.join(target_path, split)
         if os.path.isdir(candidate):
@@ -61,12 +66,19 @@ def _load_pointcloud(dataset_path: str, split: str, feature_cols, label_col: str
 
     return X, y
 
-def load_dataset(path: str, name: str, split: str = "train", feature_cols=None, label_col: str = "labels"):
+
+def load_dataset(
+    path: str,
+    name: str,
+    split: str = "train",
+    feature_cols=None,
+    label_col: str = "labels",
+):
     """
     Load a dataset from local disk storage.
-    
+
     Automatically detects the dataset type (graph or point-cloud) based on file structure
-    and returns the appropriate data format. 
+    and returns the appropriate data format.
 
     Parameters
     ----------
@@ -91,7 +103,7 @@ def load_dataset(path: str, name: str, split: str = "train", feature_cols=None, 
             Feature matrix of shape (n_samples, n_features)
         y : numpy.ndarray
             Labels of shape (n_samples,)
-            
+
     For graph datasets:
         A : scipy.sparse.csr_matrix
             Sparse adjacency matrix of shape (n_nodes, n_nodes)
@@ -120,23 +132,23 @@ def load_dataset(path: str, name: str, split: str = "train", feature_cols=None, 
     Notes
     -----
     Dataset type is detected automatically:
-    
+
     - **Graph datasets**: Must contain a `graph.npz` file with sparse matrix components
       (adj_data, adj_indices, adj_indptr, adj_shape) and optionally labels.
-      
+
     - **Point-cloud datasets**: Must be in Hugging Face Dataset format with
       dataset_info.json and Arrow format data files.
-    
+
     File structures:
-    
+
     Graph dataset::
-    
+
         path/
         └── name/
             └── graph.npz
-            
+
     Point-cloud dataset::
-    
+
         path/
         └── name/
             ├── dataset_info.json
@@ -144,23 +156,28 @@ def load_dataset(path: str, name: str, split: str = "train", feature_cols=None, 
                 └── data-00000-of-00001.arrow
     """
     dataset_path = os.path.join(path, name)
-    
+
     if not os.path.isdir(dataset_path):
         raise FileNotFoundError(f"Dataset directory not found: '{dataset_path}'")
-    
+
     is_graph = _is_graph_dataset(dataset_path)
-    
+
     if is_graph:
         data, labels = _load_graph(dataset_path)
     else:
         data, labels = _load_pointcloud(dataset_path, split, feature_cols, label_col)
-    
+
     return data, labels
 
-def save_dataset(data: np.ndarray, labels: np.ndarray,
-                 path: str, name: str,
-                 feature_cols: list[str] = None,
-                 label_col: str = "labels") -> None:
+
+def save_dataset(
+    data: np.ndarray,
+    labels: np.ndarray,
+    path: str,
+    name: str,
+    feature_cols: list[str] = None,
+    label_col: str = "labels",
+) -> None:
     """
     Save dataset in Hugging Face format for use in experiments.
 
@@ -217,7 +234,9 @@ def save_dataset(data: np.ndarray, labels: np.ndarray,
     The saved dataset can be loaded using load_dataset(path, name).
     """
     data, labels = np.asarray(data), np.asarray(labels)
-    assert data.shape[0] == labels.shape[0], "data and labels must have same number of samples"
+    assert (
+        data.shape[0] == labels.shape[0]
+    ), "data and labels must have same number of samples"
 
     if feature_cols is None:
         if data.ndim == 1:
@@ -238,11 +257,17 @@ def save_dataset(data: np.ndarray, labels: np.ndarray,
 
     ds_dict.save_to_disk(os.path.join(path, name))
 
-def save_experiment_results(mode: str, experiment_name: str, save_path: str, 
-                           parameters: dict = None,
-                           metric_dfs: dict = None, figure = None, 
-                           grid_results: dict = None,
-                           runtimes: dict = None) -> None:
+
+def save_experiment_results(
+    mode: str,
+    experiment_name: str,
+    save_path: str,
+    parameters: dict = None,
+    metric_dfs: dict = None,
+    figure=None,
+    grid_results: dict = None,
+    runtimes: dict = None,
+) -> None:
     """
     Save experiment results in organized directory structure for all modes.
 
@@ -308,56 +333,59 @@ def save_experiment_results(mode: str, experiment_name: str, save_path: str,
                 ├── method2_all_results.json
                 └── method2_best_results.json
     ```
-    
+
     """
-    
+
     logger = get_logger()
     dir_name = f"{experiment_name}_{mode}"
-    
+
     experiment_dir = os.path.join(save_path, dir_name)
     os.makedirs(experiment_dir, exist_ok=True)
-    
+
     if logger.verbose:
         logger.info(f"Saving {mode} experiment results to: {experiment_dir}")
-    
+
     if mode == "score":
         _save_score_files(experiment_dir, experiment_name, metric_dfs)
     elif mode == "viz":
         _save_viz_files(experiment_dir, experiment_name, figure)
     elif mode == "grid_search":
         _save_grid_search_files(experiment_dir, grid_results)
-    
+
     if parameters:
         params_filename = f"{experiment_name}_params.json"
         params_path = os.path.join(experiment_dir, params_filename)
-        with open(params_path, 'w') as f:
+        with open(params_path, "w") as f:
             json.dump(parameters, f, indent=2, default=str)
-        
+
         logger.info(f"  Parameters saved: {params_filename}")
 
     if runtimes:
         _save_runtime_files(experiment_dir, experiment_name, runtimes)
-    
+
+
 def _save_score_files(experiment_dir: str, experiment_name: str, metric_dfs: dict):
     """Save score mode specific files."""
-    
+
     logger = get_logger()
     for metric, df in metric_dfs.items():
         csv_filename = f"{experiment_name}_scores_{metric}.csv"
         csv_path = os.path.join(experiment_dir, csv_filename)
         df.to_csv(csv_path, index=True)
-        
+
         logger.info(f"  Scores saved: {csv_filename}")
+
 
 def _save_viz_files(experiment_dir: str, experiment_name: str, figure):
     """Save visualization mode specific files."""
-    
+
     logger = get_logger()
     plot_filename = f"{experiment_name}_visualization.png"
     plot_path = os.path.join(experiment_dir, plot_filename)
-    figure.savefig(plot_path, dpi=300, bbox_inches='tight')
-    
+    figure.savefig(plot_path, dpi=300, bbox_inches="tight")
+
     logger.info(f"  Visualization saved: {plot_filename}")
+
 
 def _save_runtime_files(experiment_dir: str, experiment_name: str, runtimes: dict):
     """Save method-on-dataset runtimes."""
@@ -380,92 +408,120 @@ def _save_runtime_files(experiment_dir: str, experiment_name: str, runtimes: dic
 
     logger.info(f"  Runtimes saved: {runtime_filename}")
 
+
 def _save_grid_search_files(experiment_dir: str, grid_results: dict):
     """Save grid search mode specific files."""
-    
+
     logger = get_logger()
     for dataset_name, dataset_results in grid_results.items():
         logger.info(f"  Saving results for dataset: {dataset_name}")
-            
+
         dataset_dir = os.path.join(experiment_dir, dataset_name)
         os.makedirs(dataset_dir, exist_ok=True)
-        
+
         summary_rows = []
-        
+
         for method_name, method_results in dataset_results.items():
-            if 'error' in method_results:
+            if "error" in method_results:
                 continue
-                
-            summary_row = {'method': method_name}
-            summary_row['runtime_seconds'] = round(method_results['runtime_seconds'], 4)
-            
+
+            summary_row = {"method": method_name}
+            summary_row["runtime_seconds"] = round(method_results["runtime_seconds"], 4)
+
             for key, value in method_results.items():
-                if isinstance(value, dict) and 'best' in value:
+                if isinstance(value, dict) and "best" in value:
                     metric_name = key
-                    summary_row[f"{metric_name}_mean_across_grid"] = round(value.get('mean_across_grid', 0), 3)
-                    summary_row[f"{metric_name}_std_across_grid"] = round(value.get('std_across_grid', 0), 3)
-                    best_score = value['best']
-                    summary_row[f"{metric_name}_best_mean"] = round(best_score['mean'], 3)
-                    summary_row[f"{metric_name}_best_std"] = round(best_score['std'], 3)
-                   
-                    
+                    summary_row[f"{metric_name}_mean_across_grid"] = round(
+                        value.get("mean_across_grid", 0), 3
+                    )
+                    summary_row[f"{metric_name}_std_across_grid"] = round(
+                        value.get("std_across_grid", 0), 3
+                    )
+                    best_score = value["best"]
+                    summary_row[f"{metric_name}_best_mean"] = round(
+                        best_score["mean"], 3
+                    )
+                    summary_row[f"{metric_name}_best_std"] = round(best_score["std"], 3)
+
             summary_rows.append(summary_row)
-            
-            grid_param_names = method_results.get('grid_param_names', [])
-            all_grid_results = method_results.get('all_grid_results', [])
-            
+
+            grid_param_names = method_results.get("grid_param_names", [])
+            all_grid_results = method_results.get("all_grid_results", [])
+
             all_results = []
             for result in all_grid_results:
-                if result.get('error') is None and 'final_params' in result and 'scores' in result:
-                    grid_params = {param: result['final_params'][param] 
-                                 for param in grid_param_names 
-                                 if param in result['final_params']}
-                    
+                if (
+                    result.get("error") is None
+                    and "final_params" in result
+                    and "scores" in result
+                ):
+                    grid_params = {
+                        param: result["final_params"][param]
+                        for param in grid_param_names
+                        if param in result["final_params"]
+                    }
+
                     detail_entry = grid_params.copy()
-                    detail_entry.update(result['scores'])
+                    detail_entry.update(result["scores"])
                     # Include predicted labels if available
-                    if 'predicted_labels' in result:
-                        detail_entry['predicted_labels'] = result['predicted_labels']
+                    if "predicted_labels" in result:
+                        detail_entry["predicted_labels"] = result["predicted_labels"]
                     all_results.append(detail_entry)
-            
+
             method_dir = os.path.join(dataset_dir, method_name)
             os.makedirs(method_dir, exist_ok=True)
-            
+
             if all_results:
-                all_results_file = os.path.join(method_dir, f"{method_name}_all_results.json")
-                with open(all_results_file, 'w') as f:
+                all_results_file = os.path.join(
+                    method_dir, f"{method_name}_all_results.json"
+                )
+                with open(all_results_file, "w") as f:
                     json.dump(all_results, f, indent=2, default=str)
-            
+
             best_results = {}
             for key, value in method_results.items():
-                if isinstance(value, dict) and 'best' in value and 'best_params' in value:
+                if (
+                    isinstance(value, dict)
+                    and "best" in value
+                    and "best_params" in value
+                ):
                     metric_name = key
-                    best_params = value['best_params']
-                    
-                    grid_best_params = {param: best_params[param] 
-                                      for param in grid_param_names 
-                                      if param in best_params}
-                    
+                    best_params = value["best_params"]
+
+                    grid_best_params = {
+                        param: best_params[param]
+                        for param in grid_param_names
+                        if param in best_params
+                    }
+
                     best_result_entry = None
                     for result_entry in all_results:
-                        matches = all(result_entry.get(param) == grid_best_params.get(param) 
-                                    for param in grid_param_names)
+                        matches = all(
+                            result_entry.get(param) == grid_best_params.get(param)
+                            for param in grid_param_names
+                        )
                         if matches:
                             best_result_entry = result_entry.copy()
                             break
-                    
+
                     # If we have best_predicted_labels in the aggregated results, use those directly
-                    if best_result_entry and 'best_predicted_labels' in value:
-                        best_result_entry['predicted_labels'] = value['best_predicted_labels']
-                    
+                    if best_result_entry and "best_predicted_labels" in value:
+                        best_result_entry["predicted_labels"] = value[
+                            "best_predicted_labels"
+                        ]
+
                     best_results[metric_name] = best_result_entry
-            
+
             if best_results:
-                best_results_file = os.path.join(method_dir, f"{method_name}_best_results.json")
-                with open(best_results_file, 'w') as f:
+                best_results_file = os.path.join(
+                    method_dir, f"{method_name}_best_results.json"
+                )
+                with open(best_results_file, "w") as f:
                     json.dump(best_results, f, indent=2, default=str)
 
         if summary_rows:
             summary_df = pd.DataFrame(summary_rows)
-            summary_file = os.path.join(dataset_dir, f"{os.path.basename(dataset_dir)}_summary.csv")
+            summary_file = os.path.join(
+                dataset_dir, f"{os.path.basename(dataset_dir)}_summary.csv"
+            )
             summary_df.to_csv(summary_file, index=False)
