@@ -2,7 +2,6 @@ import os
 import time
 import warnings
 from collections.abc import Iterable
-from inspect import signature
 from itertools import product
 
 import matplotlib.pyplot as plt
@@ -475,26 +474,8 @@ def _should_cache_spectral_connectivity(implicit_name, X, params):
     }
 
 
-def _resolve_callable_param_local(param, context_kwargs=None):
-    if _resolve_callable_param is not None:
-        return _resolve_callable_param(param, context_kwargs)
-
-    if not isinstance(param, tuple):
-        return param
-
-    param_func, args_dict = param
-    if context_kwargs is None:
-        context_kwargs = {}
-    final_kwargs = {**context_kwargs, **args_dict}
-    accepted = set(signature(param_func).parameters.keys())
-    filtered_kwargs = {k: v for k, v in final_kwargs.items() if k in accepted}
-    return param_func(**filtered_kwargs)
-
-
 def _build_spectral_connectivity(X, params):
-    resolved_n_neighbors = _resolve_callable_param_local(
-        params["n_neighbors"], {"X": X}
-    )
+    resolved_n_neighbors = _resolve_callable_param(params["n_neighbors"], {"X": X})
     affinity = params["affinity"]
     if affinity == "nearest_neighbors":
         return kneighbors_graph(
@@ -515,9 +496,7 @@ def _build_spectral_connectivity(X, params):
 
 
 def _get_spectral_connectivity_cache_entry(X, params, graph_cache):
-    resolved_n_neighbors = _resolve_callable_param_local(
-        params["n_neighbors"], {"X": X}
-    )
+    resolved_n_neighbors = _resolve_callable_param(params["n_neighbors"], {"X": X})
     affinity = params["affinity"]
     cache_key = (
         affinity,

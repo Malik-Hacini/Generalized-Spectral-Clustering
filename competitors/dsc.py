@@ -20,10 +20,10 @@ After adding a competitor here, you must also:
 """
 
 import numpy as np
+from scipy.linalg import eigh
 from sklearn.cluster import KMeans # type: ignore
 from sklearn.neighbors import kneighbors_graph # type: ignore
-from scipy.linalg import eigh
-from competitors.utils import _resolve_callable_param
+from sklearn.utils._param_validation import _resolve_callable_param  # type: ignore  # pyright: ignore[reportAttributeAccessIssue,reportPrivateImportUsage]
 
 class DSC:
       def __init__(self, n_clusters, n_neighbors, gamma, max_iter, tol, epsilon, random_state):

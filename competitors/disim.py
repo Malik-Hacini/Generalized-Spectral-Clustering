@@ -20,11 +20,11 @@ After adding a competitor here, you must also:
 """
 
 import numpy as np
-from sklearn.cluster import KMeans # type: ignore
-from sklearn.neighbors import kneighbors_graph # type: ignore
 from scipy.sparse.linalg import svds
 from scipy.sparse import diags_array
-from competitors.utils import _resolve_callable_param
+from sklearn.cluster import KMeans # type: ignore
+from sklearn.neighbors import kneighbors_graph # type: ignore
+from sklearn.utils._param_validation import _resolve_callable_param  # type: ignore  # pyright: ignore[reportAttributeAccessIssue,reportPrivateImportUsage]
 
 
 def avg_deg_taus(adjacency_matrix, s):
