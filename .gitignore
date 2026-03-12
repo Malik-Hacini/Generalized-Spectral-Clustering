@@ -44,3 +44,7 @@ latex/
 # OpenCode context (agent-specific, not shared)
 .opencode/
 .tmp/
+
+
+# Ignore specific files related to the grid imbalance benchmark
+datasets/grid_imbalance/
