@@ -134,6 +134,7 @@ class ExperimentConfig:
                 "standard",
                 "eigen_solver",
                 "eigen_tol",
+                "n_jobs",
                 "n_it",
                 "metric_params",
                 "precomputed_connectivity",

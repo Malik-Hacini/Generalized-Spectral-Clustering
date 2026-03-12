@@ -250,6 +250,7 @@ def clusterer(method_name, params):
             assign_labels=params.get("assign_labels", "kmeans"),
             random_state=params.get("random_state", 42),
             eigen_solver=params.get("eigen_solver", "arpack"),
+            n_jobs=params.get("n_jobs", None),
             precomputed_connectivity=params.get("precomputed_connectivity", None),
             # eigen_tol=params.get("eigen_tol", None)
         )
@@ -477,11 +478,13 @@ def _should_cache_spectral_connectivity(implicit_name, X, params):
 def _build_spectral_connectivity(X, params):
     resolved_n_neighbors = _resolve_callable_param(params["n_neighbors"], {"X": X})
     affinity = params["affinity"]
+    n_jobs = params.get("n_jobs", None)
     if affinity == "nearest_neighbors":
         return kneighbors_graph(
             X,
             n_neighbors=resolved_n_neighbors,
             include_self=False,
+            n_jobs=n_jobs,
         )
 
     gamma = params["gamma"]
@@ -490,6 +493,7 @@ def _build_spectral_connectivity(X, params):
         n_neighbors=resolved_n_neighbors,
         mode="distance",
         include_self=False,
+        n_jobs=n_jobs,
     )
     connectivity.data = np.exp(-float(gamma) * (connectivity.data**2))
     return connectivity
@@ -502,6 +506,7 @@ def _get_spectral_connectivity_cache_entry(X, params, graph_cache):
         affinity,
         int(resolved_n_neighbors),
         float(params["gamma"]) if affinity == "rbf_nearest_neighbors" else None,
+        params.get("n_jobs", None),
     )
 
     if cache_key not in graph_cache:
