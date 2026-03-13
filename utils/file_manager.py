@@ -391,15 +391,21 @@ def _save_runtime_files(experiment_dir: str, experiment_name: str, runtimes: dic
     """Save method-on-dataset runtimes."""
 
     logger = get_logger()
-    runtime_df = pd.DataFrame(
-        {
-            dataset_name: {
+    rows = []
+    for dataset_name, dataset_runtimes in runtimes.items():
+        row = {
+            "dataset": dataset_name,
+            "n": dataset_runtimes["n"],
+            **{
                 method_name: method_runtime["runtime_seconds"]
                 for method_name, method_runtime in dataset_runtimes.items()
-            }
-            for dataset_name, dataset_runtimes in runtimes.items()
+                if method_name != "n"
+            },
         }
-    ).T
+        rows.append(row)
+
+    runtime_df = pd.DataFrame(rows).set_index("dataset")
+    runtime_df = runtime_df[["n"] + [col for col in runtime_df.columns if col != "n"]]
     runtime_df.index.name = "dataset"
 
     runtime_filename = f"{experiment_name}_runtimes.csv"

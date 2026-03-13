@@ -318,6 +318,7 @@ def _run_grid_search_experiment(
             logger.info(
                 f"Loaded {dataset_name} dataset: {X.shape[0]} samples, {X.shape[1]} features"
             )
+            runtimes[dataset_name]["n"] = int(X.shape[0])
         except Exception as e:
             logger.error(f"Error loading dataset {dataset_name}: {e}")
             continue
@@ -530,6 +531,7 @@ def _run_score_experiment(
         logger.info(f"Loading {dataset_name} dataset...")
         try:
             X, y = load_dataset(load_path, dataset_name)
+            runtimes[dataset_name]["n"] = int(X.shape[0])
         except Exception as e:
             logger.error(f"Error loading dataset {dataset_name}: {e}")
             continue
@@ -610,6 +612,7 @@ def _run_viz_experiment(dataset_names, method_specs, config, load_path, metrics)
 
         try:
             X, y = load_dataset(load_path, dataset_name)
+            runtimes[dataset_name]["n"] = int(X.shape[0])
         except Exception as e:
             logger.error(f"Error loading dataset {dataset_name}: {e}")
             plot_num += len(method_specs)
