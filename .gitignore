@@ -41,6 +41,8 @@ CLAUDE.md
 metric_analysis/
 complexity_analysis/
 latex/
+figures/
+
 # OpenCode context (agent-specific, not shared)
 .opencode/
 .tmp/

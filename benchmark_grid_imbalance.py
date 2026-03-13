@@ -9,7 +9,6 @@ import time
 from pathlib import Path
 
 import numpy as np
-import scipy.sparse as sp
 
 from competitors.disim import avg_deg_taus
 from competitors.measures import teleporting_undirected_measure, degree_measure
@@ -17,6 +16,7 @@ from competitors.neighbors import log_neighbors
 from synthetic_data_gw.generate_imbalance_checkers import grid_imbalance
 from utils.config import ExperimentConfig
 from utils.experiments_utils import experiment
+from utils.file_manager import save_dataset
 
 
 """
@@ -25,7 +25,7 @@ Basic experiment config:
 save_path = "results"
 experiment_name = "benchmark_grid_imbalance"
 mode = "grid_search"  # Either "score", "grid_search" or "viz"
-metrics = ("ami",)  # Valid metrics: "ami", "ari", "nmi", "ch"
+metrics = ("ami", "ch")  # Valid metrics: "ami", "ari", "nmi"
 n_jobs = -1  # Number of parallel jobs (-1 to use all available cores)
 verbose = True
 
@@ -33,8 +33,8 @@ verbose = True
 Grid imbalance configuration:
 """
 # Fixed parameters
-grid_size = 2
-n_high = 300
+grid_size = (2,1)
+n_high = 1000
 
 # Varying parameters
 n_low_values = [n_high // 15, n_high // 10, n_high // 5, n_high // 3, n_high // 2]
@@ -53,25 +53,34 @@ for n_low in n_low_values:
         dataset_name = f"grid_{grid_size}x{grid_size}_high{n_high}_low{n_low}_seed{seed}"
         dataset_path = Path(datasets_path) / dataset_name
 
-        # Generate if doesn't exist
-        if not (dataset_path / "graph.npz").exists():
+        # Generate if doesn't exist or if it has old graph.npz format
+        needs_generation = (
+            not dataset_path.exists()
+            or not (dataset_path / "train").exists()
+            or (dataset_path / "graph.npz").exists()  # Remove old graph-format datasets
+        )
+
+        if needs_generation:
+            # Clean up old format if exists
+            if (dataset_path / "graph.npz").exists():
+                (dataset_path / "graph.npz").unlink()
+
             dataset_path.mkdir(parents=True, exist_ok=True)
-            adjacency_matrix, labels, X = grid_imbalance(
+            X, labels = grid_imbalance(
                 grid_size=grid_size,
                 n_high=n_high,
                 n_low=n_low,
                 seed=seed
             )
 
-            # Save graph in .npz format
-            graph_file = dataset_path / "graph.npz"
-            np.savez(
-                graph_file,
-                adj_data=adjacency_matrix.data,
-                adj_indices=adjacency_matrix.indices,
-                adj_indptr=adjacency_matrix.indptr,
-                adj_shape=adjacency_matrix.shape,
+            # Save as point cloud dataset (HuggingFace arrow format)
+            save_dataset(
+                data=X,
                 labels=labels,
+                path=datasets_path,
+                name=dataset_name,
+                feature_cols=['x', 'y'],
+                label_col='labels'
             )
             print(f"  Created: {dataset_name}")
 
@@ -92,8 +101,9 @@ method_specs = [
 Parameters configuration:
 """
 default_params = {
+    "n_neighbors": (log_neighbors, {"factor": 1}),
     "random_state": 42,
-    "affinity": "precomputed",  # Using precomputed adjacency matrices from graph datasets
+    "affinity": "nearest_neighbors",
     "n_it": 1,
     "assign_labels": "kmeans",
     "measure": (
