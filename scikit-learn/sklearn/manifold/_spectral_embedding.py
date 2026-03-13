@@ -341,9 +341,6 @@ def _spectral_embedding(
         laplacian, dd = laplacian_obj.random_walk()
     else:
         laplacian, dd = laplacian_obj.unnormalized()
-        _, diffusion_map = eigh(laplacian.toarray()) #Sparse solvers cause numerical issues for the unnormalized laplacian
-        embedding = diffusion_map[:, :n_components]
-        return embedding
 
     if eigen_solver == "arpack" or (
         eigen_solver != "lobpcg"
@@ -356,50 +353,78 @@ def _spectral_embedding(
         # or matlab:
         # https://www.mathworks.com/matlabcentral/fileexchange/48-lobpcg-m
         laplacian = _set_diag(laplacian, 1, laplacian_method == "norm")
+        is_symmetric = check_symmetric(laplacian, return_bool=True)
 
         # Here we'll use shift-invert mode for fast eigenvalues
         # (see https://docs.scipy.org/doc/scipy/reference/tutorial/arpack.html
-        #  for a short explanation of what this means)
-        # Because the normalized Laplacian has eigenvalues between 0 and 2,
-        # I - L has eigenvalues between -1 and 1.  ARPACK is most efficient
-        # when finding eigenvalues of largest magnitude (keyword which='LM')
-        # and when these eigenvalues are very large compared to the rest.
-        # For very large, very sparse graphs, I - L can have many, many
-        # eigenvalues very near 1.0.  This leads to slow convergence.  So
-        # instead, we'll use ARPACK's shift-invert mode, asking for the
-        # eigenvalues near 1.0.  This effectively spreads-out the spectrum
-        # near 1.0 and leads to much faster convergence: potentially an
-        # orders-of-magnitude speedup over simply using keyword which='LA'
-        # in standard mode.
+        #  for a short explanation of what this means).
+        # For normalized and random-walk Laplacians, we target eigenvalues near 1
+        # in the spectrum of -L. For unnormalized Laplacians, we target the
+        # smallest eigenvalues directly with sigma=0.
         try:
-            # We are computing the opposite of the laplacian inplace so as
-            # to spare a memory allocation of a possibly very large array
             tol = 0 if eigen_tol == "auto" else eigen_tol
-            laplacian *= -1
             v0 = _init_arpack_v0(laplacian.shape[0], random_state)
-            laplacian = check_array(
-                laplacian, accept_sparse="csr", accept_large_sparse=False
-            )
 
-            if check_symmetric(laplacian, return_bool=True):
-                _, diffusion_map = eigsh(
-                    laplacian, k=n_components, sigma=1.0, which="LM", tol=tol, v0=v0
-                )
+            if laplacian_method == "unnorm":
+                if is_symmetric:
+                    _, diffusion_map = eigsh(
+                        laplacian,
+                        k=n_components,
+                        sigma=0.0,
+                        which="LM",
+                        tol=tol,
+                        v0=v0,
+                    )
+                else:
+                    _, diffusion_map = eigs(
+                        laplacian,
+                        k=n_components,
+                        sigma=0.0,
+                        which="LM",
+                        tol=tol,
+                        v0=v0,
+                    )
+                embedding = diffusion_map.T[:n_components]
             else:
-                _, diffusion_map = eigs(
-                    laplacian, k=n_components, sigma=1.0, which="LM", tol=tol, v0=v0
-                )
-            embedding = diffusion_map.T[n_components::-1]
-            if laplacian_method == "norm":
-                #recover u = D^-1/2 x from the eigenvector output x
-                embedding = embedding / dd
-                
+                # We are computing the opposite of the laplacian inplace so as
+                # to spare a memory allocation of a possibly very large array.
+                laplacian *= -1
+
+                if is_symmetric:
+                    _, diffusion_map = eigsh(
+                        laplacian,
+                        k=n_components,
+                        sigma=1.0,
+                        which="LM",
+                        tol=tol,
+                        v0=v0,
+                    )
+                else:
+                    _, diffusion_map = eigs(
+                        laplacian,
+                        k=n_components,
+                        sigma=1.0,
+                        which="LM",
+                        tol=tol,
+                        v0=v0,
+                    )
+                embedding = diffusion_map.T[n_components::-1]
+                if laplacian_method == "norm":
+                    # recover u = D^-1/2 x from the eigenvector output x
+                    embedding = embedding / dd
+
         except RuntimeError:
-            # When submatrices are exactly singular, an LU decomposition
-            # in arpack fails. We fallback to lobpcg
-            eigen_solver = "lobpcg"
-            # Revert the laplacian to its opposite to have lobpcg work
-            laplacian *= -1
+            if laplacian_method == "unnorm":
+                if sparse.issparse(laplacian):
+                    laplacian = laplacian.toarray()
+                _, diffusion_map = eigh(laplacian, check_finite=False)
+                embedding = diffusion_map.T[:n_components]
+            else:
+                # When submatrices are exactly singular, an LU decomposition
+                # in arpack fails. We fallback to lobpcg.
+                eigen_solver = "lobpcg"
+                # Revert the laplacian to its opposite to have lobpcg work.
+                laplacian *= -1
 
     elif eigen_solver == "amg":
         # Use AMG to get a preconditioner and speed up the eigenvalue
