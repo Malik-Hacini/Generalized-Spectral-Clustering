@@ -83,3 +83,30 @@ def chain_sbm(
     for i in range(K - 1):
         P[i, i + 1] = p_forward  # Forward connection
     return directed_sbm(block_sizes, P)
+
+
+def degree_imabalance_sbm(
+    block_sizes: list,
+    p_intra: float,
+    p_high: float,
+    p_low: float,
+    seed: int = 42,
+):
+    """
+    Generate a DSBM graph with degree imbalance between two groups of blocks.
+
+    :param block_sizes: List of sizes for each block, we assume the first half are "high-degree" and the second half are "low-degree"
+    :param p_intra: Probability of edges within each block
+    :param p_high: Probability of edges from high-degree blocks to any block
+    :param p_low: Probability of edges from low-degree blocks to any block
+
+    Generally, we expect p_high >> p_low for a strong degree imbalance.
+
+    :return: Directed SBM graph and ground truth labels
+    """
+
+    K = len(block_sizes)
+    P = np.full((K, K), p_low)  # Start with low probability
+    np.fill_diagonal(P, p_intra)  # Intra-block
+    P[0, :] = p_high
+    return directed_sbm(block_sizes, P, seed)
