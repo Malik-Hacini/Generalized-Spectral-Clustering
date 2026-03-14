@@ -2,14 +2,10 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 if __package__ is None or __package__ == "":
-    import sys
-
-    sys.path.append(str(Path(__file__).resolve().parents[1]))
-
-from experiments.common import *
+    from common import *
+else:
+    from experiments.common import *
 
 save_path = project_path("results")
 experiment_name = "benchmark_uci_single_run"
@@ -22,7 +18,7 @@ load_path = project_path("datasets")
 dataset_names = [
     "breast_tissue",
     "wine",
-#    "control_chart",
+    #    "control_chart",
     # "glass",
     "iris",
     # "parkinsons",

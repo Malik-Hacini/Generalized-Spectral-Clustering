@@ -2,14 +2,13 @@
 
 from __future__ import annotations
 
+if __package__ is None or __package__ == "":
+    from common import *
+else:
+    from experiments.common import *
+
 from pathlib import Path
 
-if __package__ is None or __package__ == "":
-    import sys
-
-    sys.path.append(str(Path(__file__).resolve().parents[1]))
-
-from experiments.common import *
 from synthetic_data_gw.generate_imbalance_checkers import grid_imbalance
 from utils.file_manager import save_dataset
 
@@ -38,7 +37,10 @@ default_params = {
     "affinity": "nearest_neighbors",
     "n_it": 1,
     "assign_labels": "kmeans",
-    "measure": (teleporting_undirected_measure, {"alpha": np.arange(0, 1.5, 0.1), "t": range(0, 25)}),
+    "measure": (
+        teleporting_undirected_measure,
+        {"alpha": np.arange(0, 1.5, 0.1), "t": range(0, 25)},
+    ),
 }
 
 method_params = [
@@ -66,14 +68,22 @@ def generate_datasets() -> list[str]:
     dataset_names = []
     for n_low in n_low_values:
         for seed in range(n_seeds):
-            dataset_name = f"grid_{grid_size}x{grid_size}_high{n_high}_low{n_low}_seed{seed}"
+            dataset_name = (
+                f"grid_{grid_size}x{grid_size}_high{n_high}_low{n_low}_seed{seed}"
+            )
             dataset_path = datasets_path / dataset_name
-            needs_generation = not dataset_path.exists() or not (dataset_path / "train").exists() or (dataset_path / "graph.npz").exists()
+            needs_generation = (
+                not dataset_path.exists()
+                or not (dataset_path / "train").exists()
+                or (dataset_path / "graph.npz").exists()
+            )
             if needs_generation:
                 if (dataset_path / "graph.npz").exists():
                     (dataset_path / "graph.npz").unlink()
                 dataset_path.mkdir(parents=True, exist_ok=True)
-                X, labels = grid_imbalance(grid_size=grid_size, n_high=n_high, n_low=n_low, seed=seed)
+                X, labels = grid_imbalance(
+                    grid_size=grid_size, n_high=n_high, n_low=n_low, seed=seed
+                )
                 save_dataset(
                     data=X,
                     labels=labels,
