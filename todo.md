@@ -5,7 +5,6 @@ Complexity :
   plots are crowded (heatmap maybe ?) and it really is not an apples to apples comparison due to the different grid size, different optimization etc etc. check for sourced complexity of the baselines
 - [ ] weak-connectedness of the UCI graphs
    - not all of them are weak connected, precise which
-- [ ] update readme with new metrics and explanation of the method
 - [ ] Refactor benchmarks in a folder... with clean imports (maybe a module ?)
 
 
@@ -14,11 +13,11 @@ PLOTS :
 
 Graph viz / Dirichlet energy failing : script to add
 UCI : 
-- HEATMAPS : rewrite the script
+- HEATMAPS :done  
 - Runtimes :
-    - All baselines : to run
-    - Single run : to write
-- In degree distribtuion : to rewrite
+    - All baselines :  done
+    - Single run : done
+- In degree distribtuion : done
 
 SYNTHETIC : 
 
@@ -28,7 +27,14 @@ SYNTHETIC :
    - Complexity comparison : to clean and rerun
    - Graph_CH filter : todo
 
+REPRODUCIBILITY : 
 
+[ ] create reproduce_paper.sh script :
+    - run all experiments (with option to reuse stored results)
+    - generate all plots
+
+[ ] rewrite readme
+ 
 EXPLICIT REVIEWER REQUESTS :
 
 Review 1 :

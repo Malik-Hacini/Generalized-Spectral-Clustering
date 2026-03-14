@@ -2,25 +2,21 @@
 Clustering benchmark performed in the GSC paper.
 """
 
-import time
+from __future__ import annotations
 
-import numpy as np
+from pathlib import Path
 
-from competitors.disim import avg_deg_taus
-from competitors.measures import (
-    teleporting_undirected_measure,
-    degree_measure,
-    uniform_measure,
-    perron_vector_measure,
-)
-from competitors.neighbors import log_neighbors
-from utils.config import ExperimentConfig
-from utils.experiments_utils import experiment
+if __package__ is None or __package__ == "":
+    import sys
+
+    sys.path.append(str(Path(__file__).resolve().parents[1]))
+
+from experiments.common import *
 
 """
 Basic experiment config:
 """
-save_path = "results"
+save_path = project_path("results")
 experiment_name = "benchmark_uci"
 mode = "grid_search"  # Either "score", "grid_search" or "viz" when all datasets are 2D.
 metrics = ("ami", "ch")  # Valid metrics: "ami", "ari", "nmi", "ch"
@@ -32,11 +28,11 @@ verbose = True
 """
 Datasets and methods configuration:
 """
-load_path = "datasets"
+load_path = project_path("datasets")
 dataset_names = [
     "breast_tissue",
     "wine",
-    "control_chart",
+#    "control_chart",
     # "glass",
     "iris",
     # "parkinsons",
@@ -179,9 +175,7 @@ config = ExperimentConfig(
 )
 
 if __name__ == "__main__":
-
-    start = time.time()
-    results_df_parallel = experiment(
+    experiment(
         experiment_name=experiment_name,
         dataset_names=dataset_names,
         method_specs=method_specs,
@@ -193,5 +187,3 @@ if __name__ == "__main__":
         n_jobs=n_jobs,
         verbose=verbose,
     )
-    end = time.time()
-    print(f"Experiment completed in {end - start} seconds.")
