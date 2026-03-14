@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import json
+import shutil
 from pathlib import Path
-
 
 ROOT = Path(__file__).resolve().parents[1]
 PLOTS_ROOT = ROOT / "plots"
@@ -19,10 +19,13 @@ def experiment_name(source: str | Path) -> str:
 
 
 def resolve_output_dir(output_dir: str | Path | None, kind: str, source: str | Path) -> Path:
-    if output_dir is None:
-        output_path = PLOTS_ROOT / kind / experiment_name(source)
-    else:
-        output_path = project_path(output_dir)
+    output_path = PLOTS_ROOT / kind / experiment_name(source) if output_dir is None else project_path(output_dir)
+    output_path.mkdir(parents=True, exist_ok=True)
+    return output_path
+
+
+def resolve_kind_dir(output_dir: str | Path | None, kind: str) -> Path:
+    output_path = PLOTS_ROOT / kind if output_dir is None else project_path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
     return output_path
 
@@ -34,9 +37,7 @@ def resolve_output_file(
     source: str | Path,
     default_name: str,
 ) -> Path:
-    output_path = resolve_output_dir(output_dir, kind, source) / (output_name or default_name)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    return output_path
+    return resolve_output_dir(output_dir, kind, source) / (output_name or default_name)
 
 
 def validate_selection(available: list[str], selected: list[str] | None, label: str) -> list[str]:
@@ -48,6 +49,20 @@ def validate_selection(available: list[str], selected: list[str] | None, label: 
     return selected
 
 
+def configure_paper_style(plt) -> None:
+    plt.style.use("classic")
+    plt.rcParams.update(
+        {
+            "font.family": "serif",
+            "font.serif": ["Computer Modern Roman"],
+            "mathtext.fontset": "cm",
+            "axes.unicode_minus": False,
+        }
+    )
+    if shutil.which("latex") is not None:
+        plt.rcParams["text.usetex"] = True
+
+
 def load_best_result_entries(results: str | Path):
     results_dir = project_path(results)
     if not results_dir.exists():
@@ -57,13 +72,7 @@ def load_best_result_entries(results: str | Path):
     if not best_result_files:
         raise ValueError(f"No best_results.json files found in {results_dir}")
 
-    entries = []
-    for best_file in best_result_files:
-        entries.append(
-            (
-                best_file.parent.parent.name,
-                best_file.parent.name,
-                json.loads(best_file.read_text()),
-            )
-        )
-    return entries
+    return [
+        (best_file.parent.parent.name, best_file.parent.name, json.loads(best_file.read_text()))
+        for best_file in best_result_files
+    ]

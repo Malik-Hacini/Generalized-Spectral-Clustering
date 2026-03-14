@@ -70,6 +70,11 @@ def _configure_style() -> None:
         {
             "figure.dpi": 160,
             "figure.facecolor": "white",
+            "figure.constrained_layout.use": True,
+            "figure.constrained_layout.h_pad": 10 / 72,
+            "figure.constrained_layout.w_pad": 4 / 72,
+            "figure.constrained_layout.hspace": 0.08,
+            "figure.constrained_layout.wspace": 0.02,
             "savefig.dpi": 400,
             "savefig.facecolor": "white",
             "pdf.fonttype": 42,
@@ -187,7 +192,10 @@ def plot_runtimes(long_df: pd.DataFrame, title: str):
     markers = {method: MARKERS[i % len(MARKERS)] for i, method in enumerate(methods)}
 
     fig_width = max(9.0, 1.15 * len(datasets) + 1.8)
-    fig, ax = plt.subplots(figsize=(fig_width, 7.2), constrained_layout=True)
+    fig = plt.figure(figsize=(fig_width, 7.6), layout="constrained")
+    subfigs = fig.subfigures(2, 1, height_ratios=[1, 10])
+    
+    ax = subfigs[1].subplots()
 
     x_positions = np.arange(len(datasets), dtype=float)
     for i, x in enumerate(x_positions):
@@ -225,10 +233,36 @@ def plot_runtimes(long_df: pd.DataFrame, title: str):
     ax.set_xlim(-0.6, len(datasets) - 0.4)
     ax.set_xlabel("Datasets (sorted by sample count)")
     ax.set_ylabel("Runtime (seconds, log scale)")
-    ax.set_title(title, pad=30)
+    
+    legend_cols = min(4, max(1, len(methods)))
+    import matplotlib.lines as mlines
+    legend_handles = [
+        mlines.Line2D(
+            [0], [0],
+            marker=markers[method],
+            color="w",
+            markerfacecolor=colors[method],
+            markersize=10,
+            label=method,
+        )
+        for method in methods
+    ]
+    ax_leg = subfigs[0].subplots()
+    ax_leg.axis("off")
+    ax_leg.legend(
+        handles=legend_handles,
+        loc="center",
+        ncols=legend_cols,
+        frameon=False,
+        columnspacing=1.1,
+        handletextpad=0.4,
+    )
+    
+    fig.suptitle(title, y=1.05)
+    
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
-    ax.spines["bottom"].set_visible(False)
+   ax.spines["bottom"].set_visible(False)
     ax.spines["bottom"].set_color("#8E84A8")
     ax.spines["left"].set_color("#8E84A8")
     ax.tick_params(axis="x", length=0)
@@ -236,15 +270,6 @@ def plot_runtimes(long_df: pd.DataFrame, title: str):
     runtime_values = long_df["runtime_seconds"].to_numpy()
     ax.set_ylim(runtime_values.min() / 1.35, runtime_values.max() * 1.35)
 
-    legend_cols = min(4, max(1, len(methods)))
-    ax.legend(
-        loc="lower center",
-        bbox_to_anchor=(0.5, 1.02),
-        ncol=legend_cols,
-        frameon=False,
-        columnspacing=1.1,
-        handletextpad=0.4,
-    )
     return fig
 
 

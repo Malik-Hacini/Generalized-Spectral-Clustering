@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import shutil
 from pathlib import Path
 
 if __package__ is None or __package__ == "":
@@ -20,24 +19,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.colors import LinearSegmentedColormap
 
-from plots.common import project_path, resolve_output_dir, validate_selection
+from plots.common import configure_paper_style, project_path, resolve_output_dir, validate_selection
 
 
 PALETTE = ["#072AC8", "#9A44C5", "#ff459c", "#F96C39"]
-
-
-def configure_style() -> None:
-    plt.style.use("classic")
-    plt.rcParams.update(
-        {
-            "font.family": "serif",
-            "font.serif": ["Computer Modern Roman"],
-            "mathtext.fontset": "cm",
-            "axes.unicode_minus": False,
-        }
-    )
-    if shutil.which("latex") is not None:
-        plt.rcParams["text.usetex"] = True
 
 
 def parse_args() -> argparse.Namespace:
@@ -142,7 +127,7 @@ def plot_heatmap(grid, t_values, alpha_values, best_t, best_alpha, output_file: 
 
 def main() -> None:
     args = parse_args()
-    configure_style()
+    configure_paper_style(plt)
     results_dir = project_path(args.results_dir)
     output_dir = resolve_output_dir(args.output_dir, "heatmaps", results_dir)
 
