@@ -7,18 +7,26 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.append(str(ROOT))
 
+import time
+
 import numpy as np
+import scipy.sparse as sp
 
 from competitors import measures as _measures
 from competitors.disim import avg_deg_taus
 from competitors.measures import *  # noqa: F401,F403
 from competitors.neighbors import log_neighbors
+from synthetic_data_gw.generate_disbm_datasets import degree_imbalance_sbm
 from utils.config import ExperimentConfig
 from utils.experiments_utils import experiment
 
 __all__ = [
+    "Path",
+    "time",
     "np",
+    "sp",
     "avg_deg_taus",
+    "degree_imbalance_sbm",
     "log_neighbors",
     "ExperimentConfig",
     "experiment",

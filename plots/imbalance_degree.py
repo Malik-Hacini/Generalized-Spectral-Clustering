@@ -45,15 +45,24 @@ def load_degree_imbalance_results(results_path: str | Path):
         raise ValueError(f"No *_best_results.json files found in {results_dir}")
 
     rows = []
-    name_re = re.compile(
-        r"^disbm_degimbal_b([0-9-]+)_pintra([0-9p]+)_phigh([0-9p]+)_plow([0-9p]+)_seed(\d+)$"
-    )
+    name_patterns = [
+        re.compile(
+            r"^disbm_degimbal_b([0-9-]+)_pintra([0-9p]+)_phigh([0-9p]+)_plow([0-9p]+)_seed(\d+)$"
+        ),
+        re.compile(
+            r"^disbm_degree_imbalance_b([0-9-]+)_pintra([0-9p]+)_phigh([0-9p]+)_plow([0-9p]+)_seed(\d+)$"
+        ),
+    ]
 
     for best_file in best_result_files:
         method_name = best_file.parent.name
         dataset_name = best_file.parent.parent.name
 
-        match = name_re.match(dataset_name)
+        match = None
+        for pattern in name_patterns:
+            match = pattern.match(dataset_name)
+            if match is not None:
+                break
         if not match:
             print(f"Warning: Could not parse dataset name: {dataset_name}")
             continue

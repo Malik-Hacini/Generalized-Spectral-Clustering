@@ -5,18 +5,10 @@ Evaluates SC-N, DSC+, and GSC-N on directed SBM graphs with varying
 out-degree imbalance between high-degree and low-degree blocks.
 """
 
-import time
-from pathlib import Path
-
-import numpy as np
-import scipy.sparse as sp
-
-from competitors.measures import teleporting_undirected_measure
-from competitors.neighbors import log_neighbors
-from synthetic_data_gw.generate_disbm_datasets import degree_imbalance_sbm
-from utils.config import ExperimentConfig
-from utils.experiments_utils import experiment
-
+if __package__ is None or __package__ == "":
+    from common import *
+else:
+    from experiments.common import *
 
 def save_graph_dataset(adjacency_matrix, labels, path: str, name: str) -> None:
     """Save a sparse graph dataset in the project's graph.npz format."""
@@ -64,17 +56,18 @@ p_low_values = [p_high / 15, p_high / 10, p_high / 5, p_high / 3, p_high / 2]
 n_seeds = 50
 
 # Dataset generation
-datasets_path = "datasets/degree_imbalance"
+datasets_path = project_path("../datasets/degree_imbalance")
 Path(datasets_path).mkdir(parents=True, exist_ok=True)
 
 # Generate datasets
 print("Generating degree-imbalance DSBM datasets...")
 dataset_names = []
+block_sizes_token = "-".join(str(size) for size in block_sizes)
 
 for p_low in p_low_values:
     for seed in range(n_seeds):
         dataset_name = (
-            f"disbm_degimbal_b{block_sizes[0]}-{block_sizes[1]}"
+            f"disbm_degimbal_b{block_sizes_token}"
             f"_pintra{_fmt_prob(p_intra)}"
             f"_phigh{_fmt_prob(p_high)}"
             f"_plow{_fmt_prob(p_low)}"

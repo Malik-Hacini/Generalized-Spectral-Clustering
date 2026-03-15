@@ -23,7 +23,7 @@ grid_size = (2, 1)
 n_high = 1000
 n_low_values = [n_high // 15, n_high // 10, n_high // 5, n_high // 3, n_high // 2]
 n_seeds = 50
-datasets_path = Path(project_path("datasets/grid_imbalance"))
+datasets_path = Path(project_path("../datasets/grid_imbalance"))
 
 method_specs = [
     ("spectral", "SC-N"),
