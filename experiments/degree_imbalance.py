@@ -36,7 +36,7 @@ def _fmt_prob(value: float) -> str:
 """
 Basic experiment config:
 """
-save_path = "results"
+save_path = "../results"
 experiment_name = "benchmark_degree_imbalance"
 mode = "grid_search"  # Either "score", "grid_search" or "viz"
 metrics = ("ami", "graph_ch")  # Valid metrics include "ami", "graph_ch"
@@ -52,7 +52,7 @@ p_intra = 0.05
 p_high = 0.2
 
 # Varying parameters
-p_low_values = [p_high / 15, p_high / 10, p_high / 5, p_high / 3, p_high / 2]
+p_low_values = [p_high / 3, p_high / 2]
 n_seeds = 50
 
 # Dataset generation

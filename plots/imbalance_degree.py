@@ -14,6 +14,20 @@ import numpy as np
 import pandas as pd
 
 
+def _resolve_input_path(path_value: str | Path) -> Path:
+    """Resolve paths robustly for runs launched outside the repository root."""
+    path = Path(path_value)
+    if path.exists() or path.is_absolute():
+        return path
+
+    repo_root_candidate = Path(__file__).resolve().parents[1]
+    repo_relative = repo_root_candidate / path
+    if repo_relative.exists():
+        return repo_relative
+
+    return path
+
+
 def _parse_prob_token(token: str) -> float:
     """Parse probability tokens formatted as e.g. 0p0133 -> 0.0133."""
     return float(token.replace("p", "."))
@@ -34,7 +48,7 @@ def load_degree_imbalance_results(results_path: str | Path):
         DataFrame with columns:
         method, block_sizes, p_intra, p_high, p_low, ratio, seed, ami
     """
-    results_dir = Path(results_path)
+    results_dir = _resolve_input_path(results_path)
 
     if not results_dir.exists():
         raise FileNotFoundError(f"Results directory not found: {results_dir}")
@@ -231,7 +245,7 @@ def main():
 
     args = parser.parse_args()
 
-    output_dir = Path(args.output_dir)
+    output_dir = _resolve_input_path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
     print(f"Loading results from: {args.results_path}")
