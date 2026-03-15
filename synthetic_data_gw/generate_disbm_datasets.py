@@ -85,7 +85,7 @@ def chain_sbm(
     return directed_sbm(block_sizes, P)
 
 
-def degree_imabalance_sbm(
+def degree_imbalance_sbm(
     block_sizes: list,
     p_intra: float,
     p_high: float,
