@@ -25,14 +25,15 @@ from plots.common import project_path, resolve_output_dir, validate_selection
 DEFAULT_RESULTS_CSV = Path("results/benchmark_uci_grid_search/benchmark_uci_runtimes.csv")
 MARKERS = ["o", "s", "D", "^", "v", "P", "X", "<", ">", "h", "*"]
 METHOD_COLORS = [
-    "#1F77B4",
-    "#6F4CFF",
-    "#9467BD",
-    "#D81B60",
-    "#E15759",
-    "#F28E2B",
-    "#2CA02C",
-    "#17BECF",
+    "#FF7E68",  # SC UN
+    "#FF6347", # SC N
+    "#27A727", # DSC+
+    "#FF579F", # DiSim C
+    "#FD84B8", # DiSim R
+    "#FFB0D2", # DiSim L
+    "#405BD3", # GSC UN
+    "#072AC8", # GSC N
+    # --- additional colors
     "#8C564B",
     "#BCBD22",
 ]
@@ -53,8 +54,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--datasets", nargs="+", default=None, help="Datasets to include.")
     parser.add_argument(
         "--output-dir",
-        default=None,
-        help="Output directory. Defaults to plots/runtimes/<experiment_name>/.",
+        default="../figures/runtimes/",
+        help="Output directory. Defaults to ../figures/runtimes/.",
     )
     parser.add_argument(
         "--output-name",
@@ -194,7 +195,7 @@ def plot_runtimes(long_df: pd.DataFrame, title: str):
     fig_width = max(9.0, 1.15 * len(datasets) + 1.8)
     fig = plt.figure(figsize=(fig_width, 7.6), layout="constrained")
     subfigs = fig.subfigures(2, 1, height_ratios=[1, 10])
-    
+
     ax = subfigs[1].subplots()
 
     x_positions = np.arange(len(datasets), dtype=float)
@@ -233,7 +234,7 @@ def plot_runtimes(long_df: pd.DataFrame, title: str):
     ax.set_xlim(-0.6, len(datasets) - 0.4)
     ax.set_xlabel("Datasets (sorted by sample count)")
     ax.set_ylabel("Runtime (seconds, log scale)")
-    
+
     legend_cols = min(4, max(1, len(methods)))
     import matplotlib.lines as mlines
     legend_handles = [
@@ -257,12 +258,12 @@ def plot_runtimes(long_df: pd.DataFrame, title: str):
         columnspacing=1.1,
         handletextpad=0.4,
     )
-    
-    fig.suptitle(title, y=1.05)
-    
+
+    # fig.suptitle(title, y=1.05)
+
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
-   ax.spines["bottom"].set_visible(False)
+    ax.spines["bottom"].set_visible(False)
     ax.spines["bottom"].set_color("#8E84A8")
     ax.spines["left"].set_color("#8E84A8")
     ax.tick_params(axis="x", length=0)

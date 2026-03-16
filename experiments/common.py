@@ -16,7 +16,12 @@ from competitors import measures as _measures
 from competitors.disim import avg_deg_taus
 from competitors.measures import *  # noqa: F401,F403
 from competitors.neighbors import log_neighbors
-from synthetic_data_gw.generate_disbm_datasets import degree_imbalance_sbm
+from synthetic_data_gw.generate_disbm_datasets import (
+    chain_sbm,
+    core_periphery_disbm,
+    degree_corrected_directed_sbm,
+    degree_imbalance_sbm,
+)
 from utils.config import ExperimentConfig
 from utils.experiments_utils import experiment
 
@@ -26,6 +31,9 @@ __all__ = [
     "np",
     "sp",
     "avg_deg_taus",
+    "chain_sbm",
+    "core_periphery_disbm",
+    "degree_corrected_directed_sbm",
     "degree_imbalance_sbm",
     "log_neighbors",
     "ExperimentConfig",

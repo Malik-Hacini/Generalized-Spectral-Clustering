@@ -16,15 +16,25 @@ import pandas as pd
 from plots.common import load_best_result_entries, resolve_output_file
 
 
-def load_results_with_params(results_dir: str | Path, optimize_by: str = "ch"):
-    ami_rows = []
+def load_results_with_params(
+    results_dir: str | Path,
+    optimize_by: str = "ch",
+    show_metric: str = "ami",
+):
+    score_rows = []
     param_rows = []
     for dataset_name, method_name, best_results in load_best_result_entries(results_dir):
         if optimize_by not in best_results:
             continue
         optimized_data = best_results[optimize_by]
-        if "ami" in optimized_data and "mean" in optimized_data["ami"]:
-            ami_rows.append({"dataset": dataset_name, "method": method_name, "ami": optimized_data["ami"]["mean"]})
+        if show_metric in optimized_data and "mean" in optimized_data[show_metric]:
+            score_rows.append(
+                {
+                    "dataset": dataset_name,
+                    "method": method_name,
+                    "score": optimized_data[show_metric]["mean"],
+                }
+            )
 
         params = {"dataset": dataset_name, "method": method_name}
         measure = optimized_data.get("measure")
@@ -35,7 +45,7 @@ def load_results_with_params(results_dir: str | Path, optimize_by: str = "ch"):
                 params[key] = optimized_data[key]
         param_rows.append(params)
 
-    return pd.DataFrame(ami_rows), pd.DataFrame(param_rows)
+    return pd.DataFrame(score_rows), pd.DataFrame(param_rows)
 
 
 def format_params_string(row, method):
@@ -57,38 +67,95 @@ def format_params_string(row, method):
     return ""
 
 
-def generate_competitors_table(results_path: str | Path, optimize_by: str = "ch", dataset_order: list | None = None):
-    ami_df, params_df = load_results_with_params(results_path, optimize_by)
-    if ami_df.empty:
-        raise ValueError(f"No results found for optimization by {optimize_by}")
+def _optimize_label(optimize_by: str) -> str:
+    if optimize_by == "ch":
+        return "CH"
+    if optimize_by == "ami":
+        return "AMI"
+    if optimize_by == "graph_ch":
+        return "Graph-CH"
+    return optimize_by.upper()
+
+
+def _method_header(display: str, method: str, show_params: bool, optimize_by: str) -> str:
+    """Build method header, adding bestpar annotation for parameterized methods."""
+    if not show_params:
+        return display
+
+    metric_label = _optimize_label(optimize_by)
+    if method in {"GSC-N", "GSC-UN"}:
+        symbol = r"t,\alpha"
+        base = (
+            r"\textbf{GSC$_{\text{n}}$}"
+            if method == "GSC-N"
+            else r"\textbf{GSC$_{\text{un}}$}"
+        )
+        return rf"{base}\bestpar{{{symbol}}}{{{metric_label}}}"
+    elif method == "DSC+":
+        symbol = r"\gamma"
+    elif method in {"DI-SIM-R", "DI-SIM-L", "DI-SIM-C"}:
+        symbol = r"\tau"
+    else:
+        return display
+
+    return rf"{display}\bestpar{{{symbol}}}{{{metric_label}}}"
+
+
+def generate_competitors_table(
+    results_path: str | Path,
+    optimize_by: str = "ch",
+    show_metric: str = "ami",
+    dataset_order: list | None = None,
+):
+    score_df, params_df = load_results_with_params(results_path, optimize_by, show_metric)
+    if score_df.empty:
+        raise ValueError(
+            f"No results found for optimization by {optimize_by} with metric {show_metric}"
+        )
 
     methods_config = [
-        {"name": "SC-UN", "display": "SC-un", "show_params": False},
-        {"name": "SC-N", "display": "SC-N", "show_params": False},
-        {"name": "DSC+", "display": "DSC+", "show_params": True},
-        {"name": "DI-SIM-R", "display": "DI-SIM-R", "show_params": True},
-        {"name": "DI-SIM-L", "display": "DI-SIM-L", "show_params": True},
-        {"name": "DI-SIM-C", "display": "DI-SIM-C", "show_params": True},
-        {"name": "GSC-UN", "display": "GSC-un", "show_params": True},
-        {"name": "GSC-N", "display": "GSC-N", "show_params": True},
+        {"name": "SC-UN", "display": r"SC$_{\text{un}}$", "show_params": False},
+        {"name": "SC-N", "display": r"SC$_{\text{N}}$", "show_params": False},
+        {"name": "DSC+", "display": r"DSC+", "show_params": True},
+        {"name": "DI-SIM-R", "display": r"DI-SIM$_{\text{R}}$", "show_params": True},
+        {"name": "DI-SIM-L", "display": r"DI-SIM$_{\text{L}}$", "show_params": True},
+        {"name": "DI-SIM-C", "display": r"DI-SIM$_{\text{C}}$", "show_params": True},
+        {"name": "GSC-UN", "display": r"GSC$_{\text{un}}$", "show_params": True},
+        {"name": "GSC-N", "display": r"GSC$_{\text{N}}$", "show_params": True},
     ]
 
-    pivot_ami = ami_df.pivot(index="dataset", columns="method", values="ami")
+    # Add a visual split between non-GSC baselines and GSC variants.
+    gsc_start_idx = next(
+        (i for i, method in enumerate(methods_config) if method["name"].startswith("GSC")),
+        len(methods_config),
+    )
+    if 0 < gsc_start_idx < len(methods_config):
+        column_spec = "l|" + "c" * gsc_start_idx + "|" + "c" * (len(methods_config) - gsc_start_idx)
+    else:
+        column_spec = "l|" + "c" * len(methods_config)
+
+    pivot_scores = score_df.pivot(index="dataset", columns="method", values="score")
     params_pivot = params_df.set_index(["dataset", "method"])
-    datasets = [d for d in dataset_order if d in pivot_ami.index] if dataset_order else sorted(pivot_ami.index)
+    datasets = [d for d in dataset_order if d in pivot_scores.index] if dataset_order else sorted(pivot_scores.index)
     optimize_label = "CH" if optimize_by == "ch" else "Graph-CH" if optimize_by == "graph_ch" else "AMI"
+    show_label = _optimize_label(show_metric)
+
+    header_labels = [
+        _method_header(m["display"], m["name"], m["show_params"], optimize_by)
+        for m in methods_config
+    ]
 
     lines = [
         r"\begin{table}",
         r"  \centering",
         r"  \caption{\textbf{Comparison of clustering methods on UCI datasets.} "
-        + f"AMI scores obtained when parameters are optimized for {optimize_label}. "
+        + f"{show_label} scores obtained when parameters are optimized for {optimize_label}. "
         + r"Optimized hyperparameters are shown using $\hyperp{\cdot}$.}",
-        r"  \label{tab:competitors_" + optimize_by + r"}",
+        r"  \label{tab:competitors_" + optimize_by + "_" + show_metric + r"}",
         r"  \begin{adjustbox}{width=\textwidth}",
-        r"  \begin{tabular}{l|" + "c" * len(methods_config) + r"}",
+        r"  \begin{tabular}{" + column_spec + r"}",
         r"    \Xhline{2\arrayrulewidth}",
-        "    " + " & ".join(["Dataset"] + [m["display"] for m in methods_config]) + r" \\",
+        "    " + " & ".join(["Dataset"] + header_labels) + r" \\",
         r"    \Xhline{2\arrayrulewidth}",
     ]
 
@@ -97,12 +164,12 @@ def generate_competitors_table(results_path: str | Path, optimize_by: str = "ch"
         row_values = []
         for method_info in methods_config:
             method = method_info["name"]
-            if method in pivot_ami.columns and dataset in pivot_ami.index and pd.notna(pivot_ami.loc[dataset, method]):
-                ami_val = pivot_ami.loc[dataset, method]
+            if method in pivot_scores.columns and dataset in pivot_scores.index and pd.notna(pivot_scores.loc[dataset, method]):
+                score_val = pivot_scores.loc[dataset, method]
                 param_str = ""
                 if method_info["show_params"] and (dataset, method) in params_pivot.index:
                     param_str = format_params_string(params_pivot.loc[(dataset, method)], method)
-                row_values.append((ami_val, f"{ami_val:.3f}{param_str}"))
+                row_values.append((score_val, f"{score_val:.3f}{param_str}"))
             else:
                 row_values.append((0.0, "--"))
 
@@ -118,9 +185,9 @@ def generate_competitors_table(results_path: str | Path, optimize_by: str = "ch"
     ranks = {method: [] for method in all_methods}
     for dataset in datasets:
         dataset_values = {
-            method: pivot_ami.loc[dataset, method]
+            method: pivot_scores.loc[dataset, method]
             for method in all_methods
-            if method in pivot_ami.columns and dataset in pivot_ami.index and pd.notna(pivot_ami.loc[dataset, method])
+            if method in pivot_scores.columns and dataset in pivot_scores.index and pd.notna(pivot_scores.loc[dataset, method])
         }
         if not dataset_values:
             continue
@@ -146,8 +213,9 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Generate LaTeX table comparing GSC methods with competitors")
     parser.add_argument("--results-dir", type=str, default="results/benchmark_uci_grid_search", help="Path to results directory")
     parser.add_argument("--optimize-by", type=str, default="ch", choices=["ch", "graph_ch", "ami"], help="Metric used for optimization")
+    parser.add_argument("--show-metric", type=str, default="ami", choices=["ami", "ch", "graph_ch"], help="Metric displayed in table cells")
     parser.add_argument("--output-dir", type=str, default=None, help="Output directory. Defaults to plots/tables/<experiment_name>/.")
-    parser.add_argument("--output-name", type=str, default=None, help="Output filename. Defaults to competitors_<metric>.tex.")
+    parser.add_argument("--output-name", type=str, default=None, help="Output filename. Defaults to competitors_<opt_metric>_show_<metric>.tex.")
     parser.add_argument("--datasets", nargs="+", default=None, help="Order of datasets in table")
     args = parser.parse_args()
 
@@ -156,9 +224,14 @@ def main() -> None:
         args.output_name,
         "tables",
         args.results_dir,
-        f"competitors_{args.optimize_by}.tex",
+        f"competitors_{args.optimize_by}_show_{args.show_metric}.tex",
     )
-    latex_table = generate_competitors_table(args.results_dir, args.optimize_by, args.datasets)
+    latex_table = generate_competitors_table(
+        args.results_dir,
+        optimize_by=args.optimize_by,
+        show_metric=args.show_metric,
+        dataset_order=args.datasets,
+    )
     output_file.write_text(latex_table)
     print(f"LaTeX table saved to: {output_file}")
 
