@@ -27,7 +27,7 @@ Datasets and methods configuration:
 load_path = project_path("datasets")
 dataset_names = [
     "polblogs",
-    "karate",
+    # "karate",
     "football",
     "email_eu_core",
     "wiki_vote",
@@ -43,8 +43,8 @@ synthetic_network_specs = [
         "name": "chain_sbm_fixed",
         "builder": chain_sbm,
         "params": {
-            "block_sizes": [350, 350, 350],
-            "p_intra": 0.12,
+            "block_sizes": [500, 500, 500],
+            "p_intra": 0.1,
             "p_forward": 0.06,
             "p_backward": 0.01,
             "seed": 42,
@@ -54,10 +54,10 @@ synthetic_network_specs = [
         "name": "core_periphery_disbm_fixed",
         "builder": core_periphery_disbm,
         "params": {
-            "block_sizes": [350, 350, 350],
+            "block_sizes": [500, 500, 500],
             "p_core": 0.14,
             "p_periphery": 0.02,
-            "p_core_periphery": 0.12,
+            "p_core_periphery": 0.08,
             "p_periphery_core": 0.01,
             "seed": 42,
         },
@@ -90,12 +90,12 @@ method_specs = [
     ("di_sim", "DI-SIM-C"),
     ("spectral", "GSC-N"),
     ("spectral", "GSC-UN"),
-    ("spectral", "deg-GSC-N"),
-    ("spectral", "deg-GSC-UN"),
-    ("spectral", "uniform-GSC-N"),
-    ("spectral", "uniform-GSC-UN"),
-    ("spectral", "perron-GSC-N"),
-    ("spectral", "perron-GSC-UN"),
+    # ("spectral", "deg-GSC-N"),
+    # ("spectral", "deg-GSC-UN"),
+    # ("spectral", "uniform-GSC-N"),
+    # ("spectral", "uniform-GSC-UN"),
+    # ("spectral", "perron-GSC-N"),
+    # ("spectral", "perron-GSC-UN"),
     # (Internal  name, Display name ) - see utils.experiments_utils.clusterer
 ]
 
@@ -168,33 +168,33 @@ method_params = [
     ),
     ("GSC-N", {"laplacian_method": "norm"}),
     ("GSC-UN", {"laplacian_method": "unnorm"}),
-    (
-        "deg-GSC-N",
-        {
-            "laplacian_method": "norm",
-            "measure": (degree_measure, {"gamma": np.arange(0, 1, 0.05)}),
-        },
-    ),
-    (
-        "deg-GSC-UN",
-        {
-            "laplacian_method": "unnorm",
-            "measure": (degree_measure, {"gamma": np.arange(0, 1, 0.05)}),
-        },
-    ),
-    ("uniform-GSC-N", {"laplacian_method": "norm", "measure": (uniform_measure, {})}),
-    (
-        "uniform-GSC-UN",
-        {"laplacian_method": "unnorm", "measure": (uniform_measure, {})},
-    ),
-    (
-        "perron-GSC-N",
-        {"laplacian_method": "norm", "measure": (perron_vector_measure, {})},
-    ),
-    (
-        "perron-GSC-UN",
-        {"laplacian_method": "unnorm", "measure": (perron_vector_measure, {})},
-    ),
+    # (
+    #     "deg-GSC-N",
+    #     {
+    #         "laplacian_method": "norm",
+    #         "measure": (degree_measure, {"gamma": np.arange(0, 1, 0.05)}),
+    #     },
+    # ),
+    # (
+    #     "deg-GSC-UN",
+    #     {
+    #         "laplacian_method": "unnorm",
+    #         "measure": (degree_measure, {"gamma": np.arange(0, 1, 0.05)}),
+    #     },
+    # ),
+    # ("uniform-GSC-N", {"laplacian_method": "norm", "measure": (uniform_measure, {})}),
+    # (
+    #     "uniform-GSC-UN",
+    #     {"laplacian_method": "unnorm", "measure": (uniform_measure, {})},
+    # ),
+    # (
+    #     "perron-GSC-N",
+    #     {"laplacian_method": "norm", "measure": (perron_vector_measure, {})},
+    # ),
+    # (
+    #     "perron-GSC-UN",
+    #     {"laplacian_method": "unnorm", "measure": (perron_vector_measure, {})},
+    # ),
 ]
 
 method_dataset_params = []
