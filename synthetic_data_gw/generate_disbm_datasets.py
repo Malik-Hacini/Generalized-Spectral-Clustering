@@ -10,6 +10,7 @@ Here, $A$ controls the intra- and inter-community connection probabilities, $A$ 
 
 import networkx as nx
 import numpy as np
+import scipy.sparse as sp
 
 
 def directed_sbm(block_sizes: list, P: np.ndarray, seed: int = 42):
@@ -64,6 +65,7 @@ def chain_sbm(
     p_intra: float,
     p_forward: float,
     p_backward: float,
+    seed: int = 42,
 ):
     """
     Generate a chain-structured DSBM graph where each block is connected to the next with a forward probability and to the previous with a backward probability.
@@ -82,7 +84,7 @@ def chain_sbm(
     np.fill_diagonal(P, p_intra)  # Intra-block
     for i in range(K - 1):
         P[i, i + 1] = p_forward  # Forward connection
-    return directed_sbm(block_sizes, P)
+    return directed_sbm(block_sizes, P, seed)
 
 
 def degree_imbalance_sbm(
@@ -106,7 +108,85 @@ def degree_imbalance_sbm(
     """
 
     K = len(block_sizes)
-    P = np.full((K, K), p_low)  # Start with low probability
-    np.fill_diagonal(P, p_intra)  # Intra-block
+    P = np.full((K, K), p_low)
+    np.fill_diagonal(P, p_intra)
     P[0, :] = p_high
     return directed_sbm(block_sizes, P, seed)
+
+
+def degree_corrected_directed_sbm(
+    block_sizes: list,
+    p_intra: float,
+    p_inter: float,
+    power_law_exponents: tuple[float, ...] = (1.8, 3.5, 3.5),
+    block_degree_scales: tuple[float, ...] = (2.5, 0.7, 0.7),
+    seed: int = 42,
+):
+    """
+    Generate a degree-corrected directed SBM with block-specific power laws.
+
+    Each block receives node-level degree propensities sampled from a Pareto law.
+    Different Pareto exponents and scaling factors can be used per block, so the
+    first block can have a much heavier tail and larger average degree than the
+    other blocks.
+
+    Parameters
+    ----------
+    block_sizes : list of int
+        Number of nodes in each block.
+    p_intra : float
+        Baseline within-block connection probability.
+    p_inter : float
+        Baseline between-block connection probability.
+    power_law_exponents : tuple of float, optional
+        Pareto shape parameter for each block. Smaller values produce heavier tails.
+    block_degree_scales : tuple of float, optional
+        Mean scaling applied to each block after Pareto sampling. Larger values
+        increase the expected degree of that block.
+    seed : int, optional
+        Random seed.
+
+    Returns
+    -------
+    scipy.sparse.csr_matrix
+        Directed adjacency matrix.
+    list[int]
+        Ground-truth community labels.
+    """
+
+    K = len(block_sizes)
+    if len(power_law_exponents) != K:
+        raise ValueError("power_law_exponents must have the same length as block_sizes")
+    if len(block_degree_scales) != K:
+        raise ValueError("block_degree_scales must have the same length as block_sizes")
+    if any(size <= 0 for size in block_sizes):
+        raise ValueError("All block sizes must be positive")
+    if any(alpha <= 0 for alpha in power_law_exponents):
+        raise ValueError("All power-law exponents must be positive")
+    if any(scale <= 0 for scale in block_degree_scales):
+        raise ValueError("All block degree scales must be positive")
+
+    rng = np.random.default_rng(seed)
+
+    base_block_matrix = np.full((K, K), p_inter, dtype=float)
+    np.fill_diagonal(base_block_matrix, p_intra)
+
+    labels = np.concatenate([
+        np.full(size, block_id, dtype=int) for block_id, size in enumerate(block_sizes)
+    ])
+
+    propensities = []
+    for size, alpha, scale in zip(block_sizes, power_law_exponents, block_degree_scales):
+        raw = rng.pareto(alpha, size=size) + 1.0
+        normalized = raw / raw.mean()
+        propensities.append(scale * normalized)
+    theta = np.concatenate(propensities)
+
+    probability_matrix = base_block_matrix[labels][:, labels] * np.outer(theta, theta)
+    probability_matrix = np.clip(probability_matrix, 0.0, 1.0)
+    np.fill_diagonal(probability_matrix, 0.0)
+
+    adjacency = rng.random(probability_matrix.shape) < probability_matrix
+    np.fill_diagonal(adjacency, False)
+
+    return sp.csr_matrix(adjacency.astype(float)), labels.tolist()

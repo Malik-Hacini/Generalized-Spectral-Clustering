@@ -51,3 +51,4 @@ figures/
 # Ignore specific files related to the grid imbalance benchmark
 datasets/grid_imbalance/
 datasets/degree_imbalance/
+datasets/degree_corrected_directed_sbm/

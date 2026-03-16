@@ -7,6 +7,24 @@ if __package__ is None or __package__ == "":
 else:
     from experiments.common import *
 
+
+def save_graph_dataset(adjacency_matrix, labels, path: str, name: str) -> None:
+    """Save a sparse graph dataset in the project's graph.npz format."""
+    adjacency_matrix = sp.csr_matrix(adjacency_matrix)
+    labels = np.asarray(labels)
+
+    dataset_dir = Path(path) / name
+    dataset_dir.mkdir(parents=True, exist_ok=True)
+
+    np.savez(
+        dataset_dir / "graph.npz",
+        adj_data=adjacency_matrix.data,
+        adj_indices=adjacency_matrix.indices,
+        adj_indptr=adjacency_matrix.indptr,
+        adj_shape=np.asarray(adjacency_matrix.shape, dtype=np.int64),
+        labels=labels,
+    )
+
 """
 Basic experiment config:
 """
@@ -27,9 +45,58 @@ dataset_names = [
     "polblogs",
     "karate",
     "football",
-    "wikics_lcc",
+    "email_eu_core",
+    "wiki_vote",
+    # "lead_lag"
     "polbooks"
 ]
+
+"""
+Synthetic directed-network datasets with fixed parameters for the paper/document.
+"""
+synthetic_network_specs = [
+    {
+        "name": "chain_sbm_fixed",
+        "builder": chain_sbm,
+        "params": {
+            "block_sizes": [350, 350, 350],
+            "p_intra": 0.12,
+            "p_forward": 0.06,
+            "p_backward": 0.01,
+            "seed": 42,
+        },
+    },
+    {
+        "name": "core_periphery_disbm_fixed",
+        "builder": core_periphery_disbm,
+        "params": {
+            "block_sizes": [350, 350, 350],
+            "p_core": 0.14,
+            "p_periphery": 0.02,
+            "p_core_periphery": 0.12,
+            "p_periphery_core": 0.01,
+            "seed": 42,
+        },
+    },
+]
+
+for spec in synthetic_network_specs:
+    dataset_name = spec["name"]
+    dataset_dir = Path(load_path) / dataset_name
+    graph_file = dataset_dir / "graph.npz"
+
+    if not graph_file.exists():
+        adjacency_matrix, labels = spec["builder"](**spec["params"])
+        save_graph_dataset(
+            adjacency_matrix=adjacency_matrix,
+            labels=labels,
+            path=load_path,
+            name=dataset_name,
+        )
+        print(f"Created synthetic network dataset: {dataset_name}")
+
+    dataset_names.append(dataset_name)
+
 method_specs = [
     ("spectral", "SC-UN"),
     ("spectral", "SC-N"),
@@ -67,7 +134,7 @@ Notes :
 default_params = {
     "n_neighbors": (log_neighbors, {"factor": 1}),
     "random_state": 42,  # Used for kmeans initialization. Has negligible effect for spectral methods.
-    "affinity": "nearest_neighbors",
+    "affinity": "precomputed",  # Graph datasets provide adjacency directly.
     "n_it": 1,
     "assign_labels": "kmeans",
     "measure": (
