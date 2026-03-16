@@ -170,6 +170,24 @@ def load_dataset(
     return data, labels
 
 
+def save_graph_dataset(adjacency_matrix, labels, path: str, name: str) -> None:
+    """Save a sparse graph dataset in the project's graph.npz format."""
+    adjacency_matrix = sp.csr_matrix(adjacency_matrix)
+    labels = np.asarray(labels)
+
+    dataset_dir = os.path.join(path, name)
+    os.makedirs(dataset_dir, exist_ok=True)
+
+    np.savez(
+        os.path.join(dataset_dir, "graph.npz"),
+        adj_data=adjacency_matrix.data,
+        adj_indices=adjacency_matrix.indices,
+        adj_indptr=adjacency_matrix.indptr,
+        adj_shape=np.asarray(adjacency_matrix.shape, dtype=np.int64),
+        labels=labels,
+    )
+
+
 def save_dataset(
     data: np.ndarray,
     labels: np.ndarray,

@@ -7,23 +7,7 @@ if __package__ is None or __package__ == "":
 else:
     from experiments.common import *
 
-
-def save_graph_dataset(adjacency_matrix, labels, path: str, name: str) -> None:
-    """Save a sparse graph dataset in the project's graph.npz format."""
-    adjacency_matrix = sp.csr_matrix(adjacency_matrix)
-    labels = np.asarray(labels)
-
-    dataset_dir = Path(path) / name
-    dataset_dir.mkdir(parents=True, exist_ok=True)
-
-    np.savez(
-        dataset_dir / "graph.npz",
-        adj_data=adjacency_matrix.data,
-        adj_indices=adjacency_matrix.indices,
-        adj_indptr=adjacency_matrix.indptr,
-        adj_shape=np.asarray(adjacency_matrix.shape, dtype=np.int64),
-        labels=labels,
-    )
+from utils.file_manager import save_graph_dataset
 
 """
 Basic experiment config:
