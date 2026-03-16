@@ -142,6 +142,7 @@ def experiment(
 
     set_logger_verbose(verbose)
     logger = get_logger()
+    start_time = time.time()
 
     logger.minimal(f"Running experiment '{experiment_name}'...")
 
@@ -182,8 +183,9 @@ def experiment(
             grid_results=grid_results,
             runtimes=runtimes,
         )
+        elapsed = time.time() - start_time
         logger.success(
-            f"{mode.capitalize().replace('_',' ')} experiment '{experiment_name}' completed and saved successfully to '{save_path}'."
+            f"{mode.capitalize().replace('_',' ')} experiment '{experiment_name}' completed and saved successfully to '{save_path}' in {elapsed:.2f} seconds."
         )
     except Exception as e:
         raise IOError(f"Failed to save experiment results: {str(e)}")
