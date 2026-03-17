@@ -79,8 +79,9 @@ def _optimize_label(optimize_by: str) -> str:
 
 def _method_header(display: str, method: str, show_params: bool, optimize_by: str) -> str:
     """Build method header, adding bestpar annotation for parameterized methods."""
+    base = rf"\textbf{{{display}}}"
     if not show_params:
-        return display
+        return base
 
     metric_label = _optimize_label(optimize_by)
     if method in {"GSC-N", "GSC-UN"}:
@@ -90,15 +91,14 @@ def _method_header(display: str, method: str, show_params: bool, optimize_by: st
             if method == "GSC-N"
             else r"\textbf{GSC$_{\text{un}}$}"
         )
-        return rf"{base}\bestpar{{{symbol}}}{{{metric_label}}}"
     elif method == "DSC+":
         symbol = r"\gamma"
     elif method in {"DI-SIM-R", "DI-SIM-L", "DI-SIM-C"}:
         symbol = r"\tau"
     else:
-        return display
+        return base
 
-    return rf"{display}\bestpar{{{symbol}}}{{{metric_label}}}"
+    return rf"{base}$\bestpar{{{symbol}}}{{{metric_label}}}$"
 
 
 def generate_competitors_table(
