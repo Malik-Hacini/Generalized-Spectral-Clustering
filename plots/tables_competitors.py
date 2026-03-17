@@ -16,6 +16,44 @@ import pandas as pd
 from plots.common import load_best_result_entries, resolve_output_file
 
 
+def _metric_candidates(metric: str) -> tuple[str, ...]:
+    """Return ordered metric keys to try for loading results."""
+    if metric == "graph_ch":
+        return ("graph_ch", "ch")
+    return (metric,)
+
+
+def _resolve_available_metric(result_blob: dict, requested_metric: str) -> str | None:
+    """Resolve metric key with fallbacks (graph_ch -> ch)."""
+    for candidate in _metric_candidates(requested_metric):
+        if candidate in result_blob:
+            return candidate
+    return None
+
+
+def _discover_available_opt_metrics(results_dir: str | Path) -> set[str]:
+    """Discover which optimization metrics are present in result files."""
+    available = set()
+    for _, _, best_results in load_best_result_entries(results_dir):
+        if "ami" in best_results:
+            available.add("ami")
+        if "ch" in best_results:
+            available.add("ch")
+        if "graph_ch" in best_results:
+            available.add("graph_ch")
+    return available
+
+
+def _format_score_value(score: float, show_metric: str) -> str:
+    """Format score with 2 decimals.
+
+    AMI is displayed on [0, 1] scale (0.xx), while CH/Graph-CH remain raw values.
+    """
+    if show_metric == "ami":
+        return f"{score:.2f}"
+    return f"{score:.2f}"
+
+
 def load_results_with_params(
     results_dir: str | Path,
     optimize_by: str = "ch",
@@ -24,15 +62,17 @@ def load_results_with_params(
     score_rows = []
     param_rows = []
     for dataset_name, method_name, best_results in load_best_result_entries(results_dir):
-        if optimize_by not in best_results:
+        optimize_metric = _resolve_available_metric(best_results, optimize_by)
+        if optimize_metric is None:
             continue
-        optimized_data = best_results[optimize_by]
-        if show_metric in optimized_data and "mean" in optimized_data[show_metric]:
+        optimized_data = best_results[optimize_metric]
+        show_metric_resolved = _resolve_available_metric(optimized_data, show_metric)
+        if show_metric_resolved and "mean" in optimized_data[show_metric_resolved]:
             score_rows.append(
                 {
                     "dataset": dataset_name,
                     "method": method_name,
-                    "score": optimized_data[show_metric]["mean"],
+                    "score": optimized_data[show_metric_resolved]["mean"],
                 }
             )
 
@@ -169,7 +209,7 @@ def generate_competitors_table(
                 param_str = ""
                 if method_info["show_params"] and (dataset, method) in params_pivot.index:
                     param_str = format_params_string(params_pivot.loc[(dataset, method)], method)
-                row_values.append((score_val, f"{score_val:.3f}{param_str}"))
+                row_values.append((score_val, f"{_format_score_value(score_val, show_metric)}{param_str}"))
             else:
                 row_values.append((0.0, "--"))
 
@@ -199,7 +239,7 @@ def generate_competitors_table(
 
     lines.append(
         "    "
-        + " & ".join([r"\textit{Competitiveness}"] + [f"{(sum(competitiveness[m]) / len(competitiveness[m])) if competitiveness[m] else 0.0:.3f}" for m in all_methods])
+        + " & ".join([r"\textit{Competitiveness}"] + [f"{(sum(competitiveness[m]) / len(competitiveness[m])) if competitiveness[m] else 0.0:.2f}" for m in all_methods])
         + r" \\")
     lines.append(
         "    "
@@ -212,28 +252,49 @@ def generate_competitors_table(
 def main() -> None:
     parser = argparse.ArgumentParser(description="Generate LaTeX table comparing GSC methods with competitors")
     parser.add_argument("--results-dir", type=str, default="results/benchmark_uci_grid_search", help="Path to results directory")
-    parser.add_argument("--optimize-by", type=str, default="ch", choices=["ch", "graph_ch", "ami"], help="Metric used for optimization")
-    parser.add_argument("--show-metric", type=str, default="ami", choices=["ami", "ch", "graph_ch"], help="Metric displayed in table cells")
+    parser.add_argument("--optimize-by", type=str, default=None, help="Metric used for optimization (ami, ch, graph_ch)")
+    parser.add_argument("--show-metric", type=str, default=None, help="Metric displayed in table cells (ami, ch, graph_ch)")
     parser.add_argument("--output-dir", type=str, default=None, help="Output directory. Defaults to plots/tables/<experiment_name>/.")
     parser.add_argument("--output-name", type=str, default=None, help="Output filename. Defaults to competitors_<opt_metric>_show_<metric>.tex.")
     parser.add_argument("--datasets", nargs="+", default=None, help="Order of datasets in table")
     args = parser.parse_args()
 
-    output_file = resolve_output_file(
-        args.output_dir,
-        args.output_name,
-        "tables",
-        args.results_dir,
-        f"competitors_{args.optimize_by}_show_{args.show_metric}.tex",
-    )
-    latex_table = generate_competitors_table(
-        args.results_dir,
-        optimize_by=args.optimize_by,
-        show_metric=args.show_metric,
-        dataset_order=args.datasets,
-    )
-    output_file.write_text(latex_table)
-    print(f"LaTeX table saved to: {output_file}")
+    valid_metrics = {"ami", "ch", "graph_ch"}
+    if args.optimize_by is not None and args.optimize_by not in valid_metrics:
+        raise ValueError("--optimize-by must be one of: ami, ch, graph_ch")
+    if args.show_metric is not None and args.show_metric not in valid_metrics:
+        raise ValueError("--show-metric must be one of: ami, ch, graph_ch")
+
+    if (args.optimize_by is None) ^ (args.show_metric is None):
+        raise ValueError("Provide both --optimize-by and --show-metric, or neither to generate default 3 tables.")
+
+    available_metrics = _discover_available_opt_metrics(args.results_dir)
+    default_specs = [("ami", "ami")]
+    if "graph_ch" in available_metrics:
+        default_specs.extend([("graph_ch", "graph_ch"), ("graph_ch", "ami")])
+    if "ch" in available_metrics:
+        default_specs.extend([("ch", "ch"), ("ch", "ami")])
+
+    # Keep order stable while removing duplicates.
+    default_specs = list(dict.fromkeys(default_specs))
+    table_specs = [(args.optimize_by, args.show_metric)] if args.optimize_by else default_specs
+
+    for optimize_by, show_metric in table_specs:
+        output_file = resolve_output_file(
+            args.output_dir,
+            args.output_name if len(table_specs) == 1 else None,
+            "tables",
+            args.results_dir,
+            f"competitors_{optimize_by}_show_{show_metric}.tex",
+        )
+        latex_table = generate_competitors_table(
+            args.results_dir,
+            optimize_by=optimize_by,
+            show_metric=show_metric,
+            dataset_order=args.datasets,
+        )
+        output_file.write_text(latex_table)
+        print(f"LaTeX table saved to: {output_file}")
 
 
 if __name__ == "__main__":
