@@ -30,7 +30,6 @@ dataset_names = [
     # "karate",
     "football",
     "email_eu_core",
-    "wiki_vote",
     # "lead_lag"
     "polbooks"
 ]
@@ -40,44 +39,53 @@ Synthetic directed-network datasets with fixed parameters for the paper/document
 """
 synthetic_network_specs = [
     {
-        "name": "chain_sbm_fixed",
+        "name": "DiSBM_Chain",
         "builder": chain_sbm,
         "params": {
             "block_sizes": [500, 500, 500],
             "p_intra": 0.1,
-            "p_forward": 0.06,
+            "p_forward": 0.15,
             "p_backward": 0.01,
             "seed": 42,
         },
     },
+    # {
+    #     "name": "DiSBM_C-P",
+    #     "builder": core_periphery_disbm,
+    #     "params": {
+    #         "block_sizes": [500, 500, 500],
+    #         "p_core": 0.14,
+    #         "p_periphery": 0.02,
+    #         "p_core_periphery": 0.12,
+    #         "p_periphery_core": 0.01,
+    #         "seed": 42,
+    #     },
+    # },
     {
-        "name": "core_periphery_disbm_fixed",
-        "builder": core_periphery_disbm,
-        "params": {
-            "block_sizes": [500, 500, 500],
-            "p_core": 0.14,
-            "p_periphery": 0.02,
-            "p_core_periphery": 0.08,
-            "p_periphery_core": 0.01,
-            "seed": 42,
-        },
-    },
+      "name": "Deg-corr",
+      "builder": degree_corrected_directed_sbm,
+      "params": {
+          "block_sizes": [500, 500, 500],
+          "p_intra": 0.05,
+          "p_inter": 0.01,
+          "power_law_exponents": (1.8, 3.5, 3.5),
+          "block_degree_scales": (2.5, 0.7, 0.7),
+          "seed": 42,
+      },
+
+    }
 ]
 
 for spec in synthetic_network_specs:
     dataset_name = spec["name"]
-    dataset_dir = Path(load_path) / dataset_name
-    graph_file = dataset_dir / "graph.npz"
-
-    if not graph_file.exists():
-        adjacency_matrix, labels = spec["builder"](**spec["params"])
-        save_graph_dataset(
-            adjacency_matrix=adjacency_matrix,
-            labels=labels,
-            path=load_path,
-            name=dataset_name,
-        )
-        print(f"Created synthetic network dataset: {dataset_name}")
+    adjacency_matrix, labels = spec["builder"](**spec["params"])
+    save_graph_dataset(
+        adjacency_matrix=adjacency_matrix,
+        labels=labels,
+        path=load_path,
+        name=dataset_name,
+    )
+    print(f"Created synthetic network dataset: {dataset_name}")
 
     dataset_names.append(dataset_name)
 
