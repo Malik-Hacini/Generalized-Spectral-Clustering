@@ -52,3 +52,7 @@ figures/
 datasets/grid_imbalance/
 datasets/degree_imbalance/
 datasets/degree_corrected_directed_sbm/
+
+# Ignore LaTeX outputs
+
+*.tex
