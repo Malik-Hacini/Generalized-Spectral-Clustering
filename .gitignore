@@ -60,3 +60,6 @@ datasets/degree_corrected_directed_sbm/
 # Ignore Runtimes benchmark outputs
 figures/runtimes/
 datasets/runtimes/
+
+# Ignore specific files related to the Gaussian injection benchmark
+datasets/gaussian_injection_alpha_sigma/
