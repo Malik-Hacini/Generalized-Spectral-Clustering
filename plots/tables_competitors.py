@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
+from typing import Any, cast
 
 if __package__ is None or __package__ == "":
     import sys
@@ -76,13 +77,25 @@ def load_results_with_params(
                 }
             )
 
-        params = {"dataset": dataset_name, "method": method_name}
+        params: dict[str, Any] = {"dataset": dataset_name, "method": method_name}
         measure = optimized_data.get("measure")
         if isinstance(measure, list) and len(measure) >= 2 and isinstance(measure[1], dict):
             params.update(measure[1])
-        for key in ["gamma", "tau"]:
-            if key in optimized_data:
-                params[key] = optimized_data[key]
+        if "gamma" in optimized_data:
+            params["gamma"] = optimized_data["gamma"]
+        if "tau" in optimized_data:
+            tau_value = optimized_data["tau"]
+            # DI-SIM stores callable taus as ["<function ...>", {"s": value}].
+            if isinstance(tau_value, (list, tuple)) and len(tau_value) >= 2 and isinstance(tau_value[1], dict):
+                tau_kwargs = tau_value[1]
+                if "tau" in tau_kwargs:
+                    params["tau"] = tau_kwargs["tau"]
+                elif "s" in tau_kwargs:
+                    params["tau_s"] = tau_kwargs["s"]
+                else:
+                    params["tau"] = tau_value
+            else:
+                params["tau"] = tau_value
         param_rows.append(params)
 
     return pd.DataFrame(score_rows), pd.DataFrame(param_rows)
@@ -102,6 +115,11 @@ def format_params_string(row, method):
     if method in ["DI-SIM-R", "DI-SIM-L", "DI-SIM-C"] and "tau" in row:
         try:
             return f" \\hyperp{{{float(row['tau']):.2f}}}"
+        except (ValueError, TypeError):
+            return ""
+    if method in ["DI-SIM-R", "DI-SIM-L", "DI-SIM-C"] and "tau_s" in row:
+        try:
+            return f" \\hyperp{{{float(row['tau_s']):.2f}}}"
         except (ValueError, TypeError):
             return ""
     return ""
@@ -205,7 +223,7 @@ def generate_competitors_table(
         for method_info in methods_config:
             method = method_info["name"]
             if method in pivot_scores.columns and dataset in pivot_scores.index and pd.notna(pivot_scores.loc[dataset, method]):
-                score_val = pivot_scores.loc[dataset, method]
+                score_val = cast(float, pivot_scores.loc[dataset, method])
                 param_str = ""
                 if method_info["show_params"] and (dataset, method) in params_pivot.index:
                     param_str = format_params_string(params_pivot.loc[(dataset, method)], method)
@@ -224,8 +242,8 @@ def generate_competitors_table(
     competitiveness = {method: [] for method in all_methods}
     ranks = {method: [] for method in all_methods}
     for dataset in datasets:
-        dataset_values = {
-            method: pivot_scores.loc[dataset, method]
+        dataset_values: dict[str, float] = {
+            method: cast(float, pivot_scores.loc[dataset, method])
             for method in all_methods
             if method in pivot_scores.columns and dataset in pivot_scores.index and pd.notna(pivot_scores.loc[dataset, method])
         }
