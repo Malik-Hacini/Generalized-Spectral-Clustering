@@ -56,3 +56,7 @@ datasets/degree_corrected_directed_sbm/
 # Ignore LaTeX outputs
 
 *.tex
+
+# Ignore Runtimes benchmark outputs
+figures/runtimes/
+datasets/runtimes/

@@ -81,19 +81,19 @@ def _configure_style() -> None:
             "pdf.fonttype": 42,
             "ps.fonttype": 42,
             "font.family": "DejaVu Sans",
-            "font.size": 11,
+            "font.size": 14,
             "text.color": "#2F2840",
             "axes.facecolor": "white",
             "axes.edgecolor": "#8E84A8",
             "axes.labelcolor": "#2F2840",
             "axes.titlecolor": "#2F2840",
-            "axes.titlesize": 15,
-            "axes.labelsize": 12,
+            "axes.titlesize": 20,
+            "axes.labelsize": 16,
             "xtick.color": "#4E4464",
             "ytick.color": "#4E4464",
-            "xtick.labelsize": 10,
-            "ytick.labelsize": 11,
-            "legend.fontsize": 10,
+            "xtick.labelsize": 14,
+            "ytick.labelsize": 14,
+            "legend.fontsize": 15,
         }
     )
 
@@ -193,7 +193,7 @@ def plot_runtimes(long_df: pd.DataFrame, title: str):
     markers = {method: MARKERS[i % len(MARKERS)] for i, method in enumerate(methods)}
 
     fig_width = max(9.0, 1.15 * len(datasets) + 1.8)
-    fig = plt.figure(figsize=(fig_width, 7.6), layout="constrained")
+    fig = plt.figure(figsize=(fig_width, 9), layout="constrained")
     subfigs = fig.subfigures(2, 1, height_ratios=[1, 10])
 
     ax = subfigs[1].subplots()
