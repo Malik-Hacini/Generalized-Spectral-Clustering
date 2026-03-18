@@ -30,7 +30,7 @@ from sklearn.utils._param_validation import (
 
 class DSC:
     def __init__(
-        self, n_clusters, n_neighbors, gamma, max_iter, tol, epsilon, random_state
+        self, n_clusters, n_neighbors, gamma, max_iter, tol, epsilon, affinity, random_state
     ):
 
         self.n_clusters = n_clusters
@@ -39,15 +39,18 @@ class DSC:
         self.max_iter = max_iter
         self.tol = tol
         self.epsilon = epsilon
+        self.affinity = affinity
         self.random_state = random_state
 
     def _laplacian(self, X):
         context_kwargs = {"X": X}
         self.n_neighbors = _resolve_callable_param(self.n_neighbors, context_kwargs)
-
-        self.adjacency_matrix = kneighbors_graph(
-            X, n_neighbors=self.n_neighbors, include_self=True
-        )
+        if self.affinity == "precomputed":
+            self.adjacency_matrix = X
+        else:
+            self.adjacency_matrix = kneighbors_graph(
+                X, n_neighbors=self.n_neighbors, include_self=True
+            )
         n = self.adjacency_matrix.shape[0]
 
         # Step 1: Normalize rows to get transition matrix P

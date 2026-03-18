@@ -60,19 +60,23 @@ def safe_diags(vec, tau, epsilon):
 
 
 class DiSim:
-    def __init__(self, n_clusters, n_neighbors, tau, embedding, epsilon, random_state):
+    def __init__(self, n_clusters, n_neighbors, tau, embedding, epsilon, affinity, random_state):
         self.n_clusters = n_clusters
         self.n_neighbors = n_neighbors
         self.tau = tau
         self.embedding = embedding
         self.epsilon = epsilon
+        self.affinity = affinity
         self.random_state = random_state
 
     def _compute_embedding(self, X):
         self.n_neighbors = _resolve_callable_param(self.n_neighbors, {"X": X})
-        self.adjacency_matrix = kneighbors_graph(
-            X, n_neighbors=self.n_neighbors, include_self=True
-        )
+        if self.affinity == "precomputed":
+            self.adjacency_matrix = X
+        else:
+            self.adjacency_matrix = kneighbors_graph(
+                X, n_neighbors=self.n_neighbors, include_self=True
+            )
         self.tau = _resolve_callable_param(
             self.tau, {"adjacency_matrix": self.adjacency_matrix}
         )
