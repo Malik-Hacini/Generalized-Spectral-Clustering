@@ -13,7 +13,28 @@ from sklearn.datasets import make_blobs  # type: ignore
 def _gaussian_injection(
     X_blobs, n_neighbors, injection_center, sigma_injection=1, alpha=0.5, bandwidth=1.0
 ):
+    """Inject higher affinities around a specified center using a Gaussian function.
 
+    Parameters
+    ----------
+    X_blobs : ndarray of shape (n_samples, n_features)
+        The original data points.
+    n_neighbors : int
+        Number of neighbors for kNN graph construction.
+    injection_center : tuple of float
+        2D point around which to inject higher affinities.
+    sigma_injection : float, optional
+        Standard deviation of the Gaussian injection (controls how localized the injection is).
+    alpha : float, optional
+        Blending weight between the natural Gaussian affinity and the injection-based affinity. Should be in [0, 1].
+    bandwidth : float, optional
+        Bandwidth parameter for the natural Gaussian affinity.
+
+    Returns
+    -------
+    injected_graph : ndarray of shape (n_samples, n_samples)
+        The injected kNN graph.
+    """
     distances_to_center = pairwise_distances(X_blobs, injection_center).ravel()
     injection_weights = np.exp(-(distances_to_center**2) / (2 * sigma_injection**2))
 
