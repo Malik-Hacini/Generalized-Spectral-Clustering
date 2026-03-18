@@ -31,6 +31,7 @@ dataset_names = [
     "football",
     "email_eu_core",
     # "lead_lag"
+    "digrac",
     "polbooks"
 ]
 
@@ -131,7 +132,7 @@ default_params = {
     "assign_labels": "kmeans",
     "measure": (
         teleporting_undirected_measure,
-        {"alpha": np.arange(0, 1.5, 0.1), "t": range(0, 25)},
+        {"alpha": np.arange(0, 2, 0.1), "t": range(0, 25)},
     ),  # Grid search for GSC methods
     "tau": (
         avg_deg_taus,
