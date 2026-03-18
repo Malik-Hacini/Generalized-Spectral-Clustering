@@ -59,12 +59,16 @@ def load_degree_imbalance_results(results_path: str | Path):
         raise ValueError(f"No *_best_results.json files found in {results_dir}")
 
     rows = []
+    unmatched_target_names = []
     name_patterns = [
         re.compile(
             r"^disbm_degimbal_b([0-9-]+)_pintra([0-9p]+)_phigh([0-9p]+)_plow([0-9p]+)_seed(\d+)$"
         ),
         re.compile(
             r"^disbm_degree_imbalance_b([0-9-]+)_pintra([0-9p]+)_phigh([0-9p]+)_plow([0-9p]+)_seed(\d+)$"
+        ),
+        re.compile(
+            r"^dcdisbm_degimbal_b([0-9-]+)_pintra([0-9p]+)_pinter([0-9p]+)_highscale([0-9p]+)_lowscale([0-9p]+)_seed(\d+)$"
         ),
     ]
 
@@ -78,14 +82,21 @@ def load_degree_imbalance_results(results_path: str | Path):
             if match is not None:
                 break
         if not match:
-            print(f"Warning: Could not parse dataset name: {dataset_name}")
+            if dataset_name.startswith(("disbm", "dcdisbm")):
+                unmatched_target_names.append(dataset_name)
             continue
 
         block_sizes_token = match.group(1)
         p_intra_token = match.group(2)
-        p_high_token = match.group(3)
-        p_low_token = match.group(4)
-        seed = int(match.group(5))
+        if "_pinter" in dataset_name and "_highscale" in dataset_name:
+            # dcdisbm format: keep column names for backward compatibility with plotting code.
+            p_high_token = match.group(4)
+            p_low_token = match.group(5)
+            seed = int(match.group(6))
+        else:
+            p_high_token = match.group(3)
+            p_low_token = match.group(4)
+            seed = int(match.group(5))
 
         block_sizes = tuple(int(v) for v in block_sizes_token.split("-"))
         p_intra = _parse_prob_token(p_intra_token)
@@ -126,6 +137,13 @@ def load_degree_imbalance_results(results_path: str | Path):
                 }
             )
 
+    if unmatched_target_names:
+        unique_unmatched = sorted(set(unmatched_target_names))
+        print(
+            f"Warning: Could not parse {len(unique_unmatched)} target dataset names. "
+            f"First example: {unique_unmatched[0]}"
+        )
+
     return pd.DataFrame(rows)
 
 
@@ -148,10 +166,12 @@ def plot_degree_imbalance_results(df: pd.DataFrame, output_file: str = None):
     summary.columns = ["method", "ratio", "ami_mean", "ami_std", "n_seeds"]
     summary = summary.sort_values("ratio")
 
-    method_order = ["SC-N", "DSC+", "GSC-N"]
+    method_order = ["SC-UN", "SC-N", "DSC+", "GSC-UN", "GSC-N"]
     method_styles = {
+        "SC-UN": {"color": "#FF8C69", "linestyle": ":", "marker": "D", "label": "SC-UN"},
         "SC-N": {"color": "#FF6347", "linestyle": "--", "marker": "o", "label": "SC-N"},
         "DSC+": {"color": "#27A727", "linestyle": "-.", "marker": "^", "label": "DSC+"},
+        "GSC-UN": {"color": "#4C9AFF", "linestyle": "--", "marker": "P", "label": "GSC-UN"},
         "GSC-N": {"color": "#072AC8", "linestyle": "-", "marker": "s", "label": "GSC-N"},
     }
 
