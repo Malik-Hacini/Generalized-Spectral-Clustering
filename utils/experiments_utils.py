@@ -273,6 +273,7 @@ def clusterer(method_name, params):
             n_clusters=params.get("n_clusters", 3),
             n_neighbors=params.get("n_neighbors", 6),
             gamma=params.get("gamma", 0.5),
+            affinity=params.get("affinity", "nearest_neighbors"),
             max_iter=params.get("max_iter", 100),
             tol=params.get("tol", 1e-4),
             epsilon=params.get("epsilon", 1e-8),

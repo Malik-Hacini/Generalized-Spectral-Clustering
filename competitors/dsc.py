@@ -29,6 +29,9 @@ from sklearn.utils._param_validation import (
 
 
 class DSC:
+    """
+    Directed Spectral Clustering (DSC+) implementation based on the Chung Laplacian, with teleportation-based smoothing to handle weakly-connected digraphs.
+    """
     def __init__(
         self, n_clusters, n_neighbors, gamma, max_iter, tol, epsilon, affinity, random_state
     ):

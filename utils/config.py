@@ -144,6 +144,7 @@ class ExperimentConfig:
                 "n_clusters",
                 "n_neighbors",
                 "gamma",
+                "affinity",
                 "max_iter",
                 "tol",
                 "epsilon",
