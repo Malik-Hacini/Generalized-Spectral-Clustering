@@ -263,6 +263,7 @@ def clusterer(method_name, params):
             n_clusters=params.get("n_clusters", 3),
             n_neighbors=params.get("n_neighbors", 6),
             tau=params.get("tau", 1e-8),
+            affinity=params.get("affinity", "nearest_neighbors"),
             embedding=params.get("embedding", "left"),
             epsilon=params.get("epsilon", 1e-8),
             random_state=params.get("random_state", 42),
