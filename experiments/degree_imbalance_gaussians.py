@@ -5,7 +5,7 @@ if __package__ is None or __package__ == "":
 else:
     from experiments.common import *
 
-from synthetic_data_gw.generate_degree_imabalanced_gaussians import (
+from synthetic_data_gen.generate_degree_imabalanced_gaussians import (
     degree_imbalanced_gaussians,
 )
 from utils.file_manager import save_dataset

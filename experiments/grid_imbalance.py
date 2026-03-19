@@ -9,7 +9,7 @@ else:
 
 from pathlib import Path
 
-from synthetic_data_gw.generate_imbalance_checkers import grid_imbalance
+from synthetic_data_gen.generate_imbalance_checkers import grid_imbalance
 from utils.file_manager import save_dataset
 
 save_path = project_path("results")

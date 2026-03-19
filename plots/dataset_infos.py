@@ -35,7 +35,7 @@ import scipy.sparse as sp
 import scipy.sparse.csgraph as csgraph
 
 from plots.common import project_path, resolve_output_file
-from synthetic_data_gw.generate_disbm_datasets import (
+from synthetic_data_gen.generate_disbm_datasets import (
     chain_sbm,
     core_periphery_disbm,
     degree_corrected_directed_sbm,
