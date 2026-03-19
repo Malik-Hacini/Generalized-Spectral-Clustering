@@ -60,6 +60,10 @@ def safe_diags(vec, tau, epsilon):
 
 
 class DiSim:
+    """
+    DI-SIM clustering algorithm.
+    The matrix A is symmetrically normalized with in- and out-degrees raised to the power of tau, then decomposed via SVD. Clustering is performed on the left, right, or combined singular vectors.
+    """
     def __init__(self, n_clusters, n_neighbors, tau, embedding, epsilon, affinity, random_state):
         self.n_clusters = n_clusters
         self.n_neighbors = n_neighbors
