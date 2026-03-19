@@ -49,12 +49,12 @@ method_specs = [
     ("di_sim", "DI-SIM-C"),
     ("spectral", "GSC-N"),
     ("spectral", "GSC-UN"),
-    # ("spectral", "deg-GSC-N"),
-    # ("spectral", "deg-GSC-UN"),
-    # ("spectral", "uniform-GSC-N"),
-    # ("spectral", "uniform-GSC-UN"),
-    # ("spectral", "perron-GSC-N"),
-    # ("spectral", "perron-GSC-UN"),
+    ("spectral", "deg-GSC-N"),
+    ("spectral", "deg-GSC-UN"),
+    ("spectral", "uniform-GSC-N"),
+    ("spectral", "uniform-GSC-UN"),
+    ("spectral", "perron-GSC-N"),
+    ("spectral", "perron-GSC-UN"),
     # (Internal  name, Display name ) - see utils.experiments_utils.clusterer
 ]
 
