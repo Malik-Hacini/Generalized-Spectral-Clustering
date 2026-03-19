@@ -17,26 +17,12 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from matplotlib.colors import to_hex
 
 from plots.common import project_path, resolve_output_dir, validate_selection
+from plots.method_style import styles_for_methods
 
 
 DEFAULT_RESULTS_CSV = Path("results/benchmark_uci_grid_search/benchmark_uci_runtimes.csv")
-MARKERS = ["o", "s", "D", "^", "v", "P", "X", "<", ">", "h", "*"]
-METHOD_COLORS = [
-    "#FF7E68",  # SC UN
-    "#FF6347", # SC N
-    "#27A727", # DSC+
-    "#FF579F", # DiSim C
-    "#FD84B8", # DiSim R
-    "#FFB0D2", # DiSim L
-    "#405BD3", # GSC UN
-    "#072AC8", # GSC N
-    # --- additional colors
-    "#8C564B",
-    "#BCBD22",
-]
 LOG_COLLISION_THRESHOLD = 0.055
 COLLISION_X_STEP = 0.09
 
@@ -145,10 +131,6 @@ def load_runtime_data(results_csv: Path, methods: list[str] | None, datasets: li
     return long_df.sort_values(["dataset", "method"])
 
 
-def _method_colors(methods: list[str]) -> dict[str, str]:
-    return {method: to_hex(METHOD_COLORS[i % len(METHOD_COLORS)]) for i, method in enumerate(methods)}
-
-
 def _collision_offsets(log_values: np.ndarray) -> np.ndarray:
     if len(log_values) <= 1:
         return np.zeros(len(log_values), dtype=float)
@@ -189,8 +171,7 @@ def plot_runtimes(long_df: pd.DataFrame, title: str):
         f"{dataset.replace('_', ' ')}\n(n={dataset_sample_counts[str(dataset)]})"
         for dataset in datasets
     ]
-    colors = _method_colors(methods)
-    markers = {method: MARKERS[i % len(MARKERS)] for i, method in enumerate(methods)}
+    method_styles = styles_for_methods(methods)
 
     fig_width = max(9.0, 1.15 * len(datasets) + 1.8)
     fig = plt.figure(figsize=(fig_width, 9), layout="constrained")
@@ -217,8 +198,8 @@ def plot_runtimes(long_df: pd.DataFrame, title: str):
                 row["x"],
                 row["runtime_seconds"],
                 s=60,
-                marker=markers[method],
-                color=colors[method],
+                marker=method_styles[method]["marker"],
+                color=method_styles[method]["color"],
                 edgecolors="white",
                 linewidths=0.9,
                 label=label,
@@ -240,11 +221,11 @@ def plot_runtimes(long_df: pd.DataFrame, title: str):
     legend_handles = [
         mlines.Line2D(
             [0], [0],
-            marker=markers[method],
+            marker=method_styles[method]["marker"],
             color="w",
-            markerfacecolor=colors[method],
+            markerfacecolor=method_styles[method]["color"],
             markersize=10,
-            label=method,
+            label=method_styles[method]["label"],
         )
         for method in methods
     ]

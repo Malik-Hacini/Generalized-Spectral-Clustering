@@ -152,7 +152,7 @@ def _method_header(display: str, method: str, show_params: bool, optimize_by: st
     elif method == "DSC+":
         symbol = r"\gamma"
     elif method in {"DI-SIM-R", "DI-SIM-L", "DI-SIM-C"}:
-        symbol = r"\tau"
+        symbol = r"s"
     else:
         return base
 

@@ -17,6 +17,7 @@ import numpy as np
 import pandas as pd
 
 from plots.common import project_path, resolve_output_dir
+from plots.method_style import ordered_methods, style_for_method
 
 
 def load_grid_imbalance_results(results_path: str | Path):
@@ -90,22 +91,17 @@ def plot_imbalance_results(df: pd.DataFrame, output_file: Path) -> None:
     summary.columns = ["method", "ratio", "ami_mean", "ami_std"]
     summary = summary.sort_values("ratio")
 
-    method_order = ["SC-N", "DSC+", "GSC-N"]
-    method_styles = {
-        "SC-N": {"color": "#FF6347", "linestyle": "--", "marker": "o", "label": "SC-N"},
-        "DSC+": {"color": "#27A727", "linestyle": "-.", "marker": "^", "label": "DSC+"},
-        "GSC-N": {"color": "#072AC8", "linestyle": "-", "marker": "s", "label": "GSC-N"},
-    }
+    method_order = ordered_methods(summary["method"].unique().tolist())
 
     plt.figure()
     for method in method_order:
         method_data = summary[summary["method"] == method]
         if method_data.empty:
             continue
-        style = method_styles[method]
+        style = style_for_method(method)
         ratio = np.asarray(method_data["ratio"], dtype=float)
         ami_mean = np.asarray(method_data["ami_mean"], dtype=float)
-        ami_std = np.asarray(method_data["ami_std"], dtype=float)
+        ami_std = np.nan_to_num(np.asarray(method_data["ami_std"], dtype=float), nan=0.0)
         plt.plot(
             ratio,
             ami_mean,
