@@ -33,14 +33,16 @@ if __package__ is None or __package__ == "":
 import numpy as np
 import scipy.sparse as sp
 import scipy.sparse.csgraph as csgraph
+from sklearn.neighbors import kneighbors_graph  # type: ignore
 
+from competitors.neighbors import log_neighbors
 from plots.common import project_path, resolve_output_file
 from synthetic_data_gen.generate_disbm_datasets import (
     chain_sbm,
     core_periphery_disbm,
     degree_corrected_directed_sbm,
 )
-from utils.file_manager import save_graph_dataset
+from utils.file_manager import load_dataset, save_graph_dataset
 
 # ---------------------------------------------------------------------------
 # Default dataset list — edit this to control which datasets are processed
@@ -67,7 +69,7 @@ DEFAULT_DATASETS = [
     "ph_recognition",
     # "polblogs",
     # "yeast",
-    "dolphins",
+    # "dolphins",
     # Synthetic datasets can be listed here too. They are generated on demand
     # from SYNTHETIC_DATASET_SPECS if missing from datasets/.
     # "DiSBM_Chain",
@@ -85,6 +87,9 @@ DEFAULT_DATASETS = [
     # "wikics_lcc",
     # "telegram",
 ]
+
+# Keep k-NN construction aligned with experiment defaults: log_neighbors(X, factor=1).
+DEFAULT_KNN_FACTOR = 1
 
 SYNTHETIC_DATASET_SPECS = {
     "DiSBM_Chain": {
@@ -136,14 +141,41 @@ def _load_graph_npz(path: Path) -> tuple[sp.csr_matrix, np.ndarray | None]:
 
 
 def load_dataset_graph(datasets_root: Path, name: str) -> tuple[sp.csr_matrix, np.ndarray | None]:
-    """Load a graph dataset by name from the datasets root directory."""
+    """Load a dataset graph; build default k-NN graph for point-cloud datasets."""
     dataset_dir = datasets_root / name
     if not dataset_dir.is_dir():
         raise FileNotFoundError(f"Dataset directory not found: {dataset_dir}")
+
     graph_file = dataset_dir / "graph.npz"
-    if not graph_file.exists():
-        raise FileNotFoundError(f"No graph.npz in {dataset_dir}. Only graph datasets are supported.")
-    return _load_graph_npz(graph_file)
+    if graph_file.exists():
+        return _load_graph_npz(graph_file)
+
+    data, labels = load_dataset(str(datasets_root), name, split="train", label_col="labels")
+
+    if sp.issparse(data):
+        A = sp.csr_matrix(data)
+    else:
+        X = np.asarray(data)
+        if X.ndim != 2:
+            raise ValueError(
+                f"Point-cloud dataset '{name}' must have 2D features; got shape {X.shape}."
+            )
+        n_neighbors = int(log_neighbors(X, factor=DEFAULT_KNN_FACTOR))
+        print(
+            f"    No graph.npz found for '{name}'; building directed k-NN graph "
+            f"with k={n_neighbors} (log_neighbors, factor={DEFAULT_KNN_FACTOR})."
+        )
+        A = sp.csr_matrix(
+            kneighbors_graph(
+                X,
+                n_neighbors=n_neighbors,
+                include_self=False,
+                mode="connectivity",
+            )
+        )
+
+    labels_arr = None if labels is None else np.asarray(labels)
+    return A, labels_arr
 
 
 def ensure_dataset_exists(datasets_root: Path, name: str) -> None:
@@ -203,11 +235,11 @@ def _cluster_level_reciprocity(W: sp.csr_matrix, y: np.ndarray | None) -> float:
 
 
 def compute_stats(A: sp.csr_matrix, labels: np.ndarray | None) -> dict:
-    A = A.astype(float)
-    A_bin = (A > 0).astype(float)
-    A_bin = sp.csr_matrix(A_bin)
+    A = sp.csr_matrix(A, dtype=float)
+    A_bin = sp.csr_matrix(A > 0, dtype=float)
 
-    n_nodes = A_bin.shape[0]
+    shape = A_bin.shape
+    n_nodes = int(shape[0] if shape is not None else 0)
     n_edges = int(A_bin.nnz)
     n_classes = int(len(np.unique(labels))) if labels is not None else float("nan")
 
@@ -411,6 +443,8 @@ def main() -> None:
     if not rows:
         print("No results to write.")
         return
+
+    rows.sort(key=lambda row: _display_name(row["name"]).casefold())
 
     # Output file
     from plots.common import resolve_kind_dir
