@@ -19,16 +19,21 @@ metrics = ("ami", "ch")
 n_jobs = -1
 verbose = True
 
-grid_size = (2, 1)
-n_high = 1000
+grid_size = 2
+n_high = 300
 n_low_values = [n_high // 15, n_high // 10, n_high // 5, n_high // 3, n_high // 2]
 n_seeds = 50
 datasets_path = Path(project_path("../datasets/grid_imbalance"))
 
 method_specs = [
+    ("spectral", "SC-UN"),
     ("spectral", "SC-N"),
     ("dsc", "DSC+"),
     ("spectral", "GSC-N"),
+    ("spectral", "GSC-UN"),
+    ("disim", "DI-SIM-R"),
+    ("disim", "DI-SIM-L"),
+    ("disim", "DI-SIM-C"),
 ]
 
 default_params = {
@@ -46,6 +51,9 @@ default_params = {
 method_params = [
     ("SC-UN", {"laplacian_method": "unnorm", "standard": True, "measure": None}),
     ("SC-N", {"laplacian_method": "norm", "standard": True, "measure": None}),
+    ("DI-SIM-R", {"embedding": "right"}),
+    ("DI-SIM-L", {"embedding": "left"}),
+    ("DI-SIM-C", {"embedding": "combined"}),
     ("DSC+", {"gamma": np.arange(0, 1, 0.05)}),
     ("GSC-N", {"laplacian_method": "norm"}),
     ("GSC-UN", {"laplacian_method": "unnorm"}),
