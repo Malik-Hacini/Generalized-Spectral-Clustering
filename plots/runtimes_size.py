@@ -79,7 +79,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--output-name",
         type=str,
-        default="runtimes_size_lines.pdf",
+        default="runtimes_size.pdf",
         help="Output filename.",
     )
     parser.add_argument(
@@ -108,13 +108,13 @@ def load_runtime_table(
     if not selected_methods:
         raise ValueError("No method columns selected.")
 
-    df = df[["dataset", "n"] + selected_methods].copy()
-    df["n"] = pd.to_numeric(df["n"], errors="raise").astype(int)
+    df = pd.DataFrame(df[["dataset", "n"] + selected_methods].copy())
+    df["n"] = pd.Series(pd.to_numeric(df["n"], errors="raise"), index=df.index, dtype="int64")
 
     for m in selected_methods:
         df[m] = pd.to_numeric(df[m], errors="coerce")
 
-    return df, selected_methods
+    return pd.DataFrame(df), selected_methods
 
 
 def summarize_by_size(df: pd.DataFrame, methods: list[str]) -> pd.DataFrame:
@@ -132,12 +132,12 @@ def summarize_by_size(df: pd.DataFrame, methods: list[str]) -> pd.DataFrame:
 def plot_runtime_lines(summary: pd.DataFrame, methods: list[str], title: str) -> None:
     plt.figure()
     for method in methods:
-        method_df = summary[summary["method"] == method]
+        method_df = pd.DataFrame(summary[summary["method"] == method])
         if method_df.empty:
             continue
 
-        x = method_df["n"].to_numpy(dtype=float)
-        y = method_df["runtime_median"].to_numpy(dtype=float)
+        x = np.asarray(method_df["n"], dtype=float)
+        y = np.asarray(method_df["runtime_median"], dtype=float)
 
         color = METHOD_COLORS.get(method, None)
         marker = METHOD_MARKERS.get(method, "o")
@@ -179,7 +179,7 @@ def main() -> None:
         output_name=args.output_name,
         kind="runtimes",
         source=args.results_csv,
-        default_name="runtimes_size_lines.pdf",
+        default_name="runtimes_size.pdf",
     )
     plt.savefig(output_file, dpi=300, bbox_inches="tight")
     print(f"Saved runtime line plot to: {output_file}")
