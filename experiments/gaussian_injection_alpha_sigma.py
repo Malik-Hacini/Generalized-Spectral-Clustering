@@ -14,7 +14,7 @@ from competitors.measures import teleporting_undirected_measure
 from utils.config import ExperimentConfig
 from utils.experiments_utils import experiment
 
-from synthetic_data_gw.gaussian_injection import generate_gaussian_injection
+from synthetic_data_gen.gaussian_injection import generate_gaussian_injection
 from utils.file_manager import save_graph_dataset
 
 
@@ -44,8 +44,9 @@ injection_center = ((-2.0, 0.0),)
 bandwidth = 1.0
 
 # Sweep parameters
-alpha_values = np.arange(0.0, 1.01, 0.1)
-sigma_injection_values = (0.01, 0.05, 0.1, 0.2, 0.5, 0.8, 1.0, 2.0, 20.0, 50.0)
+# alpha_values = np.arange(0.0, 1.01, 0.1)
+alpha_values = [0.2, 0.3, 0.4]
+sigma_injection_values = (0.2, 0.5, 0.8, 1.0,)
 seeds = range(10)
 
 # Dataset generation
