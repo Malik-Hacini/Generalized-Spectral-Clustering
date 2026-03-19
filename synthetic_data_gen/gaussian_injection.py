@@ -52,7 +52,9 @@ def _gaussian_injection(
     for i in range(n):
         nn_idx = np.argpartition(injected_affinity[i], -n_neighbors)[-n_neighbors:]
         k_nn_graph[i, nn_idx] = injected_affinity[i, nn_idx]
-
+    # Normalize injection_weights to have the same max as natural_affinity for better blending
+    injection_weights = injection_weights / np.max(injection_weights)
+    natural_affinity = natural_affinity / np.max(natural_affinity)
     injected_graph = 0.5 * (k_nn_graph + k_nn_graph.T)
     return injected_graph
 
