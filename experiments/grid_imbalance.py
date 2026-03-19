@@ -19,7 +19,7 @@ metrics = ("ami", "ch")
 n_jobs = -1
 verbose = True
 
-grid_size = 2
+grid_size = 4
 n_high = 300
 n_low_values = [n_high // 15, n_high // 10, n_high // 5, n_high // 3, n_high // 2]
 n_seeds = 50
@@ -31,9 +31,9 @@ method_specs = [
     ("dsc", "DSC+"),
     ("spectral", "GSC-N"),
     ("spectral", "GSC-UN"),
-    ("disim", "DI-SIM-R"),
-    ("disim", "DI-SIM-L"),
-    ("disim", "DI-SIM-C"),
+    ("di_sim", "DI-SIM-R"),
+    ("di_sim", "DI-SIM-L"),
+    ("di_sim", "DI-SIM-C"),
 ]
 
 default_params = {
