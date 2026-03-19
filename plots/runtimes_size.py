@@ -1,8 +1,6 @@
 """Plot runtime-vs-size line charts from runtime CSV outputs.
 
-Expected input format is the runtime CSV produced by the experiment framework,
-for example:
-results/benchmark_runtimes_size_grid_search/benchmark_runtimes_size_runtimes.csv
+Expected input format is the runtime CSV produced by the experiment framework.
 
 Columns:
         dataset, n, <method_1>, <method_2>, ...
@@ -26,13 +24,35 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from plots.common import project_path, resolve_output_file, validate_selection
+from plots.common import configure_paper_style, project_path, resolve_output_file, validate_selection
 
 
 DEFAULT_RESULTS_CSV = (
     "results/benchmark_runtimes_size_grid_search/benchmark_runtimes_size_runtimes.csv"
 )
 
+
+
+METHOD_COLORS = {
+    "SC-UN": "#FF7E68",
+    "GSC-UN": "#072AC8",
+    "GSC-UN-NoTune": "#264DF7",
+}
+METHOD_MARKERS = {
+    "SC-UN": "o",
+    "GSC-UN": "s",
+    "GSC-UN-NoTune": "^",
+}
+METHOD_LINESTYLES = {
+    "SC-UN": "-",
+    "GSC-UN": "--",
+    "GSC-UN-NoTune": "-.",
+}
+METHOD_LABELS = {
+    "SC-UN": "SC-UN",
+    "GSC-UN": "GSC-UN",
+    "GSC-UN-NoTune": "GSC-UN (w/o tuning)",
+}
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -53,8 +73,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--output-dir",
         type=str,
-        default="figures",
-        help="Output directory for the figure.",
+        default=None,
+        help="Output directory. Defaults to plots/runtimes/<experiment_name>/.",
     )
     parser.add_argument(
         "--output-name",
@@ -110,27 +130,6 @@ def summarize_by_size(df: pd.DataFrame, methods: list[str]) -> pd.DataFrame:
 
 
 def plot_runtime_lines(summary: pd.DataFrame, methods: list[str], title: str) -> None:
-    colors = {
-        "SC-UN": "#FF7E68",
-        "GSC-UN": "#072AC8",
-        "GSC-UN-NoTune": "#264DF7",
-    }
-    markers = {
-        "SC-UN": "o",
-        "GSC-UN": "s",
-        "GSC-UN-NoTune": "^",
-    }
-    linestyles = {
-        "SC-UN": "-",
-        "GSC-UN": "--",
-        "GSC-UN-NoTune": "-.",
-    }
-    display_names = {
-        "SC-UN": "SC-UN",
-        "GSC-UN": "GSC-UN",
-        "GSC-UN-NoTune": "GSC-UN (w/o tuning)",
-    }
-
     plt.figure()
     for method in methods:
         method_df = summary[summary["method"] == method]
@@ -140,9 +139,9 @@ def plot_runtime_lines(summary: pd.DataFrame, methods: list[str], title: str) ->
         x = method_df["n"].to_numpy(dtype=float)
         y = method_df["runtime_median"].to_numpy(dtype=float)
 
-        color = colors.get(method, None)
-        marker = markers.get(method, "o")
-        linestyle = linestyles.get(method, ":")
+        color = METHOD_COLORS.get(method, None)
+        marker = METHOD_MARKERS.get(method, "o")
+        linestyle = METHOD_LINESTYLES.get(method, ":")
         plt.plot(
             x,
             y,
@@ -151,7 +150,7 @@ def plot_runtime_lines(summary: pd.DataFrame, methods: list[str], title: str) ->
             linewidth=2.0,
             markersize=6,
             color=color,
-            label=display_names.get(method, method),
+            label=METHOD_LABELS.get(method, method),
         )
 
     plt.xlabel(r"Number of points ($n$)")
@@ -164,6 +163,7 @@ def plot_runtime_lines(summary: pd.DataFrame, methods: list[str], title: str) ->
 
 def main() -> None:
     args = parse_args()
+    configure_paper_style(plt)
 
     runtime_df, methods = load_runtime_table(args.results_csv, args.methods)
     summary = summarize_by_size(runtime_df, methods)
@@ -177,7 +177,7 @@ def main() -> None:
     output_file = resolve_output_file(
         output_dir=args.output_dir,
         output_name=args.output_name,
-        kind="figures",
+        kind="runtimes",
         source=args.results_csv,
         default_name="runtimes_size_lines.pdf",
     )
