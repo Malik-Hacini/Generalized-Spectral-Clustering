@@ -61,15 +61,18 @@ def parse_args() -> argparse.Namespace:
 
 
 
-def plot_preprocessing_vs_full(full_summary, preprocessing_summary, methods: list[str], title: str | None) -> None:
-    plt.figure()
+def plot_preprocessing_vs_full(full_summary, preprocessing_summary, methods: list[str], title: str | None):
+    fig, ax = plt.subplots()
+    all_n_values = []
     for method in methods:
         style = style_for_method(method)
 
         full_df = full_summary[full_summary["method"] == method]
         if not full_df.empty:
-            plt.plot(
-                full_df["n"].to_numpy(dtype=float),
+            n_values = full_df["n"].to_numpy(dtype=float)
+            all_n_values.extend(n_values.tolist())
+            ax.plot(
+                n_values,
                 full_df["runtime_median"].to_numpy(dtype=float),
                 color=style["color"],
                 marker=style["marker"],
@@ -81,8 +84,10 @@ def plot_preprocessing_vs_full(full_summary, preprocessing_summary, methods: lis
 
         preprocessing_df = preprocessing_summary[preprocessing_summary["method"] == method]
         if not preprocessing_df.empty:
-            plt.plot(
-                preprocessing_df["n"].to_numpy(dtype=float),
+            n_values = preprocessing_df["n"].to_numpy(dtype=float)
+            all_n_values.extend(n_values.tolist())
+            ax.plot(
+                n_values,
                 preprocessing_df["runtime_median"].to_numpy(dtype=float),
                 color=style["color"],
                 marker=style["marker"],
@@ -93,15 +98,18 @@ def plot_preprocessing_vs_full(full_summary, preprocessing_summary, methods: lis
                 label=f"{style['label']} preprocessing",
             )
 
-    plt.xscale("log")
-    plt.yscale("log")
-    plt.xlabel(r"Number of nodes ($n$)")
-    plt.ylabel(r"Runtime (s)")
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+    ax.set_xlabel(r"Number of nodes ($n$)")
+    ax.set_ylabel(r"Runtime (s)")
+    if all_n_values:
+        ax.set_xlim(min(all_n_values) / 1.08, max(all_n_values) * 1.02)
     if title:
-        plt.title(title)
-    plt.grid(True, alpha=0.35)
-    plt.legend()
+        ax.set_title(title)
+    ax.grid(True, alpha=0.35)
+    ax.legend(loc="upper left")
     plt.tight_layout()
+    return fig
 
 
 
@@ -116,7 +124,7 @@ def main() -> None:
 
     full_summary = summarize_by_size(full_df, methods)
     preprocessing_summary = summarize_by_size(preprocessing_df, methods)
-    plot_preprocessing_vs_full(full_summary, preprocessing_summary, methods, args.title)
+    fig = plot_preprocessing_vs_full(full_summary, preprocessing_summary, methods, args.title)
 
     output_file = resolve_output_file(
         output_dir=args.output_dir,
@@ -125,7 +133,8 @@ def main() -> None:
         source=args.full_results_csv,
         default_name="runtimes_preprocessing_vs_full.pdf",
     )
-    plt.savefig(output_file, dpi=300, bbox_inches="tight")
+    fig.savefig(output_file, dpi=300, bbox_inches="tight")
+    plt.close(fig)
     print(f"Saved preprocessing-vs-full runtime plot to: {output_file}")
 
 
