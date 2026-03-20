@@ -20,16 +20,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from plots.common import configure_paper_style, plot_method_lines, project_path, resolve_output_dir, summarize_mean_std, validate_selection
+from plots.common import configure_paper_style, plot_method_lines, project_path, resolve_output_file, summarize_mean_std, validate_selection
 
 # Set to None to include all methods, or a list such as ["GSC-N", "SC-N", "DSC+"].
 DEFAULT_METHODS_TO_PLOT = [
     "GSC-N",
     "SC-N",
     "DSC+",
-    "DI-SIM-C",
-    "DI-SIM-L",
-    "DI-SIM-R"
 ]
 
 
@@ -125,12 +122,11 @@ def plot_chain_flow_results(df: pd.DataFrame, output_file: Path, x_col: str) -> 
     plot_method_lines(ax, summary, x_col, "ami_mean", y_std_col="ami_std")
 
     if x_col == "flow_ratio":
-        plt.xlabel(r"Flow Ratio ($p_{\mathrm{forward}} / p_{\mathrm{backward}}$)", fontsize=12)
+        ax.set_xlabel(r"Flow Ratio ($p_{\mathrm{forward}} / p_{\mathrm{backward}}$)", fontsize=12)
     else:
-        plt.xlabel(r"Forward Flow Strength ($\rho$)", fontsize=12)
-    plt.ylabel("AMI", fontsize=12)
-    plt.legend(loc="best", fontsize=10, framealpha=0.95)
-    plt.grid(True, alpha=0.3, linestyle="--")
+        ax.set_xlabel(r"Forward Flow Strength ($\rho$)", fontsize=12)
+    ax.set_ylabel("AMI", fontsize=12)
+    ax.grid(True, alpha=0.3, linestyle="--")
     plt.tight_layout()
     fig.savefig(output_file, dpi=300, bbox_inches="tight")
     plt.close(fig)
@@ -175,8 +171,6 @@ def main() -> None:
     configure_paper_style(plt)
 
     results_path = project_path(args.results_dir)
-    output_dir = resolve_output_dir(args.output_dir, "chain_flow", results_path)
-
     print(f"Loading results from: {results_path}")
     df = load_chain_flow_results(results_path)
     if df.empty:
@@ -191,13 +185,18 @@ def main() -> None:
     df = df[df["method"].isin(selected_methods)].copy()
     print(f"Filtered to {len(selected_methods)} method(s): {selected_methods}")
 
-    x_values = sorted(df[args.x].dropna().unique().tolist())
+    x_values = sorted(pd.Series(df[args.x]).dropna().unique().tolist())
     print(f"{args.x} values: {x_values}")
-    print(f"Seeds: {sorted(df['seed'].unique())}")
+    print(f"Seeds: {sorted(pd.Series(df['seed']).unique().tolist())}")
 
-    output_name = args.output_name or f"chain_flow_ami_vs_{args.x}.pdf"
-    output_file = output_dir / output_name
-    plot_chain_flow_results(df=df, output_file=output_file, x_col=args.x)
+    output_file = resolve_output_file(
+        args.output_dir,
+        args.output_name,
+        "curves",
+        results_path,
+        f"chain_flow_ami_vs_{args.x}.pdf",
+    )
+    plot_chain_flow_results(df=pd.DataFrame(df), output_file=output_file, x_col=args.x)
 
 
 if __name__ == "__main__":
