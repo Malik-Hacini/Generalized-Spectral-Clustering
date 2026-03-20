@@ -29,7 +29,7 @@ DEFAULT_OUTPUT_DIR = "figures"
 DEFAULT_OPTIMIZE_BY = "graph_ch"
 DEFAULT_INCLUDE_GSC_AMI_SUPERVISED = False
 DEFAULT_FIXED_SIGMA = 0.8
-DEFAULT_FIXED_ALPHA = 0.4
+DEFAULT_FIXED_ALPHA = 0.5
 DEFAULT_SHOW_STD = True
 # Set to None to include all methods, or provide a list to filter plotted methods.
 DEFAULT_METHODS_TO_PLOT = [
@@ -166,6 +166,7 @@ def _plot_mean_std_lines(
     xlabel: str,
     log_x: bool = False,
     show_std: bool = True,
+    show_legend: bool = True,
 ) -> None:
     """Plot AMI mean line with std shading for each method."""
     method_order = ordered_methods(summary["method"].unique().tolist())
@@ -211,7 +212,8 @@ def _plot_mean_std_lines(
 
     # ax.set_title(title, fontsize=13, fontweight="bold")
     ax.grid(alpha=0.3, which="both")
-    ax.legend(loc="best", fontsize=11)
+    if show_legend:
+        ax.legend(loc="best", fontsize=11)
     plt.tight_layout()
 
     output_file.parent.mkdir(parents=True, exist_ok=True)
@@ -343,6 +345,7 @@ def main() -> None:
             xlabel="Injection alpha (blending weight)",
             log_x=False,
             show_std=args.show_std,
+            show_legend=False,
         )
 
     # AMI vs sigma for fixed alpha
@@ -367,6 +370,7 @@ def main() -> None:
             xlabel="Injected sigma",
             log_x=True,
             show_std=args.show_std,
+            show_legend=True,
         )
 
 

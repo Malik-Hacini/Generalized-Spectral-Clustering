@@ -194,11 +194,9 @@ def plot_runtimes(long_df: pd.DataFrame, title: str):
     ]
     method_styles = styles_for_methods(methods)
 
-    fig_width = max(9.0, 1.15 * len(datasets) + 1.8)
+    fig_width = max(10.5, 1.15 * len(datasets) + 3.0)
     fig = plt.figure(figsize=(fig_width, 9), layout="constrained")
-    subfigs = fig.subfigures(2, 1, height_ratios=[1, 10])
-
-    ax = subfigs[1].subplots()
+    ax = fig.subplots()
 
     x_positions = np.arange(len(datasets), dtype=float)
     for i, x in enumerate(x_positions):
@@ -237,7 +235,6 @@ def plot_runtimes(long_df: pd.DataFrame, title: str):
     ax.set_xlabel("Datasets (sorted by sample count)")
     ax.set_ylabel("Runtime (seconds, log scale)")
 
-    legend_cols = min(4, max(1, len(methods)))
     import matplotlib.lines as mlines
     legend_handles = [
         mlines.Line2D(
@@ -250,14 +247,14 @@ def plot_runtimes(long_df: pd.DataFrame, title: str):
         )
         for method in methods
     ]
-    ax_leg = subfigs[0].subplots()
-    ax_leg.axis("off")
-    ax_leg.legend(
+    ax.legend(
         handles=legend_handles,
-        loc="center",
-        ncols=legend_cols,
+        loc="center left",
+        bbox_to_anchor=(1.02, 0.5),
+        ncols=1,
         frameon=False,
         columnspacing=1.1,
+        borderaxespad=0.0,
         handletextpad=0.4,
     )
 

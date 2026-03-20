@@ -93,7 +93,7 @@ def load_grid_imbalance_results(results_path: str | Path):
     return pd.DataFrame(rows)
 
 
-def plot_imbalance_results(df: pd.DataFrame, output_file: Path) -> None:
+def plot_imbalance_results(df: pd.DataFrame, output_file: Path, show_legend: bool = True) -> None:
     summary = df.groupby(["method", "ratio"]).agg({"ami": ["mean", "std"]}).reset_index()
     summary.columns = ["method", "ratio", "ami_mean", "ami_std"]
     summary = summary.sort_values("ratio")
@@ -124,7 +124,8 @@ def plot_imbalance_results(df: pd.DataFrame, output_file: Path) -> None:
 
     plt.xlabel(r"Density Ratio ($n_{\mathrm{low}} / n_{\mathrm{high}}$)", fontsize=12)
     plt.ylabel("AMI Score", fontsize=12)
-    plt.legend(loc="best", fontsize=10, framealpha=0.95)
+    if show_legend:
+        plt.legend(loc="best", fontsize=10, framealpha=0.95)
     plt.grid(True, alpha=0.3, linestyle="--")
     plt.tight_layout()
     plt.savefig(output_file, dpi=300, bbox_inches="tight")
@@ -192,7 +193,8 @@ def main() -> None:
         print(f"Density ratios: {sorted(set(df_grid['ratio']))}")
 
         output_file = output_dir / f"grid_imbalance_{grid_rows}x{grid_cols}.pdf"
-        plot_imbalance_results(pd.DataFrame(df_grid), output_file)
+        show_legend = (grid_rows, grid_cols) == (2, 1)
+        plot_imbalance_results(pd.DataFrame(df_grid), output_file, show_legend=show_legend)
 
     print(f"\n{'=' * 60}")
     print(f"All plots saved to: {output_dir}/")
