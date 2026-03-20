@@ -165,6 +165,12 @@ def main() -> None:
         default="p_forward",
         help="X-axis variable: forward flow probability or forward/backward ratio.",
     )
+    parser.add_argument(
+        "--output-name",
+        type=str,
+        default=None,
+        help="Output filename. Defaults to chain_flow_ami_vs_<x>.pdf.",
+    )
     args = parser.parse_args()
     configure_paper_style(plt)
 
@@ -189,7 +195,8 @@ def main() -> None:
     print(f"{args.x} values: {x_values}")
     print(f"Seeds: {sorted(df['seed'].unique())}")
 
-    output_file = output_dir / f"chain_flow_ami_vs_{args.x}.pdf"
+    output_name = args.output_name or f"chain_flow_ami_vs_{args.x}.pdf"
+    output_file = output_dir / output_name
     plot_chain_flow_results(df=df, output_file=output_file, x_col=args.x)
 
 
