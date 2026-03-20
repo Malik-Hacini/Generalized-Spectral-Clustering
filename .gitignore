@@ -71,3 +71,6 @@ testings.ipynb
 plots/heatmaps/
 plots/heatmaps_uci.py
 plots/heatmaps_networks.py
+
+# Chain flow
+datasets/chain_flow/
