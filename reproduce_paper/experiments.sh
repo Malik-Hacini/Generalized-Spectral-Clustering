@@ -23,9 +23,9 @@ run_paper_experiments() {
   run_experiment \
     "Grid imbalance benchmark (2x1)" \
     "experiments/grid_imbalance.py" \
-    "results/benchmark_grid_imbalance_grid_search/grid_2x1_high300_low20_seed0" \
-    1 \
-    --grid-size 2x1
+    "results/benchmark_grid_imbalance_grid_search/grid_2x1_high1000_low20_seed0" \
+    0 \
+    --grid-size 2x1 --n-high 1000
 
   run_experiment \
     "Grid imbalance benchmark (3x3)" \

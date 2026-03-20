@@ -21,8 +21,8 @@ metrics = ("ami", "ch")
 n_jobs = -1
 verbose = True
 
-n_high = 300
-n_low_values = [n_high // 15, n_high // 10, n_high // 5, n_high // 3, n_high // 2]
+
+
 n_seeds = 50
 datasets_path = Path(project_path("datasets/grid_imbalance"))
 
@@ -83,10 +83,11 @@ def format_grid_size(grid_size: tuple[int, int]) -> str:
     return f"{grid_size[0]}x{grid_size[1]}"
 
 
-def generate_datasets(grid_size: tuple[int, int]) -> list[str]:
+def generate_datasets(n_high:int, grid_size: tuple[int, int]) -> list[str]:
     datasets_path.mkdir(parents=True, exist_ok=True)
     print(f"Generating grid-imbalance datasets for {format_grid_size(grid_size)}...")
     dataset_names = []
+    n_low_values = [n_high // 15, n_high // 10, n_high // 5, n_high // 3, n_high // 2]
     for n_low in n_low_values:
         for seed in range(n_seeds):
             dataset_name = f"grid_{format_grid_size(grid_size)}_high{n_high}_low{n_low}_seed{seed}"
@@ -124,12 +125,19 @@ if __name__ == "__main__":
         default="4",
         help="Grid size, e.g. 2, 3, 4, or rectangular 2x1.",
     )
+    parser.add_argument(
+        "--n-high",
+        type=int,
+        default=300,
+        help="Number of nodes in the high-density blocks (default: 300)",
+    )
     args = parser.parse_args()
     grid_size = parse_grid_size(args.grid_size)
+    n_high = args.n_high
 
     experiment(
         experiment_name=experiment_name,
-        dataset_names=generate_datasets(grid_size),
+        dataset_names=generate_datasets(n_high, grid_size),
         method_specs=method_specs,
         config=config,
         load_path=str(datasets_path),
