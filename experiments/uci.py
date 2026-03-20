@@ -88,7 +88,6 @@ default_params = {
         avg_deg_taus,
         {"s": np.arange(-1, 1, 0.5)},
     ),  # Grid search for DI-SIM methods
-   }, 
 }
 
 dataset_params = []
