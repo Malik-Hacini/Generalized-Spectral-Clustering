@@ -51,7 +51,6 @@ default_params = {
     "assign_labels": "kmeans",
     "measure": (teleporting_undirected_measure, {"alpha": 0.2, "t": 5}),
     "tau": (avg_deg_taus, {"s": 0.5}),
-    "metric_params": {"filter_coeffs": [{2: 0.5, 3: 0.5}]},
 }
 
 dataset_params = []

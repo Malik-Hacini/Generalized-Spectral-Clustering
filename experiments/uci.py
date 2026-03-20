@@ -88,11 +88,7 @@ default_params = {
         avg_deg_taus,
         {"s": np.arange(-1, 1, 0.5)},
     ),  # Grid search for DI-SIM methods
-    "metric_params": {
-        "filter_coeffs": [
-            {2: 0.5, 3: 0.5},
-        ]
-    },  # Grid search for graph-CH optimization
+   }, 
 }
 
 dataset_params = []
