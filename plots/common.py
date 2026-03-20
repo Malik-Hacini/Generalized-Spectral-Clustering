@@ -140,7 +140,8 @@ def plot_method_lines(
             color=style["color"],
             linestyle=style["linestyle"],
             marker=style["marker"],
-            markersize=6,
+            markeredgewidth=0,
+            markersize=8,
             linewidth=2,
             alpha=1,
         )
@@ -149,7 +150,7 @@ def plot_method_lines(
             ax.fill_between(x_values, y_values - y_std, y_values + y_std, color=style["color"], alpha=0.2)
 
     if show_legend:
-        ax.legend(**(legend_kwargs or {"loc": "best", "fontsize": 10, "framealpha": 0.95}))
+        ax.legend(numpoints=1,**(legend_kwargs or {"loc": "best", "fontsize": 10, "framealpha": 0.95}))
 
 
 def configure_paper_style(plt) -> None:
