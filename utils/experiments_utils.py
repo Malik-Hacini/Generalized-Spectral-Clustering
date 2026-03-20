@@ -25,7 +25,6 @@ from competitors.dsc import DSC
 from utils.file_manager import load_dataset, save_experiment_results
 from utils.logger import get_logger, set_logger_verbose
 from utils.metrics.graph_ch import graph_calinski_harabasz
-from utils.metrics.map_equation import map_equation
 from utils.metrics.modularity import modularity
 
 
@@ -126,7 +125,6 @@ def experiment(
         "ch",
         "dbcv",
         "modularity",
-        "map_equation",
         "graph_ch",
     }
     invalid_metrics = set(metrics) - valid_metrics
@@ -839,7 +837,6 @@ def _compute_clustering_scores(y_true, y_pred, metrics, X, metric_params=None):
     - Unsupervised :
         - "ch": Calinski-Harabasz index (for point clouds, requires dense X)
         - "modularity": Newman modularity (for graphs, requires sparse adjacency X)
-        - "map_equation": Map equation code length (for graphs, requires sparse adjacency X)
         - "graph_ch": Graph CH index via random walk distance (for graphs, requires sparse adjacency X)
 
     Parameters
@@ -874,7 +871,7 @@ def _compute_clustering_scores(y_true, y_pred, metrics, X, metric_params=None):
 
     supervised_metrics = {"nmi", "ari", "ami"}
     point_cloud_metrics = {"ch"}
-    graph_metrics = {"modularity", "map_equation", "graph_ch"}
+    graph_metrics = {"modularity", "graph_ch"}
 
     metric_available = {
         **{metric: supervised_available for metric in supervised_metrics},
@@ -912,8 +909,6 @@ def _compute_clustering_scores(y_true, y_pred, metrics, X, metric_params=None):
                 score = calinski_harabasz_score(X, y_pred)
             elif metric == "modularity":
                 score = modularity(X, y_pred)
-            elif metric == "map_equation":
-                score = map_equation(X, y_pred)
             else:
                 score = graph_calinski_harabasz(X, y_pred, **metric_kwargs)
         except Exception as e:
@@ -1071,8 +1066,6 @@ def _aggregate_grid_search_results(results, metrics):
     successful_results = [r for r in results if r is not None]
     error_count = len(results) - len(successful_results)
 
-    minimize_metrics = {"map_equation"}
-
     if not successful_results:
         return {"error": f"All {len(results)} parameter combinations failed"}
 
@@ -1107,10 +1100,7 @@ def _aggregate_grid_search_results(results, metrics):
                 metric_params.append(result["final_params"])
 
         if metric_scores:
-            if metric in minimize_metrics:
-                best_idx = np.argmin(metric_scores)
-            else:
-                best_idx = np.argmax(metric_scores)
+            best_idx = np.argmax(metric_scores)
             best_params = metric_params[best_idx]
             best_full_scores = successful_results[best_idx]["scores"]
             best_score_dict = best_full_scores[metric]
