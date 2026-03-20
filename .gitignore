@@ -75,3 +75,6 @@ plots/heatmaps_networks.py
 
 # Chain flow
 datasets/chain_flow/
+
+# Degree Corrected
+datasets/deg_corr/
