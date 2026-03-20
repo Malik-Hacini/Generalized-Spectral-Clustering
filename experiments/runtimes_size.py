@@ -43,7 +43,7 @@ core-periphery setup where the two peripheral blocks were statistically
 indistinguishable.
 """
 dataset_sizes = [600, 1200, 2400, 3600, 4800, 6000, 7200, 9600]
-n_seeds = 10
+n_seeds = 3
 n_clusters = 3
 degree_factor = 1.0
 block_probability_weights = np.array(
@@ -173,7 +173,7 @@ method_params = [
             "laplacian_method": "unnorm",
             "measure": (
                 teleporting_undirected_measure,
-                {"alpha": np.arange(0.0, 1.5, 0.1), "t": range(0, 21, 2)},
+                {"alpha": np.arange(0.0, 1.5, 0.1), "t": range(0, 25, 4)},
             ),
         },
     ),
