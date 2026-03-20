@@ -1,8 +1,8 @@
+- Run full runtime benchmark
+- Add lead_lag plots and explanation
 REPRODUCIBILITY : 
 
-[ ] create reproduce_paper.sh script :
-    - run all experiments (with option to reuse stored results)
-    - generate all plots
+- Add doc
 
 [ ] rewrite readme
  
