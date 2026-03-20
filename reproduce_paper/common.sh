@@ -114,7 +114,7 @@ prepare_environment() {
 print_environment() {
   section "Environment"
   printf 'Root directory : %s\n' "$ROOT_DIR"
-  printf 'Virtual env    : %s\n' "$VENV_DIR"
+  printf '%-14s %s\n' "${ENV_LABEL:-Python env}:" "$VENV_DIR"
   printf 'Python         : %s\n' "$PYTHON_BIN"
   printf 'Latex figures  : %s\n' "$LATEX_FIGURES"
   printf 'Latex tables   : %s\n' "$LATEX_TABLES"
