@@ -20,6 +20,7 @@ After adding a competitor here, you must also:
 """
 
 import numpy as np
+import scipy.sparse as sp
 from scipy.linalg import eigh
 from sklearn.cluster import KMeans  # type: ignore
 from sklearn.neighbors import kneighbors_graph  # type: ignore
@@ -57,8 +58,6 @@ class DSC:
         n = self.adjacency_matrix.shape[0]
 
         # Step 1: Normalize rows to get transition matrix P
-        import scipy.sparse as sp
-        
         d_out = np.asarray(self.adjacency_matrix.sum(axis=1)).ravel()
         d_out[d_out <= 0] = self.epsilon  # prevent division by zero
         if sp.issparse(self.adjacency_matrix):
