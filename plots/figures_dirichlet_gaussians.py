@@ -24,7 +24,7 @@ import scipy.sparse as sp
 from matplotlib.colors import LinearSegmentedColormap
 from sklearn.neighbors import kneighbors_graph
 
-from plots.common import resolve_kind_dir
+from plots.common import configure_paper_style, resolve_kind_dir
 
 
 COLORS = ["#072AC8", "#FFBF46", "#FF1F2E"]
@@ -178,6 +178,7 @@ def build_dirichlet_functions(data: np.ndarray, transition: np.ndarray, stationa
 
 def main() -> None:
     args = parse_args()
+    configure_paper_style(plt)
     output_dir = resolve_kind_dir(args.output_dir, "figures")
 
     data, labels_true = generate_data(args.seed)
