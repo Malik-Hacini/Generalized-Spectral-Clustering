@@ -108,13 +108,6 @@ if directed:
   name += "_directed"
 plt.savefig(f"{name}.svg")
 
-# Print some statistics
-print(f"Total points: {len(data)}")
-print(f"Points per cluster: {n_points_per_cluster}")
-print(f"k-NN parameter: k={k}")
-print(f"Total edges in graph: {G_knn.number_of_edges()}")
-print(f"Average in-degree: {np.mean([d for n, d in G_knn.in_degree()]):.2f}")
-print(f"Is weakly connected: {nx.is_weakly_connected(G_knn)}")
 
 directed = True  # Set to False to use underlying undirected graph
 use_zero_mask = False  # Set to False to use colormap for all points including zeros
@@ -234,12 +227,6 @@ plt.savefig(f"{filename}.pdf", bbox_inches='tight')
 
 # Check reciprocity (how many edges are bidirectional)
 reciprocal_edges = sum(1 for u, v in G_knn_asym.edges() if G_knn_asym.has_edge(v, u))
-print(f"Reciprocal edges: {reciprocal_edges}/{G_knn_asym.number_of_edges()} ({100*reciprocal_edges/G_knn_asym.number_of_edges():.1f}%)")
-print(f"Using {'directed' if directed else 'undirected'} graph for ergodic law computation")
-if use_zero_mask:
-    zero_mask = np.abs(node_colors) < 1e-10
-    print(f"Points with zero distribution: {np.sum(zero_mask)}/{len(node_colors)}")
-
 
 # Create two functions with the same Dirichlet energy
 # Function 1: Use true cluster labels (assuming 3 clusters)
@@ -258,7 +245,6 @@ f1_true = np.array([cluster_values[int(label)] for label in true_labels])
 
 # Compute Dirichlet energy for f1
 energy_f1 = dirichlet_energy(f1_true, P, stationary_dist)
-print(f"Dirichlet energy for true labels: {energy_f1:.6f}")
 
 # Create function 2: mix first two clusters randomly, keep third intact
 # Strategy: randomly assign labels from clusters 0 and 1 to the first two clusters
@@ -277,14 +263,11 @@ f2_mixed = np.array([cluster_values[int(label)] for label in f2_mixed_labels])
 
 # Compute initial energy
 energy_f2_initial = dirichlet_energy(f2_mixed, P, stationary_dist)
-print(f"Initial Dirichlet energy for mixed version: {energy_f2_initial:.6f}")
 
-# Fine-tune to match energies by scaling
 # Energy scales quadratically with function values
 if energy_f2_initial > 0:
     f2_mixed_scaled = f2_mixed
     energy_f2_scaled = dirichlet_energy(f2_mixed_scaled, P, stationary_dist)
-    print(f"Scaled Dirichlet energy for mixed version: {energy_f2_scaled:.6f}")
 else:
     f2_mixed_scaled = f2_mixed
     energy_f2_scaled = energy_f2_initial
@@ -334,6 +317,3 @@ plot_function(f1_true, 'dirichlet_true_labels', colors_true, directed=True)
 
 # Plot 2: Mixed version (use only blue and yellow for first two clusters, red for third)
 plot_function(f2_mixed_scaled, 'dirichlet_mixed_labels', colors_true, directed=True)
-
-print(f"\nEnergy difference: {abs(energy_f1 - energy_f2_scaled):.8f}")
-print(f"Relative energy difference: {abs(energy_f1 - energy_f2_scaled) / energy_f1 * 100:.4f}%")
