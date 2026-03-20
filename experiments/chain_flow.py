@@ -41,7 +41,7 @@ base_p_backward = 0.01
 
 # Varying parameters: flow strength multiplier
 
-flow_strengths = [0.01, 0.05, 0.1, 0.2, 0.5]
+flow_strengths = [0.01, 0.05, 0.1, 0.15, 0.2, 0.5]
 n_seeds = 20
 
 # Dataset generation
@@ -123,7 +123,7 @@ default_params = {
     "assign_labels": "kmeans",
     "measure": (
         teleporting_undirected_measure,
-        {"alpha": np.arange(0, 2, 0.1), "t": range(0, 25)},
+        {"alpha": np.arange(0, 1.5, 0.1), "t": range(0, 25)},
     ),  # Grid search for GSC methods
     "tau": (
         avg_deg_taus,

@@ -30,8 +30,7 @@ dataset_names = [
     # "karate",
     "football",
     "email_eu_core",
-    # "lead_lag"
-    "digrac",
+    # "lead_lag",
     "polbooks"
 ]
 
