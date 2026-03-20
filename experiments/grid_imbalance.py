@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import re
 
 if __package__ is None or __package__ == "":
     from common import *
@@ -72,11 +73,34 @@ config = ExperimentConfig(
 
 
 def parse_grid_size(value: str) -> tuple[int, int]:
-    if "x" in value:
-        rows, cols = value.lower().split("x", maxsplit=1)
-        return int(rows), int(cols)
-    size = int(value)
-    return size, size
+    raw = value.strip().lower()
+
+    # Accept simple rectangular format, e.g. "2x1".
+    if "x" in raw and "(" not in raw:
+        rows, cols = raw.split("x", maxsplit=1)
+        return int(rows.strip()), int(cols.strip())
+
+    # Accept square shorthand, e.g. "4".
+    if raw.isdigit():
+        size = int(raw)
+        return size, size
+
+    # Accept tuple-product form, e.g. "(2,1)x(2,1)".
+    tuple_product_match = re.fullmatch(
+        r"\(\s*(\d+)\s*,\s*(\d+)\s*\)\s*x\s*\(\s*(\d+)\s*,\s*(\d+)\s*\)",
+        raw,
+    )
+    if tuple_product_match is not None:
+        r1, c1, r2, c2 = (int(group) for group in tuple_product_match.groups())
+        if (r1, c1) != (r2, c2):
+            raise argparse.ArgumentTypeError(
+                f"Unsupported tuple-product grid size '{value}'. Expected both tuples to match."
+            )
+        return r1, c1
+
+    raise argparse.ArgumentTypeError(
+        "Invalid --grid-size value. Use one of: '4', '2x1', '(2,1)x(2,1)'."
+    )
 
 
 def format_grid_size(grid_size: tuple[int, int]) -> str:
@@ -122,7 +146,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run the grid-imbalance benchmark")
     parser.add_argument(
         "--grid-size",
-        default="4",
+        type=parse_grid_size,
+        default=(4, 4),
         help="Grid size, e.g. 2, 3, 4, or rectangular 2x1.",
     )
     parser.add_argument(
@@ -132,7 +157,7 @@ if __name__ == "__main__":
         help="Number of nodes in the high-density blocks (default: 300)",
     )
     args = parser.parse_args()
-    grid_size = parse_grid_size(args.grid_size)
+    grid_size = args.grid_size
     n_high = args.n_high
 
     experiment(

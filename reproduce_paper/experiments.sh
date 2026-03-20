@@ -16,30 +16,37 @@ run_paper_experiments() {
   run_experiment \
     "Grid imbalance benchmark (2x2)" \
     "experiments/grid_imbalance.py" \
-    "results/benchmark_grid_imbalance_grid_search/grid_2x2_high300_low20_seed0" \
+    "results/benchmark_grid_imbalance_grid_search/grid_2x2_high300_low20_seed0/GSC-N/GSC-N_best_results.json" \
     1 \
     --grid-size 2
 
   run_experiment \
     "Grid imbalance benchmark (2x1)" \
     "experiments/grid_imbalance.py" \
-    "results/benchmark_grid_imbalance_grid_search/grid_2x1_high1000_low20_seed0" \
+    "results/benchmark_grid_imbalance_grid_search/grid_2x1_high1000_low66_seed0/GSC-N/GSC-N_best_results.json" \
     0 \
     --grid-size 2x1 --n-high 1000
 
   run_experiment \
     "Grid imbalance benchmark (3x3)" \
     "experiments/grid_imbalance.py" \
-    "results/benchmark_grid_imbalance_grid_search/grid_3x3_high300_low20_seed0" \
+    "results/benchmark_grid_imbalance_grid_search/grid_3x3_high300_low20_seed0/GSC-N/GSC-N_best_results.json" \
     1 \
     --grid-size 3
 
   run_experiment \
     "Grid imbalance benchmark (4x4)" \
     "experiments/grid_imbalance.py" \
-    "results/benchmark_grid_imbalance_grid_search/grid_4x4_high300_low20_seed0" \
+    "results/benchmark_grid_imbalance_grid_search/grid_4x4_high300_low20_seed0/GSC-N/GSC-N_best_results.json" \
     1 \
     --grid-size 4
+
+  run_experiment \
+    "Chain flow benchmark" \
+    "experiments/chain_flow.py" \
+    "results/benchmark_chain_flow_grid_search/disbm_chainflow_b500-500-500_pintra0p1000_pfwd0p0100_pbwd0p0100_seed0" \
+    1 \
+    --n-seeds 20 \
 
   run_experiment \
     "Gaussian injection benchmark" \

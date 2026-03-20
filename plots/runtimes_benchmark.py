@@ -177,9 +177,9 @@ def plot_runtimes(long_df: pd.DataFrame, title: str):
         runtime_values = np.asarray(dataset_df["runtime_seconds"], dtype=float)
         dataset_df["x"] = base_x + _collision_offsets(np.log10(runtime_values))
 
+
         for _, row in dataset_df.iterrows():
             method = str(row["method"])
-            label = method if method not in labeled_methods else None
             ax.scatter(
                 row["x"],
                 row["runtime_seconds"],
@@ -188,11 +188,9 @@ def plot_runtimes(long_df: pd.DataFrame, title: str):
                 color=method_styles[method]["color"],
                 edgecolors="white",
                 linewidths=0.9,
-                label=label,
                 zorder=3,
             )
             labeled_methods.add(method)
-
     ax.set_yscale("log")
     ax.grid(axis="y", which="major", color="#D8D2E3", linewidth=0.9)
     ax.grid(axis="y", which="minor", color="#F1EDF7", linewidth=0.6)
@@ -203,15 +201,16 @@ def plot_runtimes(long_df: pd.DataFrame, title: str):
     ax.set_ylabel("Runtime (seconds, log scale)")
 
     import matplotlib.lines as mlines
+
     legend_handles = [
         mlines.Line2D(
-            [0], [0],
+            [], [],  # ← important: no line data at all
             marker=method_styles[method]["marker"],
-            color="w",
+            linestyle="None",  # ← explicitly no line
             markerfacecolor=method_styles[method]["color"],
+            markeredgecolor=method_styles[method]["color"],
             markersize=10,
             label=method_styles[method]["label"],
-            markevery=[0],
         )
         for method in methods
     ]
@@ -219,11 +218,12 @@ def plot_runtimes(long_df: pd.DataFrame, title: str):
         handles=legend_handles,
         loc="center left",
         bbox_to_anchor=(1.02, 0.5),
-        ncols=1,
+        # ncols=1,
         frameon=False,
-        columnspacing=1.1,
+        # columnspacing=1.1,
         borderaxespad=0.0,
         handletextpad=0.4,
+        numpoints = 1,
     )
 
     # fig.suptitle(title, y=1.05)

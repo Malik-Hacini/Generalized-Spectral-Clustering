@@ -93,6 +93,17 @@ run_imbalance_and_injection_figures() {
     require_file "$LATEX_FIGURES/$filename"
   done
 
+  section "Paper assets: chain-flow figure"
+
+  run_timed \
+    "Generate chain-flow figure" \
+    "$PYTHON_BIN" "$ROOT_DIR/plots/curves_chain_flow.py" \
+    --results-dir results/benchmark_chain_flow_grid_search \
+    --output-dir "$LATEX_FIGURES" \
+    --x p_forward
+
+  require_file "$LATEX_FIGURES/chain_flow_ami_vs_p_forward.pdf"
+
   section "Paper assets: degree-imbalance figures"
 
   run_timed \
