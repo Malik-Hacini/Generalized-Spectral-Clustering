@@ -19,12 +19,13 @@ import numpy as np
 import pandas as pd
 
 from plots.common import project_path, resolve_output_dir, validate_selection
-from plots.method_style import styles_for_methods
+from plots.method_style import ordered_methods, styles_for_methods
 
 
 DEFAULT_RESULTS_CSV = Path("results/benchmark_uci_grid_search/benchmark_uci_runtimes.csv")
 LOG_COLLISION_THRESHOLD = 0.055
 COLLISION_X_STEP = 0.09
+DEFAULT_PRIMARY_GSC_METHODS = {"GSC", "GSC-N", "GSC-UN"}
 
 
 def parse_args() -> argparse.Namespace:
@@ -36,12 +37,20 @@ def parse_args() -> argparse.Namespace:
         default=str(DEFAULT_RESULTS_CSV),
         help="Path to the runtimes CSV file.",
     )
-    parser.add_argument("--methods", nargs="+", default=None, help="Methods to include.")
+    parser.add_argument(
+        "--methods",
+        nargs="+",
+        default=None,
+        help=(
+            "Methods to include. Default: all non-GSC methods plus primary GSC methods "
+            "(GSC, GSC-N, GSC-UN), excluding GSC variants."
+        ),
+    )
     parser.add_argument("--datasets", nargs="+", default=None, help="Datasets to include.")
     parser.add_argument(
         "--output-dir",
-        default="../figures/runtimes/",
-        help="Output directory. Defaults to ../figures/runtimes/.",
+        default="figures/runtimes/",
+        help="Output directory. Defaults to figures/runtimes/.",
     )
     parser.add_argument(
         "--output-name",
@@ -103,7 +112,19 @@ def load_runtime_data(results_csv: Path, methods: list[str] | None, datasets: li
         raise ValueError(f"Missing 'n' column in {results_csv}")
 
     available_methods = [column for column in df.columns if column not in {"dataset", "n"}]
-    selected_methods = validate_selection(available_methods, methods, "methods")
+    if methods is None:
+        selected_methods = [
+            method
+            for method in available_methods
+            if ("GSC" not in method) or (method in DEFAULT_PRIMARY_GSC_METHODS)
+        ]
+    else:
+        selected_methods = validate_selection(available_methods, methods, "methods")
+
+    if not selected_methods:
+        raise ValueError("No method columns selected.")
+
+    selected_methods = ordered_methods(selected_methods)
     available_datasets = df["dataset"].tolist()
     selected_datasets = validate_selection(available_datasets, datasets, "datasets")
 

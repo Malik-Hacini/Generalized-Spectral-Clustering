@@ -19,6 +19,13 @@ import pandas as pd
 from plots.common import project_path, resolve_output_dir
 from plots.method_style import ordered_methods, style_for_method
 
+# Configurable default methods to plot (None = all methods)
+DEFAULT_METHODS_TO_PLOT = [
+    "GSC-N",
+    "SC-N",
+    "DSC+",
+]
+
 
 def load_grid_imbalance_results(results_path: str | Path):
     results_dir = project_path(results_path)
@@ -139,6 +146,13 @@ def main() -> None:
         default=None,
         help="Output directory. Defaults to plots/imbalance/<experiment_name>/.",
     )
+    parser.add_argument(
+        "--methods",
+        type=str,
+        nargs="+",
+        default=DEFAULT_METHODS_TO_PLOT,
+        help="Methods to plot (default: all methods)",
+    )
     args = parser.parse_args()
 
     results_path = project_path(args.results_dir)
@@ -151,7 +165,21 @@ def main() -> None:
         return
 
     print(f"Loaded {len(df)} result entries")
-    print(f"Methods: {sorted(df['method'].unique())}")
+    all_methods = sorted(df["method"].unique())
+    print(f"Methods: {all_methods}")
+
+    # Filter by selected methods if specified
+    if args.methods is not None:
+        selected_methods = [m for m in args.methods]  # Preserve user's order
+        missing_methods = set(selected_methods) - set(all_methods)
+        if missing_methods:
+            print(f"Warning: Methods not found in results: {sorted(missing_methods)}")
+        available_selected = [m for m in selected_methods if m in all_methods]
+        if not available_selected:
+            print("Error: No selected methods found in results!")
+            return
+        df = df[df["method"].isin(available_selected)].copy()
+        print(f"Filtered to {len(available_selected)} method(s): {available_selected}")
     grid_sizes = sorted(df[["grid_rows", "grid_cols"]].drop_duplicates().itertuples(index=False, name=None))
     print(f"Grid sizes found: {grid_sizes}")
 

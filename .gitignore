@@ -66,4 +66,8 @@ datasets/gaussian_injection_alpha_sigma/
 plots/imbalance/
 
 testings.ipynb
+
+# Macro for heatmaps
 plots/heatmaps/
+plots/heatmaps_uci.py
+plots/heatmaps_networks.py
