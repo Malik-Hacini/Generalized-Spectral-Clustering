@@ -57,7 +57,3 @@ When updating the paper:
 2. **New Plots/Tables:** Add the generation step to the appropriate function in `plots.sh` (e.g., `run_tables`, `run_heatmaps`). Use the `run_timed` helper to execute the Python plotting script.
 3. **Copying Assets:** If a script generates an asset in a temporary directory or needs it moved to the `latex/` folder, use the `copy_file` helper in `plots.sh`.
 4. **Validating Output:** Use the `require_file` helper in `plots.sh` to explicitly check that a critical asset was successfully generated. This ensures the failure tracking system catches missing figures before you try to compile the LaTeX document.
-
-## Failure Handling
-
-The pipeline is designed to be resilient. If a single experiment or plot generation fails, the script will record the failure, print a warning, and continue with the rest of the pipeline. A summary of all failures is printed at the very end.
