@@ -12,6 +12,7 @@ if __package__ is None or __package__ == "":
     from runtimes_size import (
         METHOD_COLORS,
         METHOD_LABELS,
+        METHOD_LINESTYLES,
         METHOD_MARKERS,
         load_runtime_table,
         summarize_by_size,
@@ -20,6 +21,7 @@ else:
     from plots.runtimes_size import (
         METHOD_COLORS,
         METHOD_LABELS,
+        METHOD_LINESTYLES,
         METHOD_MARKERS,
         load_runtime_table,
         summarize_by_size,
@@ -78,6 +80,7 @@ def plot_preprocessing_vs_full(full_summary, preprocessing_summary, methods: lis
     for method in methods:
         color = METHOD_COLORS.get(method)
         marker = METHOD_MARKERS.get(method, "o")
+        linestyle = METHOD_LINESTYLES.get(method, "-")
         label = METHOD_LABELS.get(method, method)
 
         full_df = full_summary[full_summary["method"] == method]
@@ -87,7 +90,7 @@ def plot_preprocessing_vs_full(full_summary, preprocessing_summary, methods: lis
                 full_df["runtime_median"].to_numpy(dtype=float),
                 color=color,
                 marker=marker,
-                linestyle="-",
+                linestyle=linestyle,
                 linewidth=2.0,
                 markersize=6,
                 label=f"{label} full",
@@ -100,9 +103,10 @@ def plot_preprocessing_vs_full(full_summary, preprocessing_summary, methods: lis
                 preprocessing_df["runtime_median"].to_numpy(dtype=float),
                 color=color,
                 marker=marker,
-                linestyle="--",
-                linewidth=2.0,
+                linestyle=":",
+                linewidth=1.8,
                 markersize=5,
+                alpha=0.9,
                 label=f"{label} preprocessing",
             )
 
