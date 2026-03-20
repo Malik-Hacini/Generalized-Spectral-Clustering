@@ -5,7 +5,7 @@ run_intro_figures() {
 
   run_timed \
     "Generate introductory Dirichlet/GDE figures" \
-    "$PYTHON_BIN" "$ROOT_DIR/plots/dirichlet_gaussians.py" \
+    "$PYTHON_BIN" "$ROOT_DIR/plots/figures_dirichlet_gaussians.py" \
     --output-dir "$LATEX_FIGURES"
 
   require_file "$LATEX_FIGURES/clustering_ergodic.pdf"
@@ -74,7 +74,7 @@ run_tables() {
 
   run_timed \
     "Generate dataset statistics table" \
-    "$PYTHON_BIN" "$ROOT_DIR/plots/dataset_infos.py" \
+    "$PYTHON_BIN" "$ROOT_DIR/plots/tables_dataset_infos.py" \
     --datasets "${DATASET_INFO_DATASETS[@]}" \
     --output-dir "$LATEX_TABLES" \
     --output-name dataset_stats.tex
@@ -97,8 +97,8 @@ run_imbalance_and_injection_figures() {
 
   run_timed \
     "Generate Gaussian-injection plots (alpha=0.5, sigma=1.0)" \
-    "$PYTHON_BIN" "$ROOT_DIR/plots/gaussian_injection_alpha_sigma.py" \
-    --results-path results/benchmark_gaussian_injection_alpha_sigma_grid_search \
+    "$PYTHON_BIN" "$ROOT_DIR/plots/imbalance_gaussian_injection.py" \
+    --results-dir results/benchmark_gaussian_injection_alpha_sigma_grid_search \
     --output-dir "$LATEX_FIGURES" \
     --optimize-by graph_ch \
     --fixed-alpha 0.5 \
@@ -106,8 +106,8 @@ run_imbalance_and_injection_figures() {
 
   run_timed \
     "Generate Gaussian-injection plots (alpha=0.5, sigma=0.8)" \
-    "$PYTHON_BIN" "$ROOT_DIR/plots/gaussian_injection_alpha_sigma.py" \
-    --results-path results/benchmark_gaussian_injection_alpha_sigma_grid_search \
+    "$PYTHON_BIN" "$ROOT_DIR/plots/imbalance_gaussian_injection.py" \
+    --results-dir results/benchmark_gaussian_injection_alpha_sigma_grid_search \
     --output-dir "$LATEX_FIGURES" \
     --optimize-by graph_ch \
     --fixed-alpha 0.5 \
@@ -140,7 +140,7 @@ run_appendix_figures() {
 
   run_timed \
     "Generate in-degree distribution plots" \
-    "$PYTHON_BIN" "$ROOT_DIR/plots/indegree_knn.py" \
+    "$PYTHON_BIN" "$ROOT_DIR/plots/figures_indegree_knn.py" \
     --datasets "${INDEGREE_DATASETS[@]}" \
     --factor 1 \
     --output-dir "$indegree_tmp"

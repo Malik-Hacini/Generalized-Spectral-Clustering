@@ -14,10 +14,10 @@ Statistics computed per dataset:
 Usage
 -----
 # All datasets under datasets/
-python plots/dataset_infos.py
+python plots/tables_dataset_infos.py
 
 # Explicit list (folder names or synthetic generator names)
-python plots/dataset_infos.py --datasets karate dolphins polblogs email_eu_core
+python plots/tables_dataset_infos.py --datasets karate dolphins polblogs email_eu_core
 """
 
 from __future__ import annotations
@@ -446,15 +446,13 @@ def main() -> None:
 
     rows.sort(key=lambda row: _display_name(row["name"]).casefold())
 
-    # Output file
-    from plots.common import resolve_kind_dir
-    output_dir = (
-        project_path(args.output_dir)
-        if args.output_dir
-        else resolve_kind_dir(None, "tables")
+    output_file = resolve_output_file(
+        args.output_dir,
+        args.output_name,
+        "tables",
+        args.datasets_dir,
+        "dataset_stats.tex",
     )
-    output_dir.mkdir(parents=True, exist_ok=True)
-    output_file = output_dir / args.output_name
 
     kwargs: dict = {"label": args.label}
     if args.caption:
@@ -467,4 +465,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

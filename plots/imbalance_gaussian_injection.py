@@ -16,16 +16,20 @@ if __package__ is None or __package__ == "":
 
     sys.path.append(str(Path(__file__).resolve().parents[1]))
 
+import matplotlib
+
+matplotlib.use("Agg")
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from plots.method_style import ordered_methods, style_for_method
+from plots.common import configure_paper_style, plot_method_lines, project_path, resolve_output_dir, summarize_mean_std, validate_selection
 
 
 # Default parameters: edit here for your usual plotting setup.
-DEFAULT_RESULTS_PATH = "results/benchmark_gaussian_injection_alpha_sigma_grid_search"
-DEFAULT_OUTPUT_DIR = "figures"
+DEFAULT_RESULTS_DIR = "results/benchmark_gaussian_injection_alpha_sigma_grid_search"
+DEFAULT_OUTPUT_DIR = None
 DEFAULT_OPTIMIZE_BY = "graph_ch"
 DEFAULT_INCLUDE_GSC_AMI_SUPERVISED = False
 DEFAULT_FIXED_SIGMA = 0.8
@@ -37,21 +41,6 @@ DEFAULT_METHODS_TO_PLOT = [
   "SC-N",
   "DSC+"
 ]
-
-
-def _resolve_input_path(path_value: str | Path) -> Path:
-    """Resolve paths robustly for runs launched outside the repository root."""
-    path = Path(path_value)
-    if path.exists() or path.is_absolute():
-        return path
-
-    repo_root_candidate = Path(__file__).resolve().parents[1]
-    repo_relative = repo_root_candidate / path
-    if repo_relative.exists():
-        return repo_relative
-
-    return path
-
 
 def _parse_float_token(token: str) -> float:
     """Parse float tokens formatted as 1p2300 -> 1.2300."""
@@ -78,7 +67,7 @@ def _extract_ami_value(best_results: dict, optimize_by: str = "graph_ch") -> flo
 
 
 def load_gaussian_injection_results(
-    results_path: str | Path,
+    results_dir: str | Path,
     optimize_by: str = "graph_ch",
     include_gsc_ami_supervised: bool = True,
 ) -> pd.DataFrame:
@@ -87,7 +76,7 @@ def load_gaussian_injection_results(
     Returns rows with columns:
         method, sigma, alpha, seed, ami
     """
-    results_dir = _resolve_input_path(results_path)
+    results_dir = project_path(results_dir)
     if not results_dir.exists():
         raise FileNotFoundError(f"Results directory not found: {results_dir}")
 
@@ -169,41 +158,17 @@ def _plot_mean_std_lines(
     show_legend: bool = True,
 ) -> None:
     """Plot AMI mean line with std shading for each method."""
-    method_order = ordered_methods(summary["method"].unique().tolist())
-
     fig, ax = plt.subplots(figsize=(8, 6))
-
-    for method in method_order:
-        method_data = summary[summary["method"] == method].sort_values(x_col)
-        if method_data.empty:
-            continue
-
-        style = style_for_method(method)
-        x_values = np.asarray(method_data[x_col], dtype=float)
-        ami_mean = np.asarray(method_data["ami_mean"], dtype=float)
-        ami_std = np.nan_to_num(np.asarray(method_data["ami_std"], dtype=float), nan=0.0)
-
-        ax.plot(
-            x_values,
-            ami_mean,
-            label=style.get("label", method),
-            color=style.get("color", None),
-            marker=style.get("marker", "o"),
-            linestyle=style.get("linestyle", "-"),
-            linewidth=2.5,
-            markersize=6,
-        )
-        if show_std:
-            ax.fill_between(
-                x_values,
-                ami_mean - ami_std,
-                ami_mean + ami_std,
-                color=style.get("color", None),
-                alpha=0.2,
-            )
-            ax.set_ylabel("AMI (mean +/- std)", fontsize=12)
-        else:
-            ax.set_ylabel("AMI (mean)", fontsize=12)
+    plot_method_lines(
+        ax,
+        summary.sort_values(x_col),
+        x_col,
+        "ami_mean",
+        y_std_col="ami_std" if show_std else None,
+        show_legend=show_legend,
+        legend_kwargs={"loc": "best", "fontsize": 11} if show_legend else None,
+    )
+    ax.set_ylabel("AMI (mean +/- std)" if show_std else "AMI (mean)", fontsize=12)
 
     if log_x:
         ax.set_xscale("log")
@@ -212,8 +177,6 @@ def _plot_mean_std_lines(
 
     # ax.set_title(title, fontsize=13, fontweight="bold")
     ax.grid(alpha=0.3, which="both")
-    if show_legend:
-        ax.legend(loc="best", fontsize=11)
     plt.tight_layout()
 
     output_file.parent.mkdir(parents=True, exist_ok=True)
@@ -227,16 +190,16 @@ def main() -> None:
         description="Plot Gaussian-injection AMI mean +/- std from graph_ch-optimized benchmark results."
     )
     parser.add_argument(
-        "--results-path",
+        "--results-dir",
         type=str,
-        default=DEFAULT_RESULTS_PATH,
+        default=DEFAULT_RESULTS_DIR,
         help="Path to Gaussian-injection benchmark results directory.",
     )
     parser.add_argument(
         "--output-dir",
         type=str,
         default=DEFAULT_OUTPUT_DIR,
-        help="Directory where figures are saved.",
+        help="Output directory. Defaults to plots/imbalance/<experiment_name>/.",
     )
     parser.add_argument(
         "--optimize-by",
@@ -290,12 +253,12 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    output_dir = _resolve_input_path(args.output_dir)
-    output_dir.mkdir(parents=True, exist_ok=True)
+    configure_paper_style(plt)
+    output_dir = resolve_output_dir(args.output_dir, "imbalance", args.results_dir)
 
-    print(f"Loading results from: {args.results_path}")
+    print(f"Loading results from: {args.results_dir}")
     df = load_gaussian_injection_results(
-        args.results_path,
+        args.results_dir,
         optimize_by=args.optimize_by,
         include_gsc_ami_supervised=args.gsc_ami_supervised,
     )
@@ -305,16 +268,8 @@ def main() -> None:
         return
 
     if args.methods is not None:
-        available_methods = sorted(df["method"].unique())
-        selected_methods = [method for method in args.methods if method in available_methods]
-        missing_methods = [method for method in args.methods if method not in available_methods]
-        if missing_methods:
-            print(f"Warning: requested methods not found and skipped: {missing_methods}")
-        if not selected_methods:
-            raise ValueError(
-                "No selected methods were found in parsed results. "
-                f"Available methods: {available_methods}"
-            )
+        available_methods = sorted(df["method"].astype(str).unique().tolist())
+        selected_methods = validate_selection(available_methods, args.methods, "methods")
         df = df[df["method"].isin(selected_methods)].copy()
 
     print(f"Loaded {len(df)} entries")
@@ -324,15 +279,11 @@ def main() -> None:
     tol = 1e-12
 
     # AMI vs alpha for fixed sigma
-    df_alpha = df[np.isclose(df["sigma"], args.fixed_sigma, atol=tol)]
+    df_alpha = pd.DataFrame(df[np.isclose(df["sigma"], args.fixed_sigma, atol=tol)]).copy()
     if df_alpha.empty:
         print(f"No rows found for sigma={args.fixed_sigma}. Skipping alpha plot.")
     else:
-        summary_alpha = (
-            df_alpha.groupby(["method", "alpha"])["ami"]
-            .agg(ami_mean="mean", ami_std="std", n="count")
-            .reset_index()
-        )
+        summary_alpha = summarize_mean_std(pd.DataFrame(df_alpha), ["method", "alpha"], "ami")
 
         alpha_out = output_dir / (
             f"gaussian_injection_ami_mean_std_vs_alpha_sigma{args.fixed_sigma:.4f}_{args.optimize_by}.pdf"
@@ -349,15 +300,11 @@ def main() -> None:
         )
 
     # AMI vs sigma for fixed alpha
-    df_sigma = df[np.isclose(df["alpha"], args.fixed_alpha, atol=tol)]
+    df_sigma = pd.DataFrame(df[np.isclose(df["alpha"], args.fixed_alpha, atol=tol)]).copy()
     if df_sigma.empty:
         print(f"No rows found for alpha={args.fixed_alpha}. Skipping sigma plot.")
     else:
-        summary_sigma = (
-            df_sigma.groupby(["method", "sigma"])["ami"]
-            .agg(ami_mean="mean", ami_std="std", n="count")
-            .reset_index()
-        )
+        summary_sigma = summarize_mean_std(pd.DataFrame(df_sigma), ["method", "sigma"], "ami")
 
         sigma_out = output_dir / (
             f"gaussian_injection_ami_mean_std_vs_sigma_alpha{args.fixed_alpha:.4f}_{args.optimize_by}.pdf"

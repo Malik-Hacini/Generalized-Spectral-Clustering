@@ -21,38 +21,18 @@ import matplotlib
 matplotlib.use("Agg")
 
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 
-from plots.common import configure_paper_style, project_path, resolve_output_file, validate_selection
-
-
-DEFAULT_RESULTS_CSV = (
-    "results/benchmark_runtimes_size_grid_search/benchmark_runtimes_size_runtimes.csv"
+from plots.common import (
+    configure_paper_style,
+    plot_method_lines,
+    project_path,
+    resolve_output_file,
+    validate_selection,
 )
 
 
-
-METHOD_COLORS = {
-    "SC-UN": "#FF7E68",
-    "GSC-UN": "#072AC8",
-    "GSC-UN-NoTune": "#264DF7",
-}
-METHOD_MARKERS = {
-    "SC-UN": "o",
-    "GSC-UN": "s",
-    "GSC-UN-NoTune": "^",
-}
-METHOD_LINESTYLES = {
-    "SC-UN": "-",
-    "GSC-UN": "--",
-    "GSC-UN-NoTune": "-.",
-}
-METHOD_LABELS = {
-    "SC-UN": "SC-UN",
-    "GSC-UN": "GSC-UN",
-    "GSC-UN-NoTune": "GSC-UN (w/o tuning)",
-}
+DEFAULT_RESULTS_CSV = "results/benchmark_runtimes_size_grid_search/benchmark_runtimes_size_runtimes.csv"
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -130,35 +110,13 @@ def summarize_by_size(df: pd.DataFrame, methods: list[str]) -> pd.DataFrame:
 
 
 def plot_runtime_lines(summary: pd.DataFrame, methods: list[str], title: str) -> None:
-    plt.figure()
-    for method in methods:
-        method_df = pd.DataFrame(summary[summary["method"] == method])
-        if method_df.empty:
-            continue
-
-        x = np.asarray(method_df["n"], dtype=float)
-        y = np.asarray(method_df["runtime_median"], dtype=float)
-
-        color = METHOD_COLORS.get(method, None)
-        marker = METHOD_MARKERS.get(method, "o")
-        linestyle = METHOD_LINESTYLES.get(method, ":")
-        plt.plot(
-            x,
-            y,
-            marker=marker,
-            linestyle=linestyle,
-            linewidth=2.0,
-            markersize=6,
-            color=color,
-            label=METHOD_LABELS.get(method, method),
-        )
-
-    plt.xlabel(r"Number of points ($n$)")
-    plt.ylabel(r"Runtime (s)")
-    # plt.title(plt.title)
-    plt.grid(True, alpha=0.35)
-    plt.legend()
+    fig, ax = plt.subplots()
+    plot_method_lines(ax, summary, "n", "runtime_median", methods=methods, legend_kwargs={})
+    ax.set_xlabel(r"Number of points ($n$)")
+    ax.set_ylabel(r"Runtime (s)")
+    ax.grid(True, alpha=0.35)
     plt.tight_layout()
+    return fig
 
 
 def main() -> None:
@@ -168,7 +126,7 @@ def main() -> None:
     runtime_df, methods = load_runtime_table(args.results_csv, args.methods)
     summary = summarize_by_size(runtime_df, methods)
 
-    plot_runtime_lines(
+    fig = plot_runtime_lines(
         summary=summary,
         methods=methods,
         title=args.title,
@@ -181,7 +139,8 @@ def main() -> None:
         source=args.results_csv,
         default_name="runtimes_size.pdf",
     )
-    plt.savefig(output_file, dpi=300, bbox_inches="tight")
+    fig.savefig(output_file, dpi=300, bbox_inches="tight")
+    plt.close(fig)
     print(f"Saved runtime line plot to: {output_file}")
 
 

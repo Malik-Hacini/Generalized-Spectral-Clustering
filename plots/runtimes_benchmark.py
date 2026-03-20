@@ -18,8 +18,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from plots.common import project_path, resolve_output_dir, validate_selection
-from plots.method_style import ordered_methods, styles_for_methods
+from plots.common import configure_runtime_style, ordered_methods, project_path, resolve_output_dir, styles_for_methods, validate_selection
 
 
 DEFAULT_RESULTS_CSV = Path("results/benchmark_uci_grid_search/benchmark_uci_runtimes.csv")
@@ -49,8 +48,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--datasets", nargs="+", default=None, help="Datasets to include.")
     parser.add_argument(
         "--output-dir",
-        default="figures/runtimes/",
-        help="Output directory. Defaults to figures/runtimes/.",
+        default=None,
+        help="Output directory. Defaults to plots/runtimes/<experiment_name>/.",
     )
     parser.add_argument(
         "--output-name",
@@ -59,38 +58,6 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--title", default=None, help="Custom plot title.")
     return parser.parse_args()
-
-
-def _configure_style() -> None:
-    plt.rcParams.update(
-        {
-            "figure.dpi": 160,
-            "figure.facecolor": "white",
-            "figure.constrained_layout.use": True,
-            "figure.constrained_layout.h_pad": 10 / 72,
-            "figure.constrained_layout.w_pad": 4 / 72,
-            "figure.constrained_layout.hspace": 0.08,
-            "figure.constrained_layout.wspace": 0.02,
-            "savefig.dpi": 400,
-            "savefig.facecolor": "white",
-            "pdf.fonttype": 42,
-            "ps.fonttype": 42,
-            "font.family": "DejaVu Sans",
-            "font.size": 14,
-            "text.color": "#2F2840",
-            "axes.facecolor": "white",
-            "axes.edgecolor": "#8E84A8",
-            "axes.labelcolor": "#2F2840",
-            "axes.titlecolor": "#2F2840",
-            "axes.titlesize": 20,
-            "axes.labelsize": 16,
-            "xtick.color": "#4E4464",
-            "ytick.color": "#4E4464",
-            "xtick.labelsize": 14,
-            "ytick.labelsize": 14,
-            "legend.fontsize": 15,
-        }
-    )
 
 
 def _default_title(results_csv: Path) -> str:
@@ -275,7 +242,7 @@ def plot_runtimes(long_df: pd.DataFrame, title: str):
 
 def main() -> None:
     args = parse_args()
-    _configure_style()
+    configure_runtime_style(plt)
 
     results_csv = project_path(args.results_csv)
     if not results_csv.exists():

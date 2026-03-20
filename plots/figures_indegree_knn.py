@@ -35,7 +35,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--output-dir",
         default=None,
-        help="Output directory. Defaults to plots/indegree/.",
+        help="Output directory. Defaults to plots/figures/.",
     )
     return parser.parse_args()
 
@@ -67,7 +67,7 @@ def main() -> None:
     datasets_dir = project_path(args.datasets_dir)
     available_datasets = sorted(path.name for path in datasets_dir.iterdir() if path.is_dir())
     selected_datasets = validate_selection(available_datasets, args.datasets, "datasets")
-    output_dir = resolve_kind_dir(args.output_dir, "indegree")
+    output_dir = resolve_kind_dir(args.output_dir, "figures")
     suffix = factor_label(args.factor)
 
     for dataset in selected_datasets:

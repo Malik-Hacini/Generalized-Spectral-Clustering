@@ -1,31 +1,25 @@
-"""
-Plot AMI scores vs degree imbalance ratio for degree-imbalance DSBM benchmark.
+"""Plot AMI scores vs degree-imbalance ratio for the DSBM benchmark."""
 
-Creates a line plot showing mean AMI +/- std for each clustering method
-as a function of the out-probability ratio p_low / p_high.
-"""
+from __future__ import annotations
 
+import argparse
 import json
 import re
 from pathlib import Path
 
+if __package__ is None or __package__ == "":
+    import sys
+
+    sys.path.append(str(Path(__file__).resolve().parents[1]))
+
+import matplotlib
+
+matplotlib.use("Agg")
+
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 
-
-def _resolve_input_path(path_value: str | Path) -> Path:
-    """Resolve paths robustly for runs launched outside the repository root."""
-    path = Path(path_value)
-    if path.exists() or path.is_absolute():
-        return path
-
-    repo_root_candidate = Path(__file__).resolve().parents[1]
-    repo_relative = repo_root_candidate / path
-    if repo_relative.exists():
-        return repo_relative
-
-    return path
+from plots.common import configure_paper_style, plot_method_lines, project_path, resolve_output_dir, summarize_mean_std, validate_selection
 
 
 def _parse_prob_token(token: str) -> float:
@@ -48,7 +42,7 @@ def load_degree_imbalance_results(results_path: str | Path):
         DataFrame with columns:
         method, block_sizes, p_intra, p_high, p_low, ratio, seed, ami
     """
-    results_dir = _resolve_input_path(results_path)
+    results_dir = project_path(results_path)
 
     if not results_dir.exists():
         raise FileNotFoundError(f"Results directory not found: {results_dir}")
@@ -147,77 +141,18 @@ def load_degree_imbalance_results(results_path: str | Path):
     return pd.DataFrame(rows)
 
 
-def plot_degree_imbalance_results(df: pd.DataFrame, output_file: str = None):
-    """
-    Create line plot of AMI vs degree imbalance ratio (p_low / p_high).
-
-    Parameters
-    ----------
-    df : pd.DataFrame
-        Results DataFrame from load_degree_imbalance_results
-    output_file : str, optional
-        Path to save the plot
-    """
-    summary = (
-        df.groupby(["method", "ratio"])  # aggregate across seeds
-        .agg({"ami": ["mean", "std", "count"]})
-        .reset_index()
-    )
-    summary.columns = ["method", "ratio", "ami_mean", "ami_std", "n_seeds"]
-    summary = summary.sort_values("ratio")
-
-    method_order = ["SC-UN", "SC-N", "DSC+", "GSC-UN", "GSC-N"]
-    method_styles = {
-        "SC-UN": {"color": "#FF8C69", "linestyle": ":", "marker": "D", "label": "SC-UN"},
-        "SC-N": {"color": "#FF6347", "linestyle": "--", "marker": "o", "label": "SC-N"},
-        "DSC+": {"color": "#27A727", "linestyle": "-.", "marker": "^", "label": "DSC+"},
-        "GSC-UN": {"color": "#4C9AFF", "linestyle": "--", "marker": "P", "label": "GSC-UN"},
-        "GSC-N": {"color": "#072AC8", "linestyle": "-", "marker": "s", "label": "GSC-N"},
-    }
-
-    plt.figure()
-
-    for method in method_order:
-        method_data = summary[summary["method"] == method]
-        if method_data.empty:
-            continue
-
-        style = method_styles.get(method, {})
-        ratio = method_data["ratio"].values
-        ami_mean = method_data["ami_mean"].values
-        ami_std = np.nan_to_num(method_data["ami_std"].values, nan=0.0)
-
-        plt.plot(
-            ratio,
-            ami_mean,
-            label=style.get("label", method),
-            color=style.get("color", None),
-            linestyle=style.get("linestyle", "-"),
-            marker=style.get("marker", "o"),
-            markersize=6,
-            linewidth=2,
-            alpha=1,
-        )
-
-        plt.fill_between(
-            ratio,
-            ami_mean - ami_std,
-            ami_mean + ami_std,
-            color=style.get("color", None),
-            alpha=0.2,
-        )
-
-    plt.xlabel(r"Degree Imbalance Ratio ($p_{\mathrm{low}} / p_{\mathrm{high}}$)", fontsize=12)
-    plt.ylabel("AMI Score", fontsize=12)
-    plt.legend(loc="best", fontsize=10, framealpha=0.95)
-    plt.grid(True, alpha=0.3, linestyle="--")
+def plot_degree_imbalance_results(df: pd.DataFrame, output_file: Path):
+    summary = summarize_mean_std(df, ["method", "ratio"], "ami").sort_values("ratio")
+    fig, ax = plt.subplots()
+    plot_method_lines(ax, summary, "ratio", "ami_mean", y_std_col="ami_std")
+    ax.set_xlabel(r"Degree Imbalance Ratio ($p_{\mathrm{low}} / p_{\mathrm{high}}$)", fontsize=12)
+    ax.set_ylabel("AMI Score", fontsize=12)
+    ax.grid(True, alpha=0.3, linestyle="--")
     plt.tight_layout()
 
-    if output_file:
-        plt.savefig(output_file, dpi=300, bbox_inches="tight")
-        print(f"Plot saved to: {output_file}")
-    else:
-        plt.show()
+    fig.savefig(output_file, dpi=300, bbox_inches="tight")
+    plt.close(fig)
+    print(f"Plot saved to: {output_file}")
 
 
 def print_summary_statistics(df: pd.DataFrame):
@@ -245,12 +180,10 @@ def print_summary_statistics(df: pd.DataFrame):
         print(f"  Ratio {ratio:.4f}: {best_method} (AMI = {best_score:.4f})")
 
 
-def main():
-    import argparse
-
+def main() -> None:
     parser = argparse.ArgumentParser(description="Plot results from degree-imbalance benchmark")
     parser.add_argument(
-        "--results-path",
+        "--results-dir",
         type=str,
         default="results/benchmark_degree_imbalance_grid_search",
         help="Path to degree-imbalance grid-search results directory",
@@ -258,18 +191,19 @@ def main():
     parser.add_argument(
         "--output-dir",
         type=str,
-        default="figures",
-        help="Output directory for plots (default: figures/)",
+        default=None,
+        help="Output directory. Defaults to plots/imbalance/<experiment_name>/.",
     )
+    parser.add_argument("--methods", nargs="+", default=None, help="Methods to plot (default: all methods)")
     parser.add_argument("--show-stats", action="store_true", help="Print summary statistics")
 
     args = parser.parse_args()
+    configure_paper_style(plt)
 
-    output_dir = _resolve_input_path(args.output_dir)
-    output_dir.mkdir(parents=True, exist_ok=True)
+    output_dir = resolve_output_dir(args.output_dir, "imbalance", args.results_dir)
 
-    print(f"Loading results from: {args.results_path}")
-    df = load_degree_imbalance_results(args.results_path)
+    print(f"Loading results from: {args.results_dir}")
+    df = load_degree_imbalance_results(args.results_dir)
 
     if df.empty:
         print("No results found!")
@@ -277,6 +211,9 @@ def main():
 
     print(f"Loaded {len(df)} result entries")
     print(f"Methods: {sorted(df['method'].unique())}")
+
+    selected_methods = validate_selection(sorted(df["method"].unique()), args.methods, "methods")
+    df = df[df["method"].isin(selected_methods)].copy()
 
     settings = sorted(
         df[["block_sizes", "p_intra", "p_high"]]
@@ -312,7 +249,7 @@ def main():
         output_file = output_dir / (
             f"degree_imbalance_b{block_token}_pintra{p_intra:.4f}_phigh{p_high:.4f}.pdf"
         )
-        plot_degree_imbalance_results(df_setting, str(output_file))
+        plot_degree_imbalance_results(df_setting, output_file)
         print(f"Saved plot to: {output_file}")
 
     print(f"\n{'=' * 60}")

@@ -9,23 +9,9 @@ if __package__ is None or __package__ == "":
     import sys
 
     sys.path.append(str(Path(__file__).resolve().parents[1]))
-    from runtimes_size import (
-        METHOD_COLORS,
-        METHOD_LABELS,
-        METHOD_LINESTYLES,
-        METHOD_MARKERS,
-        load_runtime_table,
-        summarize_by_size,
-    )
+    from runtimes_size import load_runtime_table, summarize_by_size
 else:
-    from plots.runtimes_size import (
-        METHOD_COLORS,
-        METHOD_LABELS,
-        METHOD_LINESTYLES,
-        METHOD_MARKERS,
-        load_runtime_table,
-        summarize_by_size,
-    )
+    from plots.runtimes_size import load_runtime_table, summarize_by_size
 
 import matplotlib
 
@@ -33,7 +19,7 @@ matplotlib.use("Agg")
 
 import matplotlib.pyplot as plt
 
-from plots.common import configure_paper_style, resolve_output_file, validate_selection
+from plots.common import configure_paper_style, resolve_output_file, style_for_method, validate_selection
 
 DEFAULT_FULL_RESULTS_CSV = (
     "results/benchmark_runtimes_size_grid_search/benchmark_runtimes_size_runtimes.csv"
@@ -78,22 +64,19 @@ def parse_args() -> argparse.Namespace:
 def plot_preprocessing_vs_full(full_summary, preprocessing_summary, methods: list[str], title: str | None) -> None:
     plt.figure()
     for method in methods:
-        color = METHOD_COLORS.get(method)
-        marker = METHOD_MARKERS.get(method, "o")
-        linestyle = METHOD_LINESTYLES.get(method, "-")
-        label = METHOD_LABELS.get(method, method)
+        style = style_for_method(method)
 
         full_df = full_summary[full_summary["method"] == method]
         if not full_df.empty:
             plt.plot(
                 full_df["n"].to_numpy(dtype=float),
                 full_df["runtime_median"].to_numpy(dtype=float),
-                color=color,
-                marker=marker,
-                linestyle=linestyle,
+                color=style["color"],
+                marker=style["marker"],
+                linestyle=style["linestyle"],
                 linewidth=2.0,
                 markersize=6,
-                label=f"{label} full",
+                label=f"{style['label']} full",
             )
 
         preprocessing_df = preprocessing_summary[preprocessing_summary["method"] == method]
@@ -101,13 +84,13 @@ def plot_preprocessing_vs_full(full_summary, preprocessing_summary, methods: lis
             plt.plot(
                 preprocessing_df["n"].to_numpy(dtype=float),
                 preprocessing_df["runtime_median"].to_numpy(dtype=float),
-                color=color,
-                marker=marker,
+                color=style["color"],
+                marker=style["marker"],
                 linestyle=":",
                 linewidth=1.8,
                 markersize=5,
                 alpha=0.9,
-                label=f"{label} preprocessing",
+                label=f"{style['label']} preprocessing",
             )
 
     plt.xscale("log")

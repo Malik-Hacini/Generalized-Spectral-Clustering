@@ -12,12 +12,14 @@ if __package__ is None or __package__ == "":
 
     sys.path.append(str(Path(__file__).resolve().parents[1]))
 
+import matplotlib
+
+matplotlib.use("Agg")
+
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 
-from plots.common import project_path, resolve_output_dir
-from plots.method_style import ordered_methods, style_for_method
+from plots.common import configure_paper_style, plot_method_lines, project_path, resolve_output_dir, summarize_mean_std, validate_selection
 
 # Configurable default methods to plot (None = all methods)
 DEFAULT_METHODS_TO_PLOT = [
@@ -94,42 +96,17 @@ def load_grid_imbalance_results(results_path: str | Path):
 
 
 def plot_imbalance_results(df: pd.DataFrame, output_file: Path, show_legend: bool = True) -> None:
-    summary = df.groupby(["method", "ratio"]).agg({"ami": ["mean", "std"]}).reset_index()
-    summary.columns = ["method", "ratio", "ami_mean", "ami_std"]
-    summary = summary.sort_values("ratio")
+    summary = summarize_mean_std(df, ["method", "ratio"], "ami").sort_values("ratio")
 
-    method_order = ordered_methods(summary["method"].unique().tolist())
+    fig, ax = plt.subplots()
+    plot_method_lines(ax, summary, "ratio", "ami_mean", y_std_col="ami_std", show_legend=show_legend)
 
-    plt.figure()
-    for method in method_order:
-        method_data = summary[summary["method"] == method]
-        if method_data.empty:
-            continue
-        style = style_for_method(method)
-        ratio = np.asarray(method_data["ratio"], dtype=float)
-        ami_mean = np.asarray(method_data["ami_mean"], dtype=float)
-        ami_std = np.nan_to_num(np.asarray(method_data["ami_std"], dtype=float), nan=0.0)
-        plt.plot(
-            ratio,
-            ami_mean,
-            label=style["label"],
-            color=style["color"],
-            linestyle=style["linestyle"],
-            marker=style["marker"],
-            markersize=6,
-            linewidth=2,
-            alpha=1,
-        )
-        plt.fill_between(ratio, ami_mean - ami_std, ami_mean + ami_std, color=style["color"], alpha=0.2)
-
-    plt.xlabel(r"Density Ratio ($n_{\mathrm{low}} / n_{\mathrm{high}}$)", fontsize=12)
-    plt.ylabel("AMI Score", fontsize=12)
-    if show_legend:
-        plt.legend(loc="best", fontsize=10, framealpha=0.95)
-    plt.grid(True, alpha=0.3, linestyle="--")
+    ax.set_xlabel(r"Density Ratio ($n_{\mathrm{low}} / n_{\mathrm{high}}$)", fontsize=12)
+    ax.set_ylabel("AMI Score", fontsize=12)
+    ax.grid(True, alpha=0.3, linestyle="--")
     plt.tight_layout()
-    plt.savefig(output_file, dpi=300, bbox_inches="tight")
-    plt.close()
+    fig.savefig(output_file, dpi=300, bbox_inches="tight")
+    plt.close(fig)
     print(f"Plot saved to: {output_file}")
 
 
@@ -155,6 +132,7 @@ def main() -> None:
         help="Methods to plot (default: all methods)",
     )
     args = parser.parse_args()
+    configure_paper_style(plt)
 
     results_path = project_path(args.results_dir)
     output_dir = resolve_output_dir(args.output_dir, "imbalance", results_path)
@@ -169,18 +147,9 @@ def main() -> None:
     all_methods = sorted(df["method"].unique())
     print(f"Methods: {all_methods}")
 
-    # Filter by selected methods if specified
-    if args.methods is not None:
-        selected_methods = [m for m in args.methods]  # Preserve user's order
-        missing_methods = set(selected_methods) - set(all_methods)
-        if missing_methods:
-            print(f"Warning: Methods not found in results: {sorted(missing_methods)}")
-        available_selected = [m for m in selected_methods if m in all_methods]
-        if not available_selected:
-            print("Error: No selected methods found in results!")
-            return
-        df = df[df["method"].isin(available_selected)].copy()
-        print(f"Filtered to {len(available_selected)} method(s): {available_selected}")
+    selected_methods = validate_selection(all_methods, args.methods, "methods")
+    df = df[df["method"].isin(selected_methods)].copy()
+    print(f"Filtered to {len(selected_methods)} method(s): {selected_methods}")
     grid_sizes = sorted(df[["grid_rows", "grid_cols"]].drop_duplicates().itertuples(index=False, name=None))
     print(f"Grid sizes found: {grid_sizes}")
 

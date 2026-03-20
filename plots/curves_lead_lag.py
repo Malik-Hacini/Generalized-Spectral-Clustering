@@ -19,16 +19,9 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from plots.common import configure_paper_style, project_path, resolve_output_file, validate_selection
+from plots.common import configure_paper_style, project_path, resolve_output_file, style_for_method, validate_selection
 
 DEFAULT_RESULTS_DIR = "results/benchmark_lead_lag_grid_search"
-
-CURVE_STYLES = {
-    "SC-N": {"color": "#FF7E68", "marker": "o", "linestyle": "-", "label": "SC-N"},
-    "GSC-N-selected": {"color": "#072AC8", "marker": "s", "linestyle": "-", "label": "GSC-N"},
-    "GSC-N-oracle": {"color": "#072AC8", "marker": "^", "linestyle": "--", "label": "GSC-N (oracle)"},
-}
-
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -151,7 +144,13 @@ def plot_lead_lag_curves(df: pd.DataFrame, title: str | None) -> None:
     x = range(len(df))
     labels = [dataset.rsplit("_", 1)[-1] for dataset in df["dataset"]]
 
-    for series_name, style in CURVE_STYLES.items():
+    selected_style = style_for_method("GSC-N")
+    curve_styles = {
+        "SC-N": style_for_method("SC-N"),
+        "GSC-N-selected": selected_style,
+        "GSC-N-oracle": {**selected_style, "marker": "^", "linestyle": "--", "label": "GSC-N (oracle)"},
+    }
+    for series_name, style in curve_styles.items():
         plt.plot(
             x,
             df[series_name].to_numpy(dtype=float),
