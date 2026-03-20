@@ -28,8 +28,8 @@ DEFAULT_RESULTS_PATH = "results/benchmark_gaussian_injection_alpha_sigma_grid_se
 DEFAULT_OUTPUT_DIR = "figures"
 DEFAULT_OPTIMIZE_BY = "graph_ch"
 DEFAULT_INCLUDE_GSC_AMI_SUPERVISED = False
-DEFAULT_FIXED_SIGMA = 0.5
-DEFAULT_FIXED_ALPHA = 0.5
+DEFAULT_FIXED_SIGMA = 0.8
+DEFAULT_FIXED_ALPHA = 0.4
 DEFAULT_SHOW_STD = True
 # Set to None to include all methods, or provide a list to filter plotted methods.
 DEFAULT_METHODS_TO_PLOT = [
