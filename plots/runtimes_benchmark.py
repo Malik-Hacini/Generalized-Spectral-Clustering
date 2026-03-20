@@ -211,6 +211,7 @@ def plot_runtimes(long_df: pd.DataFrame, title: str):
             markerfacecolor=method_styles[method]["color"],
             markersize=10,
             label=method_styles[method]["label"],
+            markevery=[0],
         )
         for method in methods
     ]
