@@ -25,16 +25,16 @@ DEFAULT_METHOD_ORDER = [
 ]
 
 METHOD_STYLES: dict[str, dict[str, str]] = {
-    "SC-UN": {"color": "#FF8C69", "linestyle": ":", "marker": "D", "label": "SC-UN"},
-    "SC-N": {"color": "#FF6347", "linestyle": "--", "marker": "o", "label": "SC-N"},
-    "DSC+": {"color": "#27A727", "linestyle": "-.", "marker": "^", "label": "DSC+"},
-    "Chung": {"color": "#008F00", "linestyle": ":", "marker": "v", "label": "Chung"},
-    "DI-SIM-R": {"color": "#7A3E9D", "linestyle": "-", "marker": "P", "label": "DI-SIM-R"},
-    "DI-SIM-L": {"color": "#A55CC2", "linestyle": "--", "marker": "X", "label": "DI-SIM-L"},
-    "DI-SIM-C": {"color": "#C084D8", "linestyle": "-.", "marker": "*", "label": "DI-SIM-C"},
-    "GSC-UN": {"color": "#4C9AFF", "linestyle": "--", "marker": "P", "label": "GSC-UN"},
-    "GSC-N": {"color": "#072AC8", "linestyle": "-", "marker": "s", "label": "GSC-N"},
-    "GSC-UN-NoTune": {"color": "#264DF7", "linestyle": "-.", "marker": "^", "label": "GSC-UN (w/o tuning)"},
+    "SC-UN": {"color": "#FF8C69", "linestyle": ":", "marker": "D", "label": r"SC$_\textnormal{un}$"},
+    "SC-N": {"color": "#FF6347", "linestyle": "--", "marker": "o", "label": r"SC$_\textnormal{n}$"},
+    "DSC+": {"color": "#27A727", "linestyle": "-.", "marker": "^", "label": r"DSC$\textnormal{+}$"},
+    "Chung": {"color": "#008F00", "linestyle": ":", "marker": "v", "label": r"Chung"},
+    "DI-SIM-R": {"color": "#7A3E9D", "linestyle": "-", "marker": "P", "label": r"DI-SIM$_\textnormal{R}$"},
+    "DI-SIM-L": {"color": "#A55CC2", "linestyle": "--", "marker": "X", "label": r"DI-SIM$_\textnormal{L}$"},
+    "DI-SIM-C": {"color": "#C084D8", "linestyle": "-.", "marker": "*", "label": r"DI-SIM$_\textnormal{C}$"},
+    "GSC-UN": {"color": "#4C9AFF", "linestyle": "--", "marker": "P", "label": r"GSC$_\textnormal{un}$"},
+    "GSC-N": {"color": "#072AC8", "linestyle": "-", "marker": "s", "label": r"GSC$_\textnormal{n}$"},
+    "GSC-UN-NoTune": {"color": "#264DF7", "linestyle": "-.", "marker": "^", "label": r"GSC$_\textnormal{un}$ (w/o tuning)"},
 }
 
 FALLBACK_COLORS = ["#6C757D", "#8C564B", "#BCBD22", "#17BECF"]
@@ -150,7 +150,7 @@ def plot_method_lines(
             ax.fill_between(x_values, y_values - y_std, y_values + y_std, color=style["color"], alpha=0.2)
 
     if show_legend:
-        ax.legend(numpoints=1,**(legend_kwargs or {"loc": "best", "fontsize": 10, "framealpha": 0.95}))
+        ax.legend(numpoints=1, handlelength=3, handletextpad=0.8, **(legend_kwargs or {"loc": "best", "fontsize": 10, "framealpha": 0.95}))
 
 
 def configure_paper_style(plt) -> None:
