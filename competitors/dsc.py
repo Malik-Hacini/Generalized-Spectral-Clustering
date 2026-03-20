@@ -57,9 +57,15 @@ class DSC:
         n = self.adjacency_matrix.shape[0]
 
         # Step 1: Normalize rows to get transition matrix P
-        d_out = np.sum(self.adjacency_matrix, axis=1)
+        import scipy.sparse as sp
+        
+        d_out = np.asarray(self.adjacency_matrix.sum(axis=1)).ravel()
         d_out[d_out <= 0] = self.epsilon  # prevent division by zero
-        P = self.adjacency_matrix / d_out[:, None]
+        if sp.issparse(self.adjacency_matrix):
+            P = sp.diags(1.0 / d_out) @ self.adjacency_matrix
+        else:
+            P = self.adjacency_matrix / d_out[:, None]
+            
         # Step 2: Teleportation-based smoothing (like in PageRank)
         P_teleport = np.ones((n, n)) / n
         P_smooth = self.gamma * P + (1 - self.gamma) * P_teleport
