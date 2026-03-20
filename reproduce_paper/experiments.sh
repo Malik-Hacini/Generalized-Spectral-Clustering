@@ -14,9 +14,32 @@ run_paper_experiments() {
     "results/networks_grid_search/networks_params.json"
 
   run_experiment \
-    "Grid imbalance benchmark" \
+    "Grid imbalance benchmark (2x2)" \
     "experiments/grid_imbalance.py" \
-    "results/benchmark_grid_imbalance_grid_search/benchmark_grid_imbalance_params.json"
+    "results/benchmark_grid_imbalance_grid_search/grid_2x2_high300_low20_seed0" \
+    0 \
+    --grid-size 2
+
+  run_experiment \
+    "Grid imbalance benchmark (2x1)" \
+    "experiments/grid_imbalance.py" \
+    "results/benchmark_grid_imbalance_grid_search/grid_2x1_high300_low20_seed0" \
+    0 \
+    --grid-size 2x1
+
+  run_experiment \
+    "Grid imbalance benchmark (3x3)" \
+    "experiments/grid_imbalance.py" \
+    "results/benchmark_grid_imbalance_grid_search/grid_3x3_high300_low20_seed0" \
+    0 \
+    --grid-size 3
+
+  run_experiment \
+    "Grid imbalance benchmark (4x4)" \
+    "experiments/grid_imbalance.py" \
+    "results/benchmark_grid_imbalance_grid_search/grid_4x4_high300_low20_seed0" \
+    0 \
+    --grid-size 4
 
   run_experiment \
     "Gaussian injection benchmark" \

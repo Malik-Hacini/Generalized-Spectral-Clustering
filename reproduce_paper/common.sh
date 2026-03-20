@@ -74,13 +74,14 @@ run_experiment() {
   local script_path="$2"
   local sentinel="$3"
   local is_long="${4:-0}"
+  shift 4
 
   if should_reuse "$sentinel" "$is_long"; then
     printf '\n[SKIP] %s (reusing %s)\n' "$label" "$sentinel"
     return
   fi
 
-  run_timed "$label" "$PYTHON_BIN" "$ROOT_DIR/$script_path"
+  run_timed "$label" "$PYTHON_BIN" "$ROOT_DIR/$script_path" "$@"
 }
 
 copy_file() {

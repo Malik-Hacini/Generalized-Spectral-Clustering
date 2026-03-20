@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import argparse
+
 if __package__ is None or __package__ == "":
     from common import *
 else:
@@ -19,11 +21,10 @@ metrics = ("ami", "ch")
 n_jobs = -1
 verbose = True
 
-grid_size = 4
 n_high = 300
 n_low_values = [n_high // 15, n_high // 10, n_high // 5, n_high // 3, n_high // 2]
 n_seeds = 50
-datasets_path = Path(project_path("../datasets/grid_imbalance"))
+datasets_path = Path(project_path("datasets/grid_imbalance"))
 
 method_specs = [
     ("spectral", "SC-UN"),
@@ -70,15 +71,25 @@ config = ExperimentConfig(
 )
 
 
-def generate_datasets() -> list[str]:
+def parse_grid_size(value: str) -> tuple[int, int]:
+    if "x" in value:
+        rows, cols = value.lower().split("x", maxsplit=1)
+        return int(rows), int(cols)
+    size = int(value)
+    return size, size
+
+
+def format_grid_size(grid_size: tuple[int, int]) -> str:
+    return f"{grid_size[0]}x{grid_size[1]}"
+
+
+def generate_datasets(grid_size: tuple[int, int]) -> list[str]:
     datasets_path.mkdir(parents=True, exist_ok=True)
-    print("Generating grid-imbalance datasets...")
+    print(f"Generating grid-imbalance datasets for {format_grid_size(grid_size)}...")
     dataset_names = []
     for n_low in n_low_values:
         for seed in range(n_seeds):
-            dataset_name = (
-                f"grid_{grid_size}x{grid_size}_high{n_high}_low{n_low}_seed{seed}"
-            )
+            dataset_name = f"grid_{format_grid_size(grid_size)}_high{n_high}_low{n_low}_seed{seed}"
             dataset_path = datasets_path / dataset_name
             needs_generation = (
                 not dataset_path.exists()
@@ -107,9 +118,18 @@ def generate_datasets() -> list[str]:
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Run the grid-imbalance benchmark")
+    parser.add_argument(
+        "--grid-size",
+        default="4",
+        help="Grid size, e.g. 2, 3, 4, or rectangular 2x1.",
+    )
+    args = parser.parse_args()
+    grid_size = parse_grid_size(args.grid_size)
+
     experiment(
         experiment_name=experiment_name,
-        dataset_names=generate_datasets(),
+        dataset_names=generate_datasets(grid_size),
         method_specs=method_specs,
         config=config,
         load_path=str(datasets_path),
