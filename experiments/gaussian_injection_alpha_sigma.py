@@ -44,9 +44,8 @@ injection_center = ((-2.0, 0.0),)
 bandwidth = 1.0
 
 # Sweep parameters
-# alpha_values = np.arange(0.0, 1.01, 0.1)
-alpha_values = [0.2, 0.3, 0.4]
-sigma_injection_values = (0.2, 0.5, 0.8, 1.0,)
+alpha_values = np.arange(0.0, 1.01, 0.1)
+sigma_injection_values = (0.05, 0.1, 0.2, 0.5, 0.8, 1.0, 2.0, 5.0)
 seeds = range(10)
 
 # Dataset generation

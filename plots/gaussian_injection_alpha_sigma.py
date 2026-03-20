@@ -30,7 +30,13 @@ DEFAULT_OPTIMIZE_BY = "graph_ch"
 DEFAULT_INCLUDE_GSC_AMI_SUPERVISED = False
 DEFAULT_FIXED_SIGMA = 0.5
 DEFAULT_FIXED_ALPHA = 0.5
-DEFAULT_SHOW_STD = False
+DEFAULT_SHOW_STD = True
+# Set to None to include all methods, or provide a list to filter plotted methods.
+DEFAULT_METHODS_TO_PLOT = [
+  "GSC-N",
+  "SC-N",
+  "DSC+"
+]
 
 
 def _resolve_input_path(path_value: str | Path) -> Path:
@@ -203,7 +209,7 @@ def _plot_mean_std_lines(
 
     ax.set_xlabel(xlabel, fontsize=12)
 
-    ax.set_title(title, fontsize=13, fontweight="bold")
+    # ax.set_title(title, fontsize=13, fontweight="bold")
     ax.grid(alpha=0.3, which="both")
     ax.legend(loc="best", fontsize=11)
     plt.tight_layout()
@@ -250,6 +256,12 @@ def main() -> None:
         help="Disable plotting GSC-N AMI selected by supervised AMI optimization.",
     )
     parser.add_argument(
+        "--methods",
+        nargs="+",
+        default=DEFAULT_METHODS_TO_PLOT,
+        help="Methods to plot. Default comes from DEFAULT_METHODS_TO_PLOT.",
+    )
+    parser.add_argument(
         "--fixed-sigma",
         type=float,
         default=DEFAULT_FIXED_SIGMA,
@@ -289,6 +301,19 @@ def main() -> None:
     if df.empty:
         print("No entries found after parsing results.")
         return
+
+    if args.methods is not None:
+        available_methods = sorted(df["method"].unique())
+        selected_methods = [method for method in args.methods if method in available_methods]
+        missing_methods = [method for method in args.methods if method not in available_methods]
+        if missing_methods:
+            print(f"Warning: requested methods not found and skipped: {missing_methods}")
+        if not selected_methods:
+            raise ValueError(
+                "No selected methods were found in parsed results. "
+                f"Available methods: {available_methods}"
+            )
+        df = df[df["method"].isin(selected_methods)].copy()
 
     print(f"Loaded {len(df)} entries")
     print(f"Methods: {sorted(df['method'].unique())}")
