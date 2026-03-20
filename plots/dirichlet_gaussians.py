@@ -1,235 +1,164 @@
+"""Generate the introductory Dirichlet/GDE illustration figures for the paper."""
 
-import numpy as np
+from __future__ import annotations
+
+import argparse
+from pathlib import Path
+
+if __package__ is None or __package__ == "":
+    import sys
+
+    sys.path.append(str(Path(__file__).resolve().parents[1]))
+
+import matplotlib
+
+matplotlib.use("Agg")
+
 import matplotlib.pyplot as plt
-from sklearn.neighbors import kneighbors_graph
-import networkx as nx
-
-def dirichlet_energy(f, P, stationary_dist):
-    """
-    Compute Dirichlet energy: sum_{i,j} pi(i) * P_{i,j} * [f(i) - f(j)]^2
-
-    Parameters:
-    -----------
-    f : array-like, shape (n,)
-        Function values on nodes
-    P : array-like, shape (n, n)
-        Transition matrix
-    stationary_dist : array-like, shape (n,)
-        Stationary distribution π(i)
-
-    Returns:
-    --------
-    float : Dirichlet energy
-    """
-    n = len(f)
-    energy = 0.0
-    for i in range(n):
-        for j in range(n):
-            if P[i, j] > 0:
-                energy += stationary_dist[i] * P[i, j] * (f[i] - f[j])**2
-    return energy
-
-
-directed = True
-
-# Generate 3 clusters from Gaussian distributions
-np.random.seed(31)
-
-# Define cluster parameters (mean and covariance)
-n_points_per_cluster = 50
-cluster_params = [
-    {'mean': [0, 0], 'cov': [[0.5, 0], [0, 0.5]]},      # Cluster 1: center
-    {'mean': [3, 3], 'cov': [[0.4, 0.15], [0.15, 0.4]]},  # Cluster 2: upper right
-    {'mean': [2, -4], 'cov': [[0.6, -0.2], [-0.2, 0.6]]}  # Cluster 3: lower
-]
-
-# Generate data
-clusters = []
-labels_true = []
-for i, params in enumerate(cluster_params):
-    cluster_data = np.random.multivariate_normal(
-        params['mean'],
-        params['cov'],
-        n_points_per_cluster
-    )
-    clusters.append(cluster_data)
-    labels_true.extend([i] * n_points_per_cluster)
-
-# Combine all clusters
-data = np.vstack(clusters)
-labels_true = np.array(labels_true)
-
-# Build k-NN graph
-k = 10
-A_knn = kneighbors_graph(data, n_neighbors=k, mode='connectivity', include_self=False)
-G_knn = nx.from_scipy_sparse_array(A_knn, create_using=nx.DiGraph())
-
-# Create the plot
-fig, ax = plt.subplots(figsize=(10, 8))
-
-# Define colors for clusters
-colors = ['#072AC8', '#FFBF46', '#FF1F2E']
-
-# Plot data points colored by their true cluster
-for i in range(3):
-    cluster_mask = labels_true == i
-    ax.scatter(data[cluster_mask, 0], data[cluster_mask, 1],
-              c=colors[i], s=100, alpha=1, linewidth=0.5)
-
-# Plot k-NN edges
-pos = {i: data[i] for i in range(len(data))}
-for edge in G_knn.edges():
-    i, j = edge
-    if not directed:
-      ax.plot([data[i, 0], data[j, 0]],
-            [data[i, 1], data[j, 1]],
-            'gray', alpha=0.3, linewidth=0.8, zorder=0,
-            )
-    else:
-      ax.annotate('', xy=(data[j, 0], data[j, 1]), xytext=(data[i, 0], data[i, 1]),
-                arrowprops=dict(arrowstyle='->', color='gray', alpha=0.3,
-                               lw=0.8, shrinkA=5, shrinkB=5),
-                zorder=0)
-
-# Remove axis labels, ticks, and frame
-ax.set_xticks([])
-ax.set_yticks([])
-ax.spines['top'].set_visible(False)
-ax.spines['right'].set_visible(False)
-ax.spines['bottom'].set_visible(False)
-ax.spines['left'].set_visible(False)
-plt.tight_layout()
-name = "figures/clustering"
-if directed:
-  name += "_directed"
-plt.savefig(f"{name}.svg")
-plt.show()
-
-# Print some statistics
-print(f"Total points: {len(data)}")
-print(f"Points per cluster: {n_points_per_cluster}")
-print(f"k-NN parameter: k={k}")
-print(f"Total edges in graph: {G_knn.number_of_edges()}")
-print(f"Average in-degree: {np.mean([d for n, d in G_knn.in_degree()]):.2f}")
-print(f"Is weakly connected: {nx.is_weakly_connected(G_knn)}")
-
-
-directed = True  # Set to False to use underlying undirected graph
-use_zero_mask = False  # Set to False to use colormap for all points including zeros
-
-# Build k-NN graph (ASYMMETRIC - not symmetrized)
-k = 10
-A_knn_asym = kneighbors_graph(data, n_neighbors=k, mode='connectivity', include_self=False)
-G_knn_asym = nx.from_scipy_sparse_array(A_knn_asym, create_using=nx.DiGraph())
-
-# Compute ergodic law (stationary distribution) from the transition matrix
-A_asym = A_knn_asym.toarray()
-
-if not directed:
-    # Use underlying undirected graph by symmetrizing
-    A_for_ergodic = A_asym + A_asym.T
-else:
-    # Use directed graph as-is
-    A_for_ergodic = A_asym
-
-# Compute row-normalized transition matrix P
-out_degrees = A_for_ergodic.sum(axis=1)
-out_degrees[out_degrees == 0] = 1  # Avoid division by zero
-P = A_for_ergodic / out_degrees[:, np.newaxis]
-
-# Find stationary distribution: left eigenvector of P with eigenvalue 1
-eigenvalues, eigenvectors = np.linalg.eig(P.T)
-# Find eigenvector corresponding to eigenvalue closest to 1
-stationary_idx = np.argmin(np.abs(eigenvalues - 1))
-stationary_dist = np.real(eigenvectors[:, stationary_idx])
-stationary_dist = stationary_dist / stationary_dist.sum()  # Normalize to sum to 1
-
-node_colors = stationary_dist
-
-# Create the plot
-fig, ax = plt.subplots(figsize=(9, 8))
-
-# Create custom colormap from gray to red
+import numpy as np
 from matplotlib.colors import LinearSegmentedColormap
-custom_cmap = LinearSegmentedColormap.from_list('gray_to_red', ['#A3D9FF', '#BF1363'])
+from sklearn.neighbors import kneighbors_graph
 
-if use_zero_mask:
-    # Separate points with exactly 0 distribution from others
-    zero_mask = np.abs(node_colors) < 1e-10  # Use small threshold for numerical precision
-    nonzero_mask = ~zero_mask
+from plots.common import configure_paper_style, resolve_kind_dir
 
-    # Plot non-zero points with colormap
-    if np.any(nonzero_mask):
-        scatter = ax.scatter(data[nonzero_mask, 0], data[nonzero_mask, 1],
-                            c=node_colors[nonzero_mask],
-                            s=100, alpha=1, linewidth=0.5,
-                            cmap=custom_cmap,
-                            vmin=node_colors[nonzero_mask].min(),
-                            vmax=node_colors[nonzero_mask].max(),
-                          )
+CLUSTER_COLORS = ["#072AC8", "#FFBF46", "#FF1F2E"]
+STATIONARY_CMAP = LinearSegmentedColormap.from_list("dirichlet_stationary", ["#A3D9FF", "#BF1363"])
 
-        # Add horizontal colorbar with reduced size and only extreme values
-        cbar = plt.colorbar(scatter, ax=ax, shrink=0.4, orientation='horizontal', pad=0.05, format='%.2f')
-        cbar.set_label('Stationary Distribution', labelpad=10)
-        # Set ticks to show only min and max values
-        cbar.set_ticks([node_colors[nonzero_mask].min(), node_colors[nonzero_mask].max()])
 
-    # Plot zero points in black
-    if np.any(zero_mask):
-        ax.scatter(data[zero_mask, 0], data[zero_mask, 1],
-                  c='#353238', s=100, alpha=1, linewidth=0.5,
-                   label='Zero distribution')
-else:
-    # Plot all points with colormap (no special handling for zeros)
-    scatter = ax.scatter(data[:, 0], data[:, 1], c=node_colors,
-                        s=100, alpha=1, linewidth=0.5,
-                        cmap=custom_cmap, vmin=min(node_colors), vmax=max(node_colors),
-                        )
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Generate the introductory Dirichlet/GDE illustration figures."
+    )
+    parser.add_argument(
+        "--output-dir",
+        default=None,
+        help="Output directory. Defaults to plots/figures/.",
+    )
+    parser.add_argument("--seed", type=int, default=31, help="Random seed for the Gaussian clouds.")
+    parser.add_argument("--k", type=int, default=10, help="k used for the directed k-NN graph.")
+    return parser.parse_args()
 
-    # Add horizontal colorbar with reduced size and only extreme values
-    cbar = plt.colorbar(scatter,
-                        ax=ax,
-                        shrink=0.4,
-                        # orientation='horizontal',
-                        pad=0.05,
-                        format='%.2f')
-    cbar.set_label('Stationary Distribution', labelpad=-10)
-    # Set ticks to show only min and max values
-    cbar.set_ticks([min(node_colors), max(node_colors)])
 
-# Plot k-NN edges (with arrows if directed)
-pos = {i: data[i] for i in range(len(data))}
-for edge in G_knn_asym.edges():
-    i, j = edge
-    if directed:
-        ax.annotate('', xy=(data[j, 0], data[j, 1]), xytext=(data[i, 0], data[i, 1]),
-                    arrowprops=dict(arrowstyle='->', color='gray', alpha=0.3,
-                                   lw=0.8, shrinkA=5, shrinkB=5),
-                    zorder=0)
-    else:
-        # For undirected visualization, plot edges without arrows
-        ax.plot([data[i, 0], data[j, 0]],
-               [data[i, 1], data[j, 1]],
-               'gray', alpha=0.3, linewidth=0.8, zorder=0)
+def generate_data(seed: int) -> tuple[np.ndarray, np.ndarray]:
+    rng = np.random.default_rng(seed)
+    cluster_params = [
+        {"mean": [0.0, 0.0], "cov": [[0.5, 0.0], [0.0, 0.5]]},
+        {"mean": [3.0, 3.0], "cov": [[0.4, 0.15], [0.15, 0.4]]},
+        {"mean": [2.0, -4.0], "cov": [[0.6, -0.2], [-0.2, 0.6]]},
+    ]
+    points_per_cluster = 50
+    clusters = [rng.multivariate_normal(spec["mean"], spec["cov"], points_per_cluster) for spec in cluster_params]
+    labels = np.concatenate([np.full(points_per_cluster, idx, dtype=int) for idx in range(len(clusters))])
+    return np.vstack(clusters), labels
 
-# Remove axis labels, ticks, and frame
-ax.set_xticks([])
-ax.set_yticks([])
-ax.spines['top'].set_visible(False)
-ax.spines['right'].set_visible(False)
-ax.spines['bottom'].set_visible(False)
-ax.spines['left'].set_visible(False)
 
-filename = "figures/clustering_ergodic"
-if not directed:
-    filename += "_undirected"
-plt.savefig(f"{filename}.pdf", bbox_inches='tight')
-plt.show()
+def build_graph(data: np.ndarray, k: int):
+    return kneighbors_graph(data, n_neighbors=k, mode="connectivity", include_self=False).tocsr()
 
-# Check reciprocity (how many edges are bidirectional)
-reciprocal_edges = sum(1 for u, v in G_knn_asym.edges() if G_knn_asym.has_edge(v, u))
-print(f"Reciprocal edges: {reciprocal_edges}/{G_knn_asym.number_of_edges()} ({100*reciprocal_edges/G_knn_asym.number_of_edges():.1f}%)")
-print(f"Using {'directed' if directed else 'undirected'} graph for ergodic law computation")
-if use_zero_mask:
-    zero_mask = np.abs(node_colors) < 1e-10
-    print(f"Points with zero distribution: {np.sum(zero_mask)}/{len(node_colors)}")
+
+def stationary_distribution(adjacency_matrix) -> np.ndarray:
+    transition = adjacency_matrix.toarray().astype(float)
+    out_degree = transition.sum(axis=1)
+    out_degree[out_degree == 0] = 1.0
+    transition = transition / out_degree[:, None]
+    eigenvalues, eigenvectors = np.linalg.eig(transition.T)
+    stationary_idx = int(np.argmin(np.abs(eigenvalues - 1.0)))
+    stationary = np.real(eigenvectors[:, stationary_idx])
+    stationary = stationary / stationary.sum()
+    return stationary
+
+
+def mixed_partition(labels_true: np.ndarray, stationary: np.ndarray, data: np.ndarray) -> np.ndarray:
+    cluster_masses = [float(stationary[labels_true == cluster].sum()) for cluster in np.unique(labels_true)]
+    sink_cluster = int(np.argmax(cluster_masses))
+    mixed = np.zeros_like(labels_true)
+    sink_mask = labels_true == sink_cluster
+    mixed[sink_mask] = 0
+
+    remaining_mask = ~sink_mask
+    threshold = float(np.median(data[remaining_mask, 0]))
+    mixed[remaining_mask & (data[:, 0] <= threshold)] = 1
+    mixed[remaining_mask & (data[:, 0] > threshold)] = 2
+    return mixed
+
+
+def _hide_axes(ax) -> None:
+    ax.set_xticks([])
+    ax.set_yticks([])
+    for side in ("top", "right", "bottom", "left"):
+        ax.spines[side].set_visible(False)
+
+
+def _draw_edges(ax, data: np.ndarray, adjacency_matrix) -> None:
+    coo = adjacency_matrix.tocoo()
+    for src, dst in zip(coo.row, coo.col, strict=True):
+        ax.annotate(
+            "",
+            xy=(data[dst, 0], data[dst, 1]),
+            xytext=(data[src, 0], data[src, 1]),
+            arrowprops=dict(arrowstyle="->", color="gray", alpha=0.22, lw=0.7, shrinkA=5, shrinkB=5),
+            zorder=0,
+        )
+
+
+def plot_partition(data: np.ndarray, labels: np.ndarray, adjacency_matrix, output_file: Path) -> None:
+    fig, ax = plt.subplots(figsize=(4.4, 4.0), layout="constrained")
+    _draw_edges(ax, data, adjacency_matrix)
+    for cluster in sorted(np.unique(labels)):
+        mask = labels == cluster
+        ax.scatter(
+            data[mask, 0],
+            data[mask, 1],
+            c=CLUSTER_COLORS[cluster % len(CLUSTER_COLORS)],
+            s=55,
+            linewidth=0.35,
+            edgecolors="white",
+            zorder=2,
+        )
+    _hide_axes(ax)
+    fig.savefig(output_file, bbox_inches="tight")
+    plt.close(fig)
+
+
+def plot_stationary_distribution(data: np.ndarray, stationary: np.ndarray, adjacency_matrix, output_file: Path) -> None:
+    fig, ax = plt.subplots(figsize=(4.7, 4.0), layout="constrained")
+    _draw_edges(ax, data, adjacency_matrix)
+    scatter = ax.scatter(
+        data[:, 0],
+        data[:, 1],
+        c=stationary,
+        s=55,
+        linewidth=0.35,
+        edgecolors="white",
+        cmap=STATIONARY_CMAP,
+        zorder=2,
+    )
+    _hide_axes(ax)
+    cbar = fig.colorbar(scatter, ax=ax, shrink=0.78, pad=0.02, format="%.2f")
+    cbar.set_ticks([float(stationary.min()), float(stationary.max())])
+    cbar.set_label("Stationary distribution", labelpad=-8)
+    fig.savefig(output_file, bbox_inches="tight")
+    plt.close(fig)
+
+
+def main() -> None:
+    args = parse_args()
+    configure_paper_style(plt)
+
+    output_dir = resolve_kind_dir(args.output_dir, "figures")
+    data, labels_true = generate_data(args.seed)
+    adjacency_matrix = build_graph(data, args.k)
+    stationary = stationary_distribution(adjacency_matrix)
+    labels_mixed = mixed_partition(labels_true, stationary, data)
+
+    plot_stationary_distribution(data, stationary, adjacency_matrix, output_dir / "clustering_ergodic.pdf")
+    plot_partition(data, labels_true, adjacency_matrix, output_dir / "dirichlet_true_labels.pdf")
+    plot_partition(data, labels_mixed, adjacency_matrix, output_dir / "dirichlet_mixed_labels.pdf")
+
+    print(f"Saved {output_dir / 'clustering_ergodic.pdf'}")
+    print(f"Saved {output_dir / 'dirichlet_true_labels.pdf'}")
+    print(f"Saved {output_dir / 'dirichlet_mixed_labels.pdf'}")
+
+
+if __name__ == "__main__":
+    main()
