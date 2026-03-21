@@ -54,6 +54,30 @@ datasets/grid_imbalance/
 datasets/degree_imbalance/
 datasets/degree_corrected_directed_sbm/
 
+# Ignore datasets not used by current experiments/
+datasets/citeseer/
+datasets/citeseer_lcc/
+datasets/control_chart/
+datasets/cora/
+datasets/cora_lcc/
+datasets/cora_ml/
+datasets/cora_ml_lcc/
+datasets/core_periphery_disbm_fixed/
+datasets/cornell/
+datasets/dolphins/
+datasets/glass/
+datasets/karate/
+datasets/migration/
+datasets/parkinsons/
+datasets/telegram/
+datasets/texas/
+datasets/vertebral/
+datasets/wiki_vote/
+datasets/wikics/
+datasets/wikics_lcc/
+datasets/wisconsin/
+datasets/yeast/
+
 # Ignore LaTeX outputs
 
 *.tex
