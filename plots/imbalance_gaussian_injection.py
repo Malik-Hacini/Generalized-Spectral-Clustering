@@ -159,6 +159,7 @@ def _plot_mean_std_lines(
 ) -> None:
     """Plot AMI mean line with std shading for each method."""
     fig, ax = plt.subplots(figsize=(8, 6))
+    x_values = np.asarray(summary[x_col], dtype=float)
     plot_method_lines(
         ax,
         summary.sort_values(x_col),
@@ -172,6 +173,21 @@ def _plot_mean_std_lines(
 
     if log_x:
         ax.set_xscale("log")
+        positive_x = np.sort(np.unique(x_values[x_values > 0]))
+        if positive_x.size > 0:
+            # Keep bounds tight around observed values to avoid empty decade padding.
+            if positive_x.size == 1:
+                ax.set_xlim(positive_x[0] / 1.2, positive_x[0] * 1.2)
+            else:
+                ax.set_xlim(positive_x[0] / 1.08, positive_x[-1] * 1.08)
+            ax.set_xticks(positive_x)
+    elif x_values.size > 0:
+        unique_x = np.sort(np.unique(x_values))
+        if unique_x.size == 1:
+            ax.set_xlim(unique_x[0] - 0.1, unique_x[0] + 0.1)
+        else:
+            span = unique_x[-1] - unique_x[0]
+            ax.set_xlim(unique_x[0] - 0.04 * span, unique_x[-1] + 0.04 * span)
 
     ax.set_xlabel(xlabel, fontsize=12)
 
