@@ -37,7 +37,7 @@ from sklearn.neighbors import kneighbors_graph  # type: ignore
 
 from competitors.neighbors import log_neighbors
 from plots.common import project_path, resolve_output_file
-from synthetic_data_gen.generate_disbm_datasets import (
+from utils.synthetic_data_gen.generate_disbm_datasets import (
     chain_sbm,
     core_periphery_disbm,
     degree_corrected_directed_sbm,

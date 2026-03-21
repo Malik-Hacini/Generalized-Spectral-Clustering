@@ -14,7 +14,7 @@ from competitors.measures import teleporting_undirected_measure
 from utils.config import ExperimentConfig
 from utils.experiments_utils import experiment
 
-from synthetic_data_gen.gaussian_injection import generate_gaussian_injection
+from utils.synthetic_data_gen.gaussian_injection import generate_gaussian_injection
 from utils.file_manager import save_graph_dataset
 
 
