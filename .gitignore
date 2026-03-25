@@ -77,7 +77,7 @@ datasets/wikics/
 datasets/wikics_lcc/
 datasets/wisconsin/
 datasets/yeast/
-
+datasets/digrac_directed/
 # Ignore LaTeX outputs
 
 *.tex
