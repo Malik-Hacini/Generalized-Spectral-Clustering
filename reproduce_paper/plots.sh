@@ -5,7 +5,7 @@ run_intro_figures() {
 
   run_timed \
     "Generate introductory Dirichlet/GDE figures" \
-    "$PYTHON_BIN" "$ROOT_DIR/plots/figures_dirichlet_gaussians.py" \
+    "$PYTHON_BIN" "$ROOT_DIR/plots/dirichlet.py" \
     --output-dir "$LATEX_FIGURES"
 
   require_file "$LATEX_FIGURES/clustering_ergodic.pdf"
@@ -107,22 +107,37 @@ run_imbalance_and_injection_figures() {
   section "Paper assets: degree-imbalance figures"
 
   run_timed \
-    "Generate Gaussian-injection plots (alpha=0.5, sigma=1.0)" \
+    "Generate Gaussian-injection alpha curve (sigma=1.0)" \
     "$PYTHON_BIN" "$ROOT_DIR/plots/imbalance_gaussian_injection.py" \
     --results-dir results/benchmark_gaussian_injection_alpha_sigma_grid_search \
     --output-dir "$LATEX_FIGURES" \
     --optimize-by graph_ch \
+    --skip-sigma-plot \
     --fixed-alpha 0.5 \
     --fixed-sigma 1.0
 
   run_timed \
-    "Generate Gaussian-injection plots (alpha=0.5, sigma=0.8)" \
+    "Generate Gaussian-injection alpha curve (sigma=0.8)" \
     "$PYTHON_BIN" "$ROOT_DIR/plots/imbalance_gaussian_injection.py" \
     --results-dir results/benchmark_gaussian_injection_alpha_sigma_grid_search \
     --output-dir "$LATEX_FIGURES" \
     --optimize-by graph_ch \
+    --skip-sigma-plot \
     --fixed-alpha 0.5 \
     --fixed-sigma 0.8
+
+  run_timed \
+    "Generate Gaussian-injection sigma curve (alpha=0.5)" \
+    "$PYTHON_BIN" "$ROOT_DIR/plots/imbalance_gaussian_injection.py" \
+    --results-dir results/benchmark_gaussian_injection_alpha_sigma_grid_search \
+    --output-dir "$LATEX_FIGURES" \
+    --optimize-by graph_ch \
+    --skip-alpha-plot \
+    --fixed-alpha 0.5
+
+  require_file "$LATEX_FIGURES/gaussian_injection_ami_mean_std_vs_sigma_alpha0.5000_graph_ch.pdf"
+  require_file "$LATEX_FIGURES/gaussian_injection_ami_mean_std_vs_alpha_sigma1.0000_graph_ch.pdf"
+  require_file "$LATEX_FIGURES/gaussian_injection_ami_mean_std_vs_alpha_sigma0.8000_graph_ch.pdf"
 }
 
 run_runtime_figures() {

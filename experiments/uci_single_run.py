@@ -18,19 +18,13 @@ load_path = project_path("datasets")
 dataset_names = [
     "breast_tissue",
     "wine",
-    #    "control_chart",
-    # "glass",
     "iris",
-    # "parkinsons",
     "seeds",
     "segmentation",
-    # "vertebral",
     "wdbc",
     "olivetti_faces",
     "mnist64",
     "ph_recognition",
-    # "polblogs",
-    # "yeast",
 ]
 method_specs = [
     ("spectral", "SC-UN"),

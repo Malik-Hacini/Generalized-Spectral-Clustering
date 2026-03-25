@@ -267,7 +267,20 @@ def main() -> None:
         action="store_false",
         help="Disable std shading and show mean curves only.",
     )
+    parser.add_argument(
+        "--skip-alpha-plot",
+        action="store_true",
+        help="Skip the AMI-vs-alpha plot for the selected sigma.",
+    )
+    parser.add_argument(
+        "--skip-sigma-plot",
+        action="store_true",
+        help="Skip the AMI-vs-sigma plot for the selected alpha.",
+    )
     args = parser.parse_args()
+
+    if args.skip_alpha_plot and args.skip_sigma_plot:
+        parser.error("At least one plot must remain enabled.")
 
     configure_paper_style(plt)
     output_dir = resolve_output_dir(args.output_dir, "imbalance", args.results_dir)
@@ -295,46 +308,48 @@ def main() -> None:
     tol = 1e-12
 
     # AMI vs alpha for fixed sigma
-    df_alpha = pd.DataFrame(df[np.isclose(df["sigma"], args.fixed_sigma, atol=tol)]).copy()
-    if df_alpha.empty:
-        print(f"No rows found for sigma={args.fixed_sigma}. Skipping alpha plot.")
-    else:
-        summary_alpha = summarize_mean_std(pd.DataFrame(df_alpha), ["method", "alpha"], "ami")
+    if not args.skip_alpha_plot:
+        df_alpha = pd.DataFrame(df[np.isclose(df["sigma"], args.fixed_sigma, atol=tol)]).copy()
+        if df_alpha.empty:
+            print(f"No rows found for sigma={args.fixed_sigma}. Skipping alpha plot.")
+        else:
+            summary_alpha = summarize_mean_std(pd.DataFrame(df_alpha), ["method", "alpha"], "ami")
 
-        alpha_out = output_dir / (
-            f"gaussian_injection_ami_mean_std_vs_alpha_sigma{args.fixed_sigma:.4f}_{args.optimize_by}.pdf"
-        )
-        _plot_mean_std_lines(
-            summary=summary_alpha,
-            x_col="alpha",
-            output_file=alpha_out,
-            title=f"AMI vs Injection Alpha (sigma={args.fixed_sigma}, optimize={args.optimize_by})",
-            xlabel="Injection alpha (blending weight)",
-            log_x=False,
-            show_std=args.show_std,
-            show_legend=False,
-        )
+            alpha_out = output_dir / (
+                f"gaussian_injection_ami_mean_std_vs_alpha_sigma{args.fixed_sigma:.4f}_{args.optimize_by}.pdf"
+            )
+            _plot_mean_std_lines(
+                summary=summary_alpha,
+                x_col="alpha",
+                output_file=alpha_out,
+                title=f"AMI vs Injection Alpha (sigma={args.fixed_sigma}, optimize={args.optimize_by})",
+                xlabel="Injection alpha (blending weight)",
+                log_x=False,
+                show_std=args.show_std,
+                show_legend=False,
+            )
 
     # AMI vs sigma for fixed alpha
-    df_sigma = pd.DataFrame(df[np.isclose(df["alpha"], args.fixed_alpha, atol=tol)]).copy()
-    if df_sigma.empty:
-        print(f"No rows found for alpha={args.fixed_alpha}. Skipping sigma plot.")
-    else:
-        summary_sigma = summarize_mean_std(pd.DataFrame(df_sigma), ["method", "sigma"], "ami")
+    if not args.skip_sigma_plot:
+        df_sigma = pd.DataFrame(df[np.isclose(df["alpha"], args.fixed_alpha, atol=tol)]).copy()
+        if df_sigma.empty:
+            print(f"No rows found for alpha={args.fixed_alpha}. Skipping sigma plot.")
+        else:
+            summary_sigma = summarize_mean_std(pd.DataFrame(df_sigma), ["method", "sigma"], "ami")
 
-        sigma_out = output_dir / (
-            f"gaussian_injection_ami_mean_std_vs_sigma_alpha{args.fixed_alpha:.4f}_{args.optimize_by}.pdf"
-        )
-        _plot_mean_std_lines(
-            summary=summary_sigma,
-            x_col="sigma",
-            output_file=sigma_out,
-            title=f"AMI vs Injected Sigma (alpha={args.fixed_alpha}, optimize={args.optimize_by})",
-            xlabel="Injected sigma",
-            log_x=True,
-            show_std=args.show_std,
-            show_legend=True,
-        )
+            sigma_out = output_dir / (
+                f"gaussian_injection_ami_mean_std_vs_sigma_alpha{args.fixed_alpha:.4f}_{args.optimize_by}.pdf"
+            )
+            _plot_mean_std_lines(
+                summary=summary_sigma,
+                x_col="sigma",
+                output_file=sigma_out,
+                title=f"AMI vs Injected Sigma (alpha={args.fixed_alpha}, optimize={args.optimize_by})",
+                xlabel="Injected sigma",
+                log_x=True,
+                show_std=args.show_std,
+                show_legend=True,
+            )
 
 
 if __name__ == "__main__":
