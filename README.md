@@ -1,6 +1,6 @@
 # Generalized Spectral Clustering
 
-This repository serves as the official implementation for the paper [Generalized Dirichlet Energy and Graph Laplacians for Clustering Directed and Undirected Graphs](https://arxiv.org/abs/2203.03221). 
+This repository serves as the official implementation for the paper [Generalized Dirichlet Energy and Graph Laplacians for Clustering Directed and Undirected Graphs](https://arxiv.org/abs/2203.03221).
 It provides a robust Python implementation of the Generalized Spectral Clustering (GSC) algorithm via a custom scikit-learn fork. This implementation thus uses SOTA algorithms and is optimized for parallel computing on CPU via JIT compilation.
 
 It also provides a flexible framework for custom clustering experiments.
@@ -34,12 +34,12 @@ Install scikit-learn in editable mode:
 pip install -e scikit-learn \
           --no-build-isolation \
           --config-settings editable-verbose=true \
-          --verbose 
+          --verbose
 ```
 
 ## Experiments
 
-### Datasets 
+### Datasets
 
 Point Cloud datasets are stored in Hugging Face format and network datasets are stored in `.npz` format via their adjacency matrix.
 All file manipulations are handled via the [file manager script](utils/file_manager.py).
@@ -57,3 +57,7 @@ Three experiment pipelines are available:
 
 ### Adding Custom Components
 Detailed guidelines for adding custom components are included in the [competitors](competitors/) module.
+
+## License
+
+This repository is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
