@@ -98,12 +98,12 @@ method_specs = [
     ("di_sim", "DI-SIM-C"),
     ("spectral", "GSC-N"),
     ("spectral", "GSC-UN"),
-    # ("spectral", "deg-GSC-N"),
-    # ("spectral", "deg-GSC-UN"),
-    # ("spectral", "uniform-GSC-N"),
-    # ("spectral", "uniform-GSC-UN"),
-    # ("spectral", "perron-GSC-N"),
-    # ("spectral", "perron-GSC-UN"),
+    ("spectral", "deg-GSC-N"),
+    ("spectral", "deg-GSC-UN"),
+    ("spectral", "uniform-GSC-N"),
+    ("spectral", "uniform-GSC-UN"),
+    ("spectral", "perron-GSC-N"),
+    ("spectral", "perron-GSC-UN"),
     # (Internal  name, Display name ) - see utils.experiments_utils.clusterer
 ]
 
@@ -176,33 +176,33 @@ method_params = [
     ),
     ("GSC-N", {"laplacian_method": "norm"}),
     ("GSC-UN", {"laplacian_method": "unnorm"}),
-    # (
-    #     "deg-GSC-N",
-    #     {
-    #         "laplacian_method": "norm",
-    #         "measure": (degree_measure, {"gamma": np.arange(0, 1, 0.05)}),
-    #     },
-    # ),
-    # (
-    #     "deg-GSC-UN",
-    #     {
-    #         "laplacian_method": "unnorm",
-    #         "measure": (degree_measure, {"gamma": np.arange(0, 1, 0.05)}),
-    #     },
-    # ),
-    # ("uniform-GSC-N", {"laplacian_method": "norm", "measure": (uniform_measure, {})}),
-    # (
-    #     "uniform-GSC-UN",
-    #     {"laplacian_method": "unnorm", "measure": (uniform_measure, {})},
-    # ),
-    # (
-    #     "perron-GSC-N",
-    #     {"laplacian_method": "norm", "measure": (perron_vector_measure, {})},
-    # ),
-    # (
-    #     "perron-GSC-UN",
-    #     {"laplacian_method": "unnorm", "measure": (perron_vector_measure, {})},
-    # ),
+    (
+        "deg-GSC-N",
+        {
+            "laplacian_method": "norm",
+            "measure": (degree_measure, {"gamma": np.arange(0, 1, 0.05)}),
+        },
+    ),
+    (
+        "deg-GSC-UN",
+        {
+            "laplacian_method": "unnorm",
+            "measure": (degree_measure, {"gamma": np.arange(0, 1, 0.05)}),
+        },
+    ),
+    ("uniform-GSC-N", {"laplacian_method": "norm", "measure": (uniform_measure, {})}),
+    (
+        "uniform-GSC-UN",
+        {"laplacian_method": "unnorm", "measure": (uniform_measure, {})},
+    ),
+    (
+        "perron-GSC-N",
+        {"laplacian_method": "norm", "measure": (perron_vector_measure, {})},
+    ),
+    (
+        "perron-GSC-UN",
+        {"laplacian_method": "unnorm", "measure": (perron_vector_measure, {})},
+    ),
 ]
 
 method_dataset_params = []
