@@ -205,7 +205,7 @@ def generate_measures_table(
 
     lines.append(
         "  "
-        + " & ".join([r"\textit{Competitiveness}"] + [f"{(sum(competitiveness[m]) / len(competitiveness[m])) if competitiveness[m] else 0.0:.2f}" for m in all_methods])
+        + " & ".join([r"\textit{PRB}"] + [f"{(sum(competitiveness[m]) / len(competitiveness[m])) if competitiveness[m] else 0.0:.2f}" for m in all_methods])
         + r" \\")
     lines.append(
         "  "
