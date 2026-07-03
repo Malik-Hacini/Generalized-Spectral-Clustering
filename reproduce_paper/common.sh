@@ -73,8 +73,13 @@ run_experiment() {
   local label="$1"
   local script_path="$2"
   local sentinel="$3"
-  local is_long="${4:-0}"
-  shift 4
+  local is_long=0
+  if [[ $# -ge 4 ]]; then
+    is_long="$4"
+    shift 4
+  else
+    shift 3
+  fi
 
   if should_reuse "$sentinel" "$is_long"; then
     printf '\n[SKIP] %s (reusing %s)\n' "$label" "$sentinel"
@@ -123,6 +128,7 @@ print_environment() {
 
 print_summary() {
   section "Summary"
+  local status=0
   if [[ ${#FAILURES[@]} -eq 0 ]]; then
     printf '[ OK ] Reproduction pipeline completed without reported failures.\n'
   else
@@ -130,8 +136,10 @@ print_summary() {
     for failure in "${FAILURES[@]}"; do
       printf '  - %s\n' "$failure"
     done
+    status=1
   fi
 
   printf 'Paper assets are available under %s and %s\n' "$LATEX_FIGURES" "$LATEX_TABLES"
   printf 'You can compile the paper separately, e.g. with: (cd latex && latexmk -pdf main.tex)\n'
+  return "$status"
 }
