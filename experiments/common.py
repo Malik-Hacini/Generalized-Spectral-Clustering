@@ -18,7 +18,6 @@ from competitors.measures import *  # noqa: F401,F403
 from competitors.neighbors import log_neighbors
 from utils.synthetic_data_gen.generate_disbm_datasets import (
     chain_sbm,
-    core_periphery_disbm,
     degree_corrected_directed_sbm,
     degree_imbalance_sbm,
     directed_sbm,
@@ -33,7 +32,6 @@ __all__ = [
     "sp",
     "avg_deg_taus",
     "chain_sbm",
-    "core_periphery_disbm",
     "degree_corrected_directed_sbm",
     "degree_imbalance_sbm",
     "directed_sbm",

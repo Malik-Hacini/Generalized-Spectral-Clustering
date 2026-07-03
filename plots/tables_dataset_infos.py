@@ -39,7 +39,6 @@ from competitors.neighbors import log_neighbors
 from plots.common import project_path, resolve_output_file
 from utils.synthetic_data_gen.generate_disbm_datasets import (
     chain_sbm,
-    core_periphery_disbm,
     degree_corrected_directed_sbm,
 )
 from utils.file_manager import load_dataset, save_graph_dataset
@@ -56,36 +55,13 @@ DEFAULT_DATASETS = [
     "polbooks",
     "breast_tissue",
     "wine",
-    #    "control_chart",
-    # "glass",
     "iris",
-    # "parkinsons",
     "seeds",
     "segmentation",
-    # "vertebral",
     "wdbc",
     "olivetti_faces",
     "mnist64",
     "ph_recognition",
-    # "polblogs",
-    # "yeast",
-    # "dolphins",
-    # Synthetic datasets can be listed here too. They are generated on demand
-    # from SYNTHETIC_DATASET_SPECS if missing from datasets/.
-    # "DiSBM_Chain",
-    # "Deg-corr",
-    # "cora",
-    # "cora_lcc",
-    # "cora_ml",
-    # "cora_ml_lcc",
-    # "citeseer",
-    # "citeseer_lcc",
-    # "cornell",
-    # "texas",
-    # "wisconsin",
-    # "wikics",
-    # "wikics_lcc",
-    # "telegram",
 ]
 
 # Keep k-NN construction aligned with experiment defaults: log_neighbors(X, factor=1).
@@ -102,17 +78,6 @@ SYNTHETIC_DATASET_SPECS = {
             "seed": 42,
         },
     },
-    # "DiSBM_C-P": {
-    #     "builder": core_periphery_disbm,
-    #     "params": {
-    #         "block_sizes": [500, 500, 500],
-    #         "p_core": 0.14,
-    #         "p_periphery": 0.02,
-    #         "p_core_periphery": 0.12,
-    #         "p_periphery_core": 0.01,
-    #         "seed": 42,
-    #     },
-    # },
     "Deg-corr": {
         "builder": degree_corrected_directed_sbm,
         "params": {

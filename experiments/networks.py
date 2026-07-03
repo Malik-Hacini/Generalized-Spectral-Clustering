@@ -27,10 +27,8 @@ Datasets and methods configuration:
 load_path = project_path("datasets")
 dataset_names = [
     "polblogs",
-    # "karate",
     "football",
     "email_eu_core",
-    # "lead_lag",
     "polbooks"
 ]
 
@@ -49,18 +47,6 @@ synthetic_network_specs = [
             "seed": 42,
         },
     },
-    # {
-    #     "name": "DiSBM_C-P",
-    #     "builder": core_periphery_disbm,
-    #     "params": {
-    #         "block_sizes": [500, 500, 500],
-    #         "p_core": 0.14,
-    #         "p_periphery": 0.02,
-    #         "p_core_periphery": 0.12,
-    #         "p_periphery_core": 0.01,
-    #         "seed": 42,
-    #     },
-    # },
     {
       "name": "Deg-corr",
       "builder": degree_corrected_directed_sbm,

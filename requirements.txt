@@ -13,9 +13,6 @@ joblib>=1.0.0
 datasets>=2.0.0
 pyarrow>=8.0.0
 
-# Directed graph generation (DSBM benchmarks)
-torch-geometric-signed-directed>=0.22.0
-
 # Build dependencies for scikit-learn (editable install)
 # These are also needed at runtime for some functionality
 wheel

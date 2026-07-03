@@ -47,12 +47,12 @@ This pipeline also includes an interactive 2D labeled dataset builder. It is acc
 
 ### Pipeline
 
-You can edit and run experiments using the [template script](experiments/template).
+You can edit and run experiments using [uci.py](experiments/uci.py) as a reference.
 An "experiment" consists of datasets to cluster with given methods and fully customizable parameters.
-The clusterings are then evaluated using the metrics of your choice (currently available: `nmi`, `ari`, `ami`, `ch`, `modularity`, `graph_ch`, `map`).
+The clusterings are then evaluated using the metrics of your choice (currently available: `nmi`, `ari`, `ami`, `ch`, `modularity`, `graph_ch`).
 Three experiment pipelines are available:
 - **Score**: Saves results as CSV double-entry tables for each metric
-- **Visualization**: Visualizes results in a matplotlib plot, for 2D or 3D point-cloud datasets.
+- **Visualization**: Visualizes results in a matplotlib plot, for 2D point-cloud datasets.
 - **Grid Search**: Perform a classical score experiment with grid search on specified parameters.
 
 ### Adding Custom Components
