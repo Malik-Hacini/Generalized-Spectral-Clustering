@@ -118,6 +118,7 @@ Parameters configuration:
 default_params = {
     "n_neighbors": (log_neighbors, {"factor": 1}),
     "random_state": 42,
+    "n_init": 1,
     "affinity": "precomputed",
     "n_it": 1,
     "assign_labels": "kmeans",

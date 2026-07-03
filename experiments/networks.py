@@ -126,6 +126,7 @@ Notes :
 default_params = {
     "n_neighbors": (log_neighbors, {"factor": 1}),
     "random_state": 42,  # Used for kmeans initialization. Has negligible effect for spectral methods.
+    "n_init": 1,
     "affinity": "precomputed",  # Graph datasets provide adjacency directly.
     "n_it": 1,
     "assign_labels": "kmeans",

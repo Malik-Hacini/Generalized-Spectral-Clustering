@@ -34,7 +34,16 @@ class DSC:
     Directed Spectral Clustering (DSC+) implementation based on the Chung Laplacian, with teleportation-based smoothing to handle weakly-connected digraphs.
     """
     def __init__(
-        self, n_clusters, n_neighbors, gamma, max_iter, tol, epsilon, affinity, random_state
+        self,
+        n_clusters,
+        n_neighbors,
+        gamma,
+        max_iter,
+        tol,
+        epsilon,
+        affinity,
+        random_state,
+        n_init=1,
     ):
 
         self.n_clusters = n_clusters
@@ -45,6 +54,7 @@ class DSC:
         self.epsilon = epsilon
         self.affinity = affinity
         self.random_state = random_state
+        self.n_init = n_init
 
     def _laplacian(self, X):
         context_kwargs = {"X": X}
@@ -97,7 +107,9 @@ class DSC:
 
     def fit(self, X):
         embedding = self._compute_embedding(X)
-        kmeans = KMeans(n_clusters=self.n_clusters, random_state=self.random_state)
+        kmeans = KMeans(
+            n_clusters=self.n_clusters, random_state=self.random_state, n_init=self.n_init
+        )
         kmeans.fit(embedding)
         self.labels_ = kmeans.labels_
 

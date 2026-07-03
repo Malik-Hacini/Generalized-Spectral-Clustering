@@ -249,6 +249,7 @@ def clusterer(method_name, params):
             standard=params.get("standard", False),
             assign_labels=params.get("assign_labels", "kmeans"),
             random_state=params.get("random_state", 42),
+            n_init=params.get("n_init", 1),
             eigen_solver=params.get("eigen_solver", "arpack"),
             n_jobs=params.get("n_jobs", None),
             precomputed_connectivity=params.get("precomputed_connectivity", None),
@@ -265,6 +266,7 @@ def clusterer(method_name, params):
             embedding=params.get("embedding", "left"),
             epsilon=params.get("epsilon", 1e-8),
             random_state=params.get("random_state", 42),
+            n_init=params.get("n_init", 1),
         )
 
     elif method_name == "dsc":
@@ -277,12 +279,14 @@ def clusterer(method_name, params):
             tol=params.get("tol", 1e-4),
             epsilon=params.get("epsilon", 1e-8),
             random_state=params.get("random_state", 42),
+            n_init=params.get("n_init", 1),
         )
 
     elif method_name == "kmeans":
         return cluster.KMeans(
             n_clusters=params.get("n_clusters", 3),
             random_state=params.get("random_state", 42),
+            n_init=params.get("n_init", 1),
         )
 
     elif method_name == "hdbscan":
