@@ -123,6 +123,11 @@ default_params = {
         teleporting_undirected_measure,
         {"alpha": np.arange(0.0, 1.51, 0.1), "t": range(0, 26)},
     ),
+    "metric_params": {
+        "graph_ch": {
+            "filter_coeffs": {2: 0.5, 3: 0.5},
+        }
+    },
 }
 
 method_params = [
