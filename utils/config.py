@@ -156,6 +156,7 @@ class ExperimentConfig:
                 "n_clusters",
                 "n_neighbors",
                 "tau",
+                "affinity",
                 "embedding",
                 "epsilon",
                 "random_state",
