@@ -124,11 +124,11 @@ default_params = {
     "assign_labels": "kmeans",
     "measure": (
         teleporting_undirected_measure,
-        {"alpha": np.arange(0, 1.5, 0.1), "t": range(0, 25)},
+        {"alpha": np.arange(0, 1.51, 0.1), "t": range(0, 26)},
     ),  # Grid search for GSC methods
     "tau": (
         avg_deg_taus,
-        {"s": np.arange(-1, 1, 0.5)},
+        {"s": np.arange(-1, 1.1, 0.5)},
     ),  # Grid search for DI-SIM methods
     "metric_params": {
         "graph_ch": {

@@ -121,7 +121,7 @@ default_params = {
     "assign_labels": "kmeans",
     "measure": (
         teleporting_undirected_measure,
-        {"alpha": np.arange(0.0, 1.5, 0.1), "t": range(0, 25)},
+        {"alpha": np.arange(0.0, 1.51, 0.1), "t": range(0, 26)},
     ),
 }
 

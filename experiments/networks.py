@@ -132,11 +132,11 @@ default_params = {
     "assign_labels": "kmeans",
     "measure": (
         teleporting_undirected_measure,
-        {"alpha": np.arange(0, 2, 0.1), "t": range(0, 25)},
+        {"alpha": np.arange(0, 2.1, 0.1), "t": range(0, 26)},
     ),  # Grid search for GSC methods
     "tau": (
         avg_deg_taus,
-        {"s": np.arange(-1, 1, 0.5)},
+        {"s": np.arange(-1, 1.1, 0.5)},
     ),  # Grid search for DI-SIM methods
     "metric_params": {
         "graph_ch": {
@@ -181,14 +181,14 @@ method_params = [
         "deg-GSC-N",
         {
             "laplacian_method": "norm",
-            "measure": (degree_measure, {"gamma": np.arange(0, 1, 0.05)}),
+            "measure": (degree_measure, {"gamma": np.arange(0, 1.01, 0.05)}),
         },
     ),
     (
         "deg-GSC-UN",
         {
             "laplacian_method": "unnorm",
-            "measure": (degree_measure, {"gamma": np.arange(0, 1, 0.05)}),
+            "measure": (degree_measure, {"gamma": np.arange(0, 1.01, 0.05)}),
         },
     ),
     ("uniform-GSC-N", {"laplacian_method": "norm", "measure": (uniform_measure, {})}),
