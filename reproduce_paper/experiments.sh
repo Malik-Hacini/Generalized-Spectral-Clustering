@@ -44,9 +44,8 @@ run_paper_experiments() {
   run_experiment \
     "Chain flow benchmark" \
     "experiments/chain_flow.py" \
-    "results/benchmark_chain_flow_grid_search/disbm_chainflow_b500-500-500_pintra0p1000_pfwd0p0100_pbwd0p0100_seed0" \
-    1 \
-    --n-seeds 20 \
+    "results/benchmark_chain_flow_grid_search/disbm_chainflow_b500-500-500_pintra0p1000_pfwd0p0100_pbwd0p0100_seed0/GSC-N/GSC-N_best_results.json" \
+    1
 
   run_experiment \
     "Gaussian injection benchmark" \
