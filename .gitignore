@@ -42,6 +42,7 @@ todo.md
 metric_analysis/
 complexity_analysis/
 latex/
+gsc-tmlr/
 figures/
 
 # OpenCode context (agent-specific, not shared)

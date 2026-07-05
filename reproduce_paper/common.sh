@@ -2,7 +2,17 @@
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SCRIPT_DIR="$ROOT_DIR/reproduce_paper"
-LATEX_DIR="$ROOT_DIR/latex"
+if [[ -n "${PAPER_DIR:-}" ]]; then
+  if [[ "$PAPER_DIR" = /* ]]; then
+    LATEX_DIR="$PAPER_DIR"
+  else
+    LATEX_DIR="$ROOT_DIR/$PAPER_DIR"
+  fi
+elif [[ -d "$ROOT_DIR/gsc-tmlr/.git" ]]; then
+  LATEX_DIR="$ROOT_DIR/gsc-tmlr"
+else
+  LATEX_DIR="$ROOT_DIR/latex"
+fi
 LATEX_FIGURES="$LATEX_DIR/figures"
 LATEX_TABLES="$LATEX_DIR/tables"
 TMP_DIR="$ROOT_DIR/.paper_build"
@@ -122,8 +132,9 @@ print_environment() {
   printf 'Root directory : %s\n' "$ROOT_DIR"
   printf '%-14s %s\n' "${ENV_LABEL:-Python env}:" "$VENV_DIR"
   printf 'Python         : %s\n' "$PYTHON_BIN"
-  printf 'Latex figures  : %s\n' "$LATEX_FIGURES"
-  printf 'Latex tables   : %s\n' "$LATEX_TABLES"
+  printf 'Paper dir      : %s\n' "$LATEX_DIR"
+  printf 'Paper figures  : %s\n' "$LATEX_FIGURES"
+  printf 'Paper tables   : %s\n' "$LATEX_TABLES"
 }
 
 print_summary() {
@@ -140,6 +151,6 @@ print_summary() {
   fi
 
   printf 'Paper assets are available under %s and %s\n' "$LATEX_FIGURES" "$LATEX_TABLES"
-  printf 'You can compile the paper separately, e.g. with: (cd latex && latexmk -pdf main.tex)\n'
+  printf 'You can compile the paper separately, e.g. with: (cd "%s" && latexmk -pdf main.tex)\n' "$LATEX_DIR"
   return "$status"
 }

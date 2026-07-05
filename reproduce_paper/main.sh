@@ -9,19 +9,22 @@ USE_CONDA=0
 VENV_SPECIFIED=0
 REUSE_RESULTS=0
 REUSE_LONG_RESULTS=0
+PAPER_DIR=""
 FAILURES=()
 
 usage() {
   cat <<'EOF'
 Usage: ./reproduce_paper.sh [options]
 
-Reproduce the experiments and paper assets used in latex/main.tex.
+Reproduce the experiments and assets used by the paper checkout.
 
 Options:
   --venv NAME_OR_PATH         Virtual environment directory (default: .venv)
   --conda NAME_OR_PREFIX      Conda environment name or prefix path
   --reuse-results             Reuse existing benchmark results when present
   --reuse-long-results        Reuse existing long runtime-size results when present
+  --paper-dir PATH            Paper repo/directory for figures and tables
+                              (default: gsc-tmlr when present, else latex)
   -h, --help                  Show this help message
 EOF
 }
@@ -45,6 +48,10 @@ while [[ $# -gt 0 ]]; do
     --reuse-long-results)
       REUSE_LONG_RESULTS=1
       shift
+      ;;
+    --paper-dir)
+      PAPER_DIR="$2"
+      shift 2
       ;;
     -h|--help)
       usage
