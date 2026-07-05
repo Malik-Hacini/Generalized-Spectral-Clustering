@@ -42,6 +42,8 @@ def _discover_available_opt_metrics(results_dir: str | Path) -> set[str]:
 
 
 def _format_score_value(score: float, show_metric: str) -> str:
+    if abs(score) < 0.005:
+        score = 0.0
     return f"{score:.2f}"
 
 
@@ -53,6 +55,19 @@ def _optimize_label(optimize_by: str) -> str:
     if optimize_by == "graph_ch":
         return "Graph-CH"
     return optimize_by.upper()
+
+
+def _prb_label(show_metric: str) -> str:
+    if show_metric == "graph_ch":
+        return "GCH"
+    return _optimize_label(show_metric)
+
+
+def _dataset_collection_label(datasets: list[str], optimize_by: str, show_metric: str) -> str:
+    network_datasets = {"DiSBM_Chain", "Deg-corr", "email_eu_core", "football", "polblogs", "polbooks"}
+    if optimize_by == "graph_ch" or show_metric == "graph_ch" or any(dataset in network_datasets for dataset in datasets):
+        return "network datasets"
+    return "UCI datasets"
 
 
 def _method_header(display: str, method: str, show_params: bool, optimize_by: str) -> str:
@@ -135,17 +150,23 @@ def generate_measures_table(
     datasets = [d for d in dataset_order if d in pivot_scores.index] if dataset_order else sorted(pivot_scores.index)
     optimize_label = _optimize_label(optimize_by)
     show_label = _optimize_label(show_metric)
+    collection_label = _dataset_collection_label(datasets, optimize_by, show_metric)
+    metric_note = ""
+    if collection_label == "network datasets":
+        metric_note = r" For network datasets, Graph-CH (GCH) is computed on random-walk diffusion features."
 
     lines = [
         r"\begin{table}",
         r"  \centering",
-        r"  \caption{\textbf{Scores for different vertex measures.} "
+        rf"  \caption{{\textbf{{Scores for different vertex measures on {collection_label}.}} "
         + f"For each dataset, we report the {show_label} score obtained by GSC with different vertex measures when parameters are optimized for {optimize_label}. "
         + r"Parameters are shown in parentheses: $\bestpar{t, \alpha}{"
         + optimize_label
         + r"}$ for $\nu_{t,\alpha}$ and $\bestpar{\gamma}{"
         + optimize_label
-        + r"}$ for $\nu_\textnormal{deg}$.}",
+        + r"}$ for $\nu_\textnormal{deg}$."
+        + metric_note
+        + r"}",
         r"  \label{tab:measures_" + optimize_by + "_" + show_metric + r"}",
         r"  \begin{adjustbox}{width=\textwidth}",
         r"  \begin{tabular}{l|cc|cc|cc|cc}",
@@ -188,7 +209,6 @@ def generate_measures_table(
     all_methods = [method for group in method_groups.values() for method in group["methods"]]
 
     competitiveness = {method: [] for method in all_methods}
-    ranks = {method: [] for method in all_methods}
     for dataset in datasets:
         dataset_values = {
             method: cast(float, pivot_scores.loc[dataset, method])
@@ -200,16 +220,20 @@ def generate_measures_table(
         best_value = max(dataset_values.values())
         for method, value in dataset_values.items():
             competitiveness[method].append(value / best_value)
-        for rank, (method, _) in enumerate(sorted(dataset_values.items(), key=lambda item: item[1], reverse=True), 1):
-            ranks[method].append(rank)
+
+    prb_values = [
+        (sum(competitiveness[method]) / len(competitiveness[method])) if competitiveness[method] else 0.0
+        for method in all_methods
+    ]
+    best_prb = max(prb_values)
+    prb_cells = [
+        f"\\bestcell{{{value:.2f}}}" if abs(value - best_prb) < 1e-4 else f"{value:.2f}"
+        for value in prb_values
+    ]
 
     lines.append(
         "  "
-        + " & ".join([r"\textit{PRB}"] + [f"{(sum(competitiveness[m]) / len(competitiveness[m])) if competitiveness[m] else 0.0:.2f}" for m in all_methods])
-        + r" \\")
-    lines.append(
-        "  "
-        + " & ".join([r"\textit{Avg. Rank}"] + [f"{(sum(ranks[m]) / len(ranks[m])) if ranks[m] else len(all_methods):.2f}" for m in all_methods])
+        + " & ".join([rf"\textit{{PRB}}({_prb_label(show_metric)})"] + prb_cells)
         + r" \\")
     lines.extend([r"  \Xhline{2\arrayrulewidth}", r"  \end{tabular}", r"  \end{adjustbox}", r"\end{table}"])
     return "\n".join(lines)

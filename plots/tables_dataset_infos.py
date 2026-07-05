@@ -67,6 +67,30 @@ DEFAULT_DATASETS = [
 # Keep k-NN construction aligned with experiment defaults: log_neighbors(X, factor=1).
 DEFAULT_KNN_FACTOR = 1
 
+NETWORK_DATASETS = {
+    "DiSBM_Chain",
+    "Deg-corr",
+    "karate",
+    "dolphins",
+    "football",
+    "polbooks",
+    "polblogs",
+    "email_eu_core",
+    "wiki_vote",
+    "wikics",
+    "wikics_lcc",
+    "cora",
+    "cora_lcc",
+    "cora_ml",
+    "cora_ml_lcc",
+    "citeseer",
+    "citeseer_lcc",
+    "cornell",
+    "texas",
+    "wisconsin",
+    "telegram",
+}
+
 SYNTHETIC_DATASET_SPECS = {
     "DiSBM_Chain": {
         "builder": chain_sbm,
@@ -242,6 +266,8 @@ def compute_stats(A: sp.csr_matrix, labels: np.ndarray | None) -> dict:
 # ---------------------------------------------------------------------------
 
 _DISPLAY_NAMES: dict[str, str] = {
+    "DiSBM_Chain": "DiSBM Chain",
+    "Deg-corr": "Deg-Corr",
     "karate": "Karate",
     "dolphins": "Dolphins",
     "football": "Football",
@@ -268,6 +294,11 @@ def _display_name(name: str) -> str:
     return _DISPLAY_NAMES.get(name, name.replace("_", " ").title())
 
 
+def _display_name_with_marker(name: str) -> str:
+    display = _display_name(name)
+    return display + r"\,*" if name in NETWORK_DATASETS else display
+
+
 def _fmt(value, fmt: str = ".0f") -> str:
     if isinstance(value, float) and np.isnan(value):
         return "--"
@@ -280,7 +311,8 @@ def generate_dataset_table(
                    r"$N$: nodes, $|E|$: edges, $K$: classes, "
                    r"Gini: in-degree Gini coefficient, "
                    r"$\rho$: reciprocity, $\hat\rho$: cluster-level reciprocity, "
-                   r"\#WCC / \#SCC: weakly/strongly connected components.",
+                   r"\#WCC / \#SCC: weakly/strongly connected components. "
+                   r"Network datasets are noted with a *.",
     label: str = "tab:dataset_stats",
 ) -> str:
     col_spec = r"l|rrr|rrrr|rr"
@@ -303,7 +335,7 @@ def generate_dataset_table(
     ]
 
     for row in rows:
-        name = _display_name(row["name"])
+        name = _display_name_with_marker(row["name"])
         s = row["stats"]
         cells = [
             name,
