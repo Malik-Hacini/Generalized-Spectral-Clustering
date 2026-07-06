@@ -112,7 +112,7 @@ Notes :
 default_params = {
     "n_neighbors": (log_neighbors, {"factor": 1}),
     "random_state": 42,  # Used for kmeans initialization. Has negligible effect for spectral methods.
-    "n_init": 1,
+    "n_init": 100,
     "affinity": "precomputed",  # Graph datasets provide adjacency directly.
     "n_it": 1,
     "assign_labels": "kmeans",
@@ -126,7 +126,7 @@ default_params = {
     ),  # Grid search for DI-SIM methods
     "metric_params": {
         "graph_ch": {
-            "filter_coeffs": {2: 0.5, 3: 0.5},
+            "filter_coeffs": {1: 1},
         },
     },  # Grid search for graph-CH optimization
 }
