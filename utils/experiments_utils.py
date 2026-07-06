@@ -841,7 +841,8 @@ def _compute_clustering_scores(y_true, y_pred, metrics, X, metric_params=None):
     - Unsupervised :
         - "ch": Calinski-Harabasz index (for point clouds, requires dense X)
         - "modularity": Newman modularity (for graphs, requires sparse adjacency X)
-        - "graph_ch": Graph CH index via random walk distance (for graphs, requires sparse adjacency X)
+        - "graph_ch": Graph CH index on Hellinger-embedded random-walk
+          diffusion profiles (for graphs, requires sparse adjacency X)
 
     Parameters
     ----------

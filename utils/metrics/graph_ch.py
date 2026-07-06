@@ -1,4 +1,4 @@
-"""Graph Calinski-Harabasz score on a diffusion embedding."""
+"""Graph Calinski-Harabasz score on Hellinger diffusion profiles."""
 
 import numpy as np
 import scipy.sparse as sp
@@ -6,7 +6,12 @@ from sklearn.metrics import calinski_harabasz_score  # type: ignore
 
 
 def graph_calinski_harabasz(A, labels, t=1, filter_coeffs=None):
-    """Compute Graph-CH from an adjacency matrix and cluster labels."""
+    """Compute Graph-CH from an adjacency matrix and cluster labels.
+
+    Vertices are represented by random-walk diffusion profiles on the directed
+    graph, embedded with the Hellinger transform before applying the standard
+    Calinski-Harabasz index.
+    """
     is_sparse = sp.issparse(A)
     coeffs = {t: 1.0} if filter_coeffs is None else filter_coeffs
     Z = _build_diffusion_embedding(A, coeffs, is_sparse)
@@ -20,7 +25,18 @@ def _build_diffusion_embedding(A, filter_coeffs, is_sparse):
     P = _build_transition_matrix(A, is_sparse)
     Z = _apply_polynomial_filter(P, filter_coeffs, is_sparse)
 
-    return Z
+    return _hellinger_transform(Z, is_sparse)
+
+
+def _hellinger_transform(Z, is_sparse):
+    if is_sparse:
+        Z = Z.copy()
+        np.maximum(Z.data, 0.0, out=Z.data)
+        np.sqrt(Z.data, out=Z.data)
+        return Z
+
+    return np.sqrt(np.maximum(Z, 0.0))
+
 
 def _build_transition_matrix(A, is_sparse):
     degree_vec = np.asarray(A.sum(axis=1)).flatten()

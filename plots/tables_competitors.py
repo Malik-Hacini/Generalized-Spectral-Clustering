@@ -215,7 +215,7 @@ def generate_competitors_table(
     collection_label = _dataset_collection_label(datasets, optimize_by, show_metric)
     metric_note = ""
     if collection_label == "network datasets":
-        metric_note = r" For network datasets, Graph-CH (GCH) is computed on random-walk diffusion features."
+        metric_note = r" For network datasets, Graph-CH (GCH) is computed on Hellinger-embedded random-walk diffusion profiles."
 
     header_labels = [
         _method_header(m["display"], m["name"], m["show_params"], optimize_by)
