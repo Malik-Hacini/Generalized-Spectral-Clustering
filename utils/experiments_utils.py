@@ -848,7 +848,7 @@ def _compute_clustering_scores(y_true, y_pred, metrics, X, metric_params=None):
     ----------
     metric_params : dict, optional
         Optional mapping of metric name to kwargs dict. Example:
-        {"graph_ch": {"filter_coeffs": {2: 0.5, 3: 0.5}}}
+        {"graph_ch": {"filter_coeffs": {1: 1}}}
         If omitted, all metrics use their default parameters.
     """
 
