@@ -115,7 +115,7 @@ Parameters configuration:
 default_params = {
     "n_neighbors": n_neighbors,
     "random_state": 42,
-    "n_init": 1,
+    "n_init": 100,
     "affinity": "precomputed",
     "n_it": 5,
     "assign_labels": "kmeans",

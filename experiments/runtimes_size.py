@@ -153,7 +153,7 @@ Parameters configuration:
 """
 default_params = {
     "random_state": 42,
-    "n_init": 1,
+    "n_init": 100,
     "affinity": "precomputed",
     "n_it": 1,
     "assign_labels": "kmeans",

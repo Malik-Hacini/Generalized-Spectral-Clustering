@@ -41,7 +41,7 @@ method_specs = [
 default_params = {
     "n_neighbors": (log_neighbors, {"factor": 1}),
     "random_state": 42,
-    "n_init": 1,
+    "n_init": 100,
     "affinity": "nearest_neighbors",
     "n_it": 1,
     "assign_labels": "kmeans",
