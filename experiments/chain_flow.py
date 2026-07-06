@@ -132,7 +132,7 @@ default_params = {
     ),  # Grid search for DI-SIM methods
     "metric_params": {
         "graph_ch": {
-            "filter_coeffs": {2: 0.5, 3: 0.5},
+            "filter_coeffs": {1: 1},
         }
     },
 }
