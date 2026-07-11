@@ -21,7 +21,7 @@ UCI_DATASETS=(breast_tissue wine iris seeds segmentation wdbc olivetti_faces mni
 UCI_HEATMAP_DATASETS=(iris wine wdbc breast_tissue seeds segmentation mnist64 olivetti_faces ph_recognition)
 NETWORK_HEATMAP_DATASETS=(DiSBM_Chain Deg-corr football polbooks polblogs email_eu_core)
 INDEGREE_DATASETS=("${UCI_DATASETS[@]}")
-DATASET_INFO_DATASETS=(DiSBM_Chain Deg-corr email_eu_core football polblogs polbooks breast_tissue iris mnist64 olivetti_faces ph_recognition seeds segmentation wdbc wine)
+DATASET_INFO_DATASETS=(breast_tissue email_eu_core football iris mnist64 olivetti_faces ph_recognition polblogs polbooks seeds segmentation wdbc wine)
 EXPECTED_GRID_IMBALANCE_FILES=(grid_imbalance_2x1.pdf grid_imbalance_2x2.pdf grid_imbalance_3x3.pdf grid_imbalance_4x4.pdf)
 
 format_seconds() {
@@ -151,6 +151,6 @@ print_summary() {
   fi
 
   printf 'Paper assets are available under %s and %s\n' "$LATEX_FIGURES" "$LATEX_TABLES"
-  printf 'You can compile the paper separately, e.g. with: (cd "%s" && latexmk -pdf main.tex)\n' "$LATEX_DIR"
+  printf 'You can compile the paper separately with: (cd "%s" && latexmk -pdf mainv9.tex)\n' "$LATEX_DIR"
   return "$status"
 }

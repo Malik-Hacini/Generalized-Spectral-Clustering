@@ -52,32 +52,54 @@ run_tables() {
   section "Paper assets: tables"
 
   run_timed \
-    "Generate UCI competitors tables" \
+    "Generate UCI competitors table" \
     "$PYTHON_BIN" "$ROOT_DIR/plots/tables_competitors.py" \
     --results-dir results/benchmark_uci_grid_search \
     --output-dir "$LATEX_TABLES/uci" \
+    --output-name competitors.tex \
+    --paper-table uci \
     --datasets breast_tissue iris mnist64 olivetti_faces ph_recognition seeds segmentation wdbc wine
 
   run_timed \
-    "Generate network competitors tables" \
+    "Generate network competitors table" \
     "$PYTHON_BIN" "$ROOT_DIR/plots/tables_competitors.py" \
     --results-dir results/networks_grid_search \
     --output-dir "$LATEX_TABLES/networks" \
-    --datasets DiSBM_Chain Deg-corr email_eu_core football polblogs polbooks
+    --output-name competitors.tex \
+    --paper-table network \
+    --datasets Deg-corr DiSBM_Chain email_eu_core football polblogs polbooks
 
   run_timed \
-    "Generate vertex-measure tables" \
+    "Generate UCI vertex-measure table" \
     "$PYTHON_BIN" "$ROOT_DIR/plots/tables_measures.py" \
     --results-dir results/benchmark_uci_grid_search \
     --output-dir "$LATEX_TABLES/measures" \
+    --output-name uci.tex \
+    --paper-table uci \
     --datasets breast_tissue iris mnist64 olivetti_faces ph_recognition seeds segmentation wdbc wine
+
+  run_timed \
+    "Generate network vertex-measure table" \
+    "$PYTHON_BIN" "$ROOT_DIR/plots/tables_measures.py" \
+    --results-dir results/networks_grid_search \
+    --output-dir "$LATEX_TABLES/measures" \
+    --output-name networks.tex \
+    --paper-table network \
+    --datasets DiSBM_Chain Deg-corr email_eu_core football polblogs polbooks
 
   run_timed \
     "Generate dataset statistics table" \
     "$PYTHON_BIN" "$ROOT_DIR/plots/tables_dataset_infos.py" \
     --datasets "${DATASET_INFO_DATASETS[@]}" \
     --output-dir "$LATEX_TABLES" \
-    --output-name dataset_stats.tex
+    --output-name dataset_stats.tex \
+    --strict
+
+  require_file "$LATEX_TABLES/uci/competitors.tex"
+  require_file "$LATEX_TABLES/networks/competitors.tex"
+  require_file "$LATEX_TABLES/measures/uci.tex"
+  require_file "$LATEX_TABLES/measures/networks.tex"
+  require_file "$LATEX_TABLES/dataset_stats.tex"
 }
 
 run_imbalance_and_injection_figures() {
@@ -157,6 +179,9 @@ run_runtime_figures() {
     --results-csv results/benchmark_runtimes_size_grid_search/benchmark_runtimes_size_runtimes.csv \
     --output-dir "$LATEX_FIGURES" \
     --output-name runtimes_size_lines.pdf
+
+  require_file "$LATEX_FIGURES/benchmark_uci_runtime_comparison.pdf"
+  require_file "$LATEX_FIGURES/runtimes_size_lines.pdf"
 }
 
 run_appendix_figures() {
@@ -186,6 +211,8 @@ run_additional_runtime_assets() {
     --preprocessing-results-csv results/benchmark_runtimes_size_preprocessing/benchmark_runtimes_size_preprocessing_runtimes.csv \
     --output-dir "$LATEX_FIGURES" \
     --output-name runtimes_preprocessing_vs_full.pdf
+
+  require_file "$LATEX_FIGURES/runtimes_preprocessing_vs_full.pdf"
 }
 
 run_paper_plots() {

@@ -36,7 +36,7 @@ import scipy.sparse.csgraph as csgraph
 from sklearn.neighbors import kneighbors_graph  # type: ignore
 
 from competitors.neighbors import log_neighbors
-from plots.common import project_path, resolve_output_file
+from plots.common import dataset_display_name, project_path, resolve_output_file
 from utils.synthetic_data_gen.generate_disbm_datasets import (
     chain_sbm,
     degree_corrected_directed_sbm,
@@ -49,19 +49,19 @@ from utils.file_manager import load_dataset, save_graph_dataset
 # ---------------------------------------------------------------------------
 
 DEFAULT_DATASETS = [
-    "polblogs",
-    "football",
-    "email_eu_core",
-    "polbooks",
     "breast_tissue",
-    "wine",
+    "email_eu_core",
+    "football",
     "iris",
+    "mnist64",
+    "olivetti_faces",
+    "ph_recognition",
+    "polblogs",
+    "polbooks",
     "seeds",
     "segmentation",
     "wdbc",
-    "olivetti_faces",
-    "mnist64",
-    "ph_recognition",
+    "wine",
 ]
 
 # Keep k-NN construction aligned with experiment defaults: log_neighbors(X, factor=1).
@@ -273,7 +273,7 @@ _DISPLAY_NAMES: dict[str, str] = {
     "football": "Football",
     "polbooks": "PolBooks",
     "polblogs": "PolBlogs",
-    "email_eu_core": "Email-EUcore",
+    "email_eu_core": "Email-Eu-Core",
     "wiki_vote": "WikiVote",
     "wikics": "WikiCS",
     "wikics_lcc": "WikiCS (LCC)",
@@ -291,12 +291,13 @@ _DISPLAY_NAMES: dict[str, str] = {
 
 
 def _display_name(name: str) -> str:
-    return _DISPLAY_NAMES.get(name, name.replace("_", " ").title())
+    return _DISPLAY_NAMES.get(name, dataset_display_name(name))
 
 
 def _display_name_with_marker(name: str) -> str:
     display = _display_name(name)
-    return display + r"\,*" if name in NETWORK_DATASETS else display
+    marker = r"*\," if name in NETWORK_DATASETS else r"\phantom{*}\,"
+    return marker + display
 
 
 def _fmt(value, fmt: str = ".0f") -> str:
@@ -307,27 +308,24 @@ def _fmt(value, fmt: str = ".0f") -> str:
 
 def generate_dataset_table(
     rows: list[dict],
-    caption: str = r"\textbf{Dataset statistics.} "
-                   r"$N$: nodes, $|E|$: edges, $K$: classes, "
-                   r"Gini: in-degree Gini coefficient, "
-                   r"$\rho$: reciprocity, $\hat\rho$: cluster-level reciprocity, "
-                   r"\#WCC / \#SCC: weakly/strongly connected components. "
-                   r"Network datasets are noted with a *.",
+    caption: str = r"\textbf{Dataset statistics.} For each real dataset, we report the number of samples $N$, "
+                   r"the number of edges $|E|$, the number of classes $K$, the numbers of weakly and strongly "
+                   r"connected components (\#WCC and \#SCC), the in-degree Gini coefficient, edge reciprocity, "
+                   r"and cluster-level reciprocity. Network datasets are indicated by a '*'.",
     label: str = "tab:dataset_stats",
 ) -> str:
-    col_spec = r"l|rrr|rrrr|rr"
+    col_spec = r"l|ccc|cc|ccc"
     header = (
         r"    \textbf{Dataset} & $N$ & $|E|$ & $K$ & "
-        r"\textbf{Gini} & $\rho$ & $\hat{\rho}$ & "
-        r"\#\textbf{WCC} & \#\textbf{SCC} \\"
+        r"\#\textbf{WCC} & \#\textbf{SCC} & \textbf{Gini} & "
+        r"\textbf{Reciprocity} & \textbf{CL Reciprocity} \\"
     )
 
     lines = [
-        r"\begin{table}",
+        r"\begin{table}[t]\small",
         r"  \centering",
         r"  \caption{" + caption + r"}",
         r"  \label{" + label + r"}",
-        r"  \begin{adjustbox}{width=\textwidth}",
         r"  \begin{tabular}{" + col_spec + r"}",
         r"    \Xhline{2\arrayrulewidth}",
         header,
@@ -342,18 +340,17 @@ def generate_dataset_table(
             _fmt(s["N"], ",d"),
             _fmt(s["|E|"], ",d"),
             _fmt(s["K"], "d") if not isinstance(s["K"], float) else "--",
+            _fmt(s["WCC"], "d"),
+            _fmt(s["SCC"], "d"),
             _fmt(s["Gini"], ".3f"),
             _fmt(s["Reciprocity"], ".3f"),
             _fmt(s["CL-Reciprocity"], ".3f"),
-            _fmt(s["WCC"], "d"),
-            _fmt(s["SCC"], "d"),
         ]
         lines.append("    " + " & ".join(cells) + r" \\")
 
     lines.extend([
         r"    \Xhline{2\arrayrulewidth}",
         r"  \end{tabular}",
-        r"  \end{adjustbox}",
         r"\end{table}",
     ])
 
@@ -405,6 +402,11 @@ def main() -> None:
         default="tab:dataset_stats",
         help="LaTeX label for the table (default: tab:dataset_stats)",
     )
+    parser.add_argument(
+        "--strict",
+        action="store_true",
+        help="Fail instead of emitting a partial table when a requested dataset cannot be processed.",
+    )
     args = parser.parse_args()
 
     datasets_root = project_path(args.datasets_dir)
@@ -435,13 +437,13 @@ def main() -> None:
             rows.append({"name": name, "stats": stats})
             print(f"N={stats['N']:,}  |E|={stats['|E|']:,}  K={stats['K']}")
         except Exception as exc:
+            if args.strict:
+                raise RuntimeError(f"Failed to process dataset '{name}'") from exc
             print(f"SKIPPED ({exc})")
 
     if not rows:
         print("No results to write.")
         return
-
-    rows.sort(key=lambda row: _display_name(row["name"]).casefold())
 
     output_file = resolve_output_file(
         args.output_dir,

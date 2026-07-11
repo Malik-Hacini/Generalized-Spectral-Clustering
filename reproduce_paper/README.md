@@ -11,6 +11,14 @@ The pipeline is split into logical modules to keep it clean and maintainable:
 - `experiments.sh`: Defines the `run_paper_experiments` function, which lists and executes all required benchmark scripts.
 - `plots.sh`: Defines the `run_paper_plots` function, which generates all figures and tables, and copies them to the configured paper directory's `figures/` and `tables/` directories.
 
+The paper consumes the generated tables directly from:
+
+- `tables/uci/competitors.tex`
+- `tables/networks/competitors.tex`
+- `tables/measures/uci.tex`
+- `tables/measures/networks.tex`
+- `tables/dataset_stats.tex`
+
 ## Usage
 
 You should normally run the pipeline from the repository root using the wrapper script:
@@ -59,6 +67,13 @@ Use a conda environment:
 Write assets to a specific paper checkout:
 ```bash
 ./reproduce_paper.sh --reuse-results --paper-dir gsc-tmlr
+```
+
+After a successful run, compile the current paper from its directory:
+
+```bash
+cd gsc-tmlr
+latexmk -pdf -interaction=nonstopmode -halt-on-error mainv9.tex
 ```
 
 ## Modifying the Pipeline

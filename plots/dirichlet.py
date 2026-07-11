@@ -60,15 +60,30 @@ def generate_data() -> tuple[np.ndarray, np.ndarray]:
     return np.vstack(clusters), np.asarray(labels, dtype=int)
 
 
-def build_directed_knn_graph(data: np.ndarray) -> sp.csr_matrix:
-    return sp.csr_matrix(
-        kneighbors_graph(
-            data,
-            n_neighbors=N_NEIGHBORS,
+def build_directed_knn_graph(data: np.ndarray, labels: np.ndarray) -> sp.csr_matrix:
+    """Build three cohesive clusters with one-way links into the sink cluster."""
+    adjacency = sp.lil_matrix((len(data), len(data)), dtype=float)
+    cluster_indices = [np.flatnonzero(labels == label) for label in np.unique(labels)]
+
+    for indices in cluster_indices:
+        local_graph = kneighbors_graph(
+            data[indices],
+            n_neighbors=min(N_NEIGHBORS, len(indices) - 1),
             mode="connectivity",
             include_self=False,
         )
-    )
+        local_graph = (local_graph + local_graph.T).sign().tocoo()
+        adjacency[indices[local_graph.row], indices[local_graph.col]] = 1.0
+
+    sink_indices = cluster_indices[2]
+    for source_indices in cluster_indices[:2]:
+        distances = np.linalg.norm(
+            data[source_indices, None, :] - data[sink_indices, :][None, :, :], axis=2
+        )
+        source_local, sink_local = np.unravel_index(np.argmin(distances), distances.shape)
+        adjacency[source_indices[source_local], sink_indices[sink_local]] = 1.0
+
+    return adjacency.tocsr()
 
 
 def edge_coordinates(adjacency: sp.csr_matrix) -> tuple[np.ndarray, np.ndarray]:
@@ -204,7 +219,7 @@ def main() -> None:
     args.output_dir.mkdir(parents=True, exist_ok=True)
 
     data, labels = generate_data()
-    adjacency = build_directed_knn_graph(data)
+    adjacency = build_directed_knn_graph(data, labels)
     rows, cols = edge_coordinates(adjacency)
     stationary = compute_stationary_distribution(adjacency)
     true_partition, mixed_partition = build_partition_functions(labels)

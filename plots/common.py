@@ -37,6 +37,19 @@ METHOD_STYLES: dict[str, dict[str, str]] = {
     "GSC-UN-NoTune": {"color": "#264DF7", "linestyle": "-.", "marker": "^", "label": r"GSC$_\textnormal{un}$ (w/o tuning)"},
 }
 
+DATASET_DISPLAY_NAMES = {
+    "DiSBM_Chain": "DiSBM Chain",
+    "Deg-corr": "Deg-Corr",
+    "breast_tissue": "Breast Tissue",
+    "email_eu_core": "Email-Eu-Core",
+    "mnist64": "MNIST64",
+    "olivetti_faces": "Olivetti Faces",
+    "ph_recognition": "PH Recognition",
+    "polblogs": "PolBlogs",
+    "polbooks": "PolBooks",
+    "wdbc": "WDBC",
+}
+
 FALLBACK_COLORS = ["#6C757D", "#8C564B", "#BCBD22", "#17BECF"]
 FALLBACK_LINESTYLES = ["-", "--", "-.", ":"]
 FALLBACK_MARKERS = ["o", "s", "D", "^", "v", "P", "X", "<", ">", "h", "*"]
@@ -45,6 +58,40 @@ FALLBACK_MARKERS = ["o", "s", "D", "^", "v", "P", "X", "<", ">", "h", "*"]
 def project_path(path: str | Path) -> Path:
     path = Path(path)
     return path if path.is_absolute() else ROOT / path
+
+
+def dataset_display_name(name: str) -> str:
+    return DATASET_DISPLAY_NAMES.get(name, name.replace("_", " ").title())
+
+
+def render_composite_table(
+    caption: str,
+    label: str,
+    subtables: list[tuple[str, str | None, str, str]],
+) -> str:
+    """Render one paper table containing vertically stacked subtables."""
+    lines = [
+        r"\begin{table}[p!]",
+        r"  \centering",
+        rf"  \caption{{{caption}}}",
+        rf"  \label{{{label}}}",
+    ]
+    for index, (subcaption, sublabel, width, tabular) in enumerate(subtables):
+        if index:
+            lines.extend(["", r"  \par\vspace*{1.5em}\par", ""])
+        lines.extend(
+            [
+                r"  \begin{adjustbox}{width=\textwidth}",
+                rf"  \begin{{subtable}}[t]{{{width}}}",
+                r"    \centering",
+                rf"    \caption{{\textsc{{{subcaption}}}}}",
+            ]
+        )
+        if sublabel:
+            lines.append(rf"    \label{{{sublabel}}}")
+        lines.extend([tabular, r"  \end{subtable}", r"  \end{adjustbox}"])
+    lines.append(r"\end{table}")
+    return "\n".join(lines)
 
 
 def experiment_name(source: str | Path) -> str:
