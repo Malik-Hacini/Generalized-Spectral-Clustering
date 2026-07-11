@@ -1,0 +1,2360 @@
+{
+  "breast_tissue": {
+    "SC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": null,
+      "laplacian_method": "unnorm",
+      "standard": true,
+      "n_clusters": 6
+    },
+    "SC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": null,
+      "laplacian_method": "norm",
+      "standard": true,
+      "n_clusters": 6
+    },
+    "DSC+": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "gamma": "[0.   0.05 0.1  0.15 0.2  0.25 0.3  0.35 0.4  0.45 0.5  0.55 0.6  0.65\n 0.7  0.75 0.8  0.85 0.9  0.95]",
+      "n_clusters": 6
+    },
+    "DI-SIM-R": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "tau": [
+        "<function avg_deg_taus at 0x7a0c8d937d80>",
+        {
+          "s": "[-1.  -0.5  0.   0.5  1. ]"
+        }
+      ],
+      "embedding": "right",
+      "n_clusters": 6
+    },
+    "DI-SIM-L": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "tau": [
+        "<function avg_deg_taus at 0x7a0c8d937d80>",
+        {
+          "s": "[-1.  -0.5  0.   0.5  1. ]"
+        }
+      ],
+      "embedding": "left",
+      "n_clusters": 6
+    },
+    "DI-SIM-C": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "tau": [
+        "<function avg_deg_taus at 0x7a0c8d937d80>",
+        {
+          "s": "[-1.  -0.5  0.   0.5  1. ]"
+        }
+      ],
+      "embedding": "combined",
+      "n_clusters": 6
+    },
+    "GSC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function teleporting_undirected_measure at 0x7a0cbd7eefc0>",
+        {
+          "alpha": "[0.  0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.  1.1 1.2 1.3 1.4 1.5]",
+          "t": "range(0, 26)"
+        }
+      ],
+      "laplacian_method": "norm",
+      "n_clusters": 6
+    },
+    "GSC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function teleporting_undirected_measure at 0x7a0cbd7eefc0>",
+        {
+          "alpha": "[0.  0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.  1.1 1.2 1.3 1.4 1.5]",
+          "t": "range(0, 26)"
+        }
+      ],
+      "laplacian_method": "unnorm",
+      "n_clusters": 6
+    },
+    "deg-GSC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function degree_measure at 0x7a0cbd7ef420>",
+        {
+          "gamma": "[0.   0.05 0.1  0.15 0.2  0.25 0.3  0.35 0.4  0.45 0.5  0.55 0.6  0.65\n 0.7  0.75 0.8  0.85 0.9  0.95 1.  ]"
+        }
+      ],
+      "laplacian_method": "norm",
+      "n_clusters": 6
+    },
+    "deg-GSC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function degree_measure at 0x7a0cbd7ef420>",
+        {
+          "gamma": "[0.   0.05 0.1  0.15 0.2  0.25 0.3  0.35 0.4  0.45 0.5  0.55 0.6  0.65\n 0.7  0.75 0.8  0.85 0.9  0.95 1.  ]"
+        }
+      ],
+      "laplacian_method": "unnorm",
+      "n_clusters": 6
+    },
+    "uniform-GSC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function uniform_measure at 0x7a0c8deb0220>",
+        {}
+      ],
+      "laplacian_method": "norm",
+      "n_clusters": 6
+    },
+    "uniform-GSC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function uniform_measure at 0x7a0c8deb0220>",
+        {}
+      ],
+      "laplacian_method": "unnorm",
+      "n_clusters": 6
+    },
+    "perron-GSC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function perron_vector_measure at 0x7a0c8d957880>",
+        {}
+      ],
+      "laplacian_method": "norm",
+      "n_clusters": 6
+    },
+    "perron-GSC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function perron_vector_measure at 0x7a0c8d957880>",
+        {}
+      ],
+      "laplacian_method": "unnorm",
+      "n_clusters": 6
+    }
+  },
+  "wine": {
+    "SC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": null,
+      "laplacian_method": "unnorm",
+      "standard": true,
+      "n_clusters": 3
+    },
+    "SC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": null,
+      "laplacian_method": "norm",
+      "standard": true,
+      "n_clusters": 3
+    },
+    "DSC+": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "gamma": "[0.   0.05 0.1  0.15 0.2  0.25 0.3  0.35 0.4  0.45 0.5  0.55 0.6  0.65\n 0.7  0.75 0.8  0.85 0.9  0.95]",
+      "n_clusters": 3
+    },
+    "DI-SIM-R": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "tau": [
+        "<function avg_deg_taus at 0x7a0c8d937d80>",
+        {
+          "s": "[-1.  -0.5  0.   0.5  1. ]"
+        }
+      ],
+      "embedding": "right",
+      "n_clusters": 3
+    },
+    "DI-SIM-L": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "tau": [
+        "<function avg_deg_taus at 0x7a0c8d937d80>",
+        {
+          "s": "[-1.  -0.5  0.   0.5  1. ]"
+        }
+      ],
+      "embedding": "left",
+      "n_clusters": 3
+    },
+    "DI-SIM-C": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "tau": [
+        "<function avg_deg_taus at 0x7a0c8d937d80>",
+        {
+          "s": "[-1.  -0.5  0.   0.5  1. ]"
+        }
+      ],
+      "embedding": "combined",
+      "n_clusters": 3
+    },
+    "GSC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function teleporting_undirected_measure at 0x7a0cbd7eefc0>",
+        {
+          "alpha": "[0.  0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.  1.1 1.2 1.3 1.4 1.5]",
+          "t": "range(0, 26)"
+        }
+      ],
+      "laplacian_method": "norm",
+      "n_clusters": 3
+    },
+    "GSC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function teleporting_undirected_measure at 0x7a0cbd7eefc0>",
+        {
+          "alpha": "[0.  0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.  1.1 1.2 1.3 1.4 1.5]",
+          "t": "range(0, 26)"
+        }
+      ],
+      "laplacian_method": "unnorm",
+      "n_clusters": 3
+    },
+    "deg-GSC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function degree_measure at 0x7a0cbd7ef420>",
+        {
+          "gamma": "[0.   0.05 0.1  0.15 0.2  0.25 0.3  0.35 0.4  0.45 0.5  0.55 0.6  0.65\n 0.7  0.75 0.8  0.85 0.9  0.95 1.  ]"
+        }
+      ],
+      "laplacian_method": "norm",
+      "n_clusters": 3
+    },
+    "deg-GSC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function degree_measure at 0x7a0cbd7ef420>",
+        {
+          "gamma": "[0.   0.05 0.1  0.15 0.2  0.25 0.3  0.35 0.4  0.45 0.5  0.55 0.6  0.65\n 0.7  0.75 0.8  0.85 0.9  0.95 1.  ]"
+        }
+      ],
+      "laplacian_method": "unnorm",
+      "n_clusters": 3
+    },
+    "uniform-GSC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function uniform_measure at 0x7a0c8deb0220>",
+        {}
+      ],
+      "laplacian_method": "norm",
+      "n_clusters": 3
+    },
+    "uniform-GSC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function uniform_measure at 0x7a0c8deb0220>",
+        {}
+      ],
+      "laplacian_method": "unnorm",
+      "n_clusters": 3
+    },
+    "perron-GSC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function perron_vector_measure at 0x7a0c8d957880>",
+        {}
+      ],
+      "laplacian_method": "norm",
+      "n_clusters": 3
+    },
+    "perron-GSC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function perron_vector_measure at 0x7a0c8d957880>",
+        {}
+      ],
+      "laplacian_method": "unnorm",
+      "n_clusters": 3
+    }
+  },
+  "iris": {
+    "SC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": null,
+      "laplacian_method": "unnorm",
+      "standard": true,
+      "n_clusters": 3
+    },
+    "SC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": null,
+      "laplacian_method": "norm",
+      "standard": true,
+      "n_clusters": 3
+    },
+    "DSC+": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "gamma": "[0.   0.05 0.1  0.15 0.2  0.25 0.3  0.35 0.4  0.45 0.5  0.55 0.6  0.65\n 0.7  0.75 0.8  0.85 0.9  0.95]",
+      "n_clusters": 3
+    },
+    "DI-SIM-R": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "tau": [
+        "<function avg_deg_taus at 0x7a0c8d937d80>",
+        {
+          "s": "[-1.  -0.5  0.   0.5  1. ]"
+        }
+      ],
+      "embedding": "right",
+      "n_clusters": 3
+    },
+    "DI-SIM-L": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "tau": [
+        "<function avg_deg_taus at 0x7a0c8d937d80>",
+        {
+          "s": "[-1.  -0.5  0.   0.5  1. ]"
+        }
+      ],
+      "embedding": "left",
+      "n_clusters": 3
+    },
+    "DI-SIM-C": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "tau": [
+        "<function avg_deg_taus at 0x7a0c8d937d80>",
+        {
+          "s": "[-1.  -0.5  0.   0.5  1. ]"
+        }
+      ],
+      "embedding": "combined",
+      "n_clusters": 3
+    },
+    "GSC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function teleporting_undirected_measure at 0x7a0cbd7eefc0>",
+        {
+          "alpha": "[0.  0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.  1.1 1.2 1.3 1.4 1.5]",
+          "t": "range(0, 26)"
+        }
+      ],
+      "laplacian_method": "norm",
+      "n_clusters": 3
+    },
+    "GSC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function teleporting_undirected_measure at 0x7a0cbd7eefc0>",
+        {
+          "alpha": "[0.  0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.  1.1 1.2 1.3 1.4 1.5]",
+          "t": "range(0, 26)"
+        }
+      ],
+      "laplacian_method": "unnorm",
+      "n_clusters": 3
+    },
+    "deg-GSC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function degree_measure at 0x7a0cbd7ef420>",
+        {
+          "gamma": "[0.   0.05 0.1  0.15 0.2  0.25 0.3  0.35 0.4  0.45 0.5  0.55 0.6  0.65\n 0.7  0.75 0.8  0.85 0.9  0.95 1.  ]"
+        }
+      ],
+      "laplacian_method": "norm",
+      "n_clusters": 3
+    },
+    "deg-GSC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function degree_measure at 0x7a0cbd7ef420>",
+        {
+          "gamma": "[0.   0.05 0.1  0.15 0.2  0.25 0.3  0.35 0.4  0.45 0.5  0.55 0.6  0.65\n 0.7  0.75 0.8  0.85 0.9  0.95 1.  ]"
+        }
+      ],
+      "laplacian_method": "unnorm",
+      "n_clusters": 3
+    },
+    "uniform-GSC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function uniform_measure at 0x7a0c8deb0220>",
+        {}
+      ],
+      "laplacian_method": "norm",
+      "n_clusters": 3
+    },
+    "uniform-GSC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function uniform_measure at 0x7a0c8deb0220>",
+        {}
+      ],
+      "laplacian_method": "unnorm",
+      "n_clusters": 3
+    },
+    "perron-GSC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function perron_vector_measure at 0x7a0c8d957880>",
+        {}
+      ],
+      "laplacian_method": "norm",
+      "n_clusters": 3
+    },
+    "perron-GSC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function perron_vector_measure at 0x7a0c8d957880>",
+        {}
+      ],
+      "laplacian_method": "unnorm",
+      "n_clusters": 3
+    }
+  },
+  "seeds": {
+    "SC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": null,
+      "laplacian_method": "unnorm",
+      "standard": true,
+      "n_clusters": 3
+    },
+    "SC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": null,
+      "laplacian_method": "norm",
+      "standard": true,
+      "n_clusters": 3
+    },
+    "DSC+": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "gamma": "[0.   0.05 0.1  0.15 0.2  0.25 0.3  0.35 0.4  0.45 0.5  0.55 0.6  0.65\n 0.7  0.75 0.8  0.85 0.9  0.95]",
+      "n_clusters": 3
+    },
+    "DI-SIM-R": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "tau": [
+        "<function avg_deg_taus at 0x7a0c8d937d80>",
+        {
+          "s": "[-1.  -0.5  0.   0.5  1. ]"
+        }
+      ],
+      "embedding": "right",
+      "n_clusters": 3
+    },
+    "DI-SIM-L": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "tau": [
+        "<function avg_deg_taus at 0x7a0c8d937d80>",
+        {
+          "s": "[-1.  -0.5  0.   0.5  1. ]"
+        }
+      ],
+      "embedding": "left",
+      "n_clusters": 3
+    },
+    "DI-SIM-C": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "tau": [
+        "<function avg_deg_taus at 0x7a0c8d937d80>",
+        {
+          "s": "[-1.  -0.5  0.   0.5  1. ]"
+        }
+      ],
+      "embedding": "combined",
+      "n_clusters": 3
+    },
+    "GSC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function teleporting_undirected_measure at 0x7a0cbd7eefc0>",
+        {
+          "alpha": "[0.  0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.  1.1 1.2 1.3 1.4 1.5]",
+          "t": "range(0, 26)"
+        }
+      ],
+      "laplacian_method": "norm",
+      "n_clusters": 3
+    },
+    "GSC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function teleporting_undirected_measure at 0x7a0cbd7eefc0>",
+        {
+          "alpha": "[0.  0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.  1.1 1.2 1.3 1.4 1.5]",
+          "t": "range(0, 26)"
+        }
+      ],
+      "laplacian_method": "unnorm",
+      "n_clusters": 3
+    },
+    "deg-GSC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function degree_measure at 0x7a0cbd7ef420>",
+        {
+          "gamma": "[0.   0.05 0.1  0.15 0.2  0.25 0.3  0.35 0.4  0.45 0.5  0.55 0.6  0.65\n 0.7  0.75 0.8  0.85 0.9  0.95 1.  ]"
+        }
+      ],
+      "laplacian_method": "norm",
+      "n_clusters": 3
+    },
+    "deg-GSC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function degree_measure at 0x7a0cbd7ef420>",
+        {
+          "gamma": "[0.   0.05 0.1  0.15 0.2  0.25 0.3  0.35 0.4  0.45 0.5  0.55 0.6  0.65\n 0.7  0.75 0.8  0.85 0.9  0.95 1.  ]"
+        }
+      ],
+      "laplacian_method": "unnorm",
+      "n_clusters": 3
+    },
+    "uniform-GSC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function uniform_measure at 0x7a0c8deb0220>",
+        {}
+      ],
+      "laplacian_method": "norm",
+      "n_clusters": 3
+    },
+    "uniform-GSC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function uniform_measure at 0x7a0c8deb0220>",
+        {}
+      ],
+      "laplacian_method": "unnorm",
+      "n_clusters": 3
+    },
+    "perron-GSC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function perron_vector_measure at 0x7a0c8d957880>",
+        {}
+      ],
+      "laplacian_method": "norm",
+      "n_clusters": 3
+    },
+    "perron-GSC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function perron_vector_measure at 0x7a0c8d957880>",
+        {}
+      ],
+      "laplacian_method": "unnorm",
+      "n_clusters": 3
+    }
+  },
+  "segmentation": {
+    "SC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": null,
+      "laplacian_method": "unnorm",
+      "standard": true,
+      "n_clusters": 7
+    },
+    "SC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": null,
+      "laplacian_method": "norm",
+      "standard": true,
+      "n_clusters": 7
+    },
+    "DSC+": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "gamma": "[0.   0.05 0.1  0.15 0.2  0.25 0.3  0.35 0.4  0.45 0.5  0.55 0.6  0.65\n 0.7  0.75 0.8  0.85 0.9  0.95]",
+      "n_clusters": 7
+    },
+    "DI-SIM-R": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "tau": [
+        "<function avg_deg_taus at 0x7a0c8d937d80>",
+        {
+          "s": "[-1.  -0.5  0.   0.5  1. ]"
+        }
+      ],
+      "embedding": "right",
+      "n_clusters": 7
+    },
+    "DI-SIM-L": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "tau": [
+        "<function avg_deg_taus at 0x7a0c8d937d80>",
+        {
+          "s": "[-1.  -0.5  0.   0.5  1. ]"
+        }
+      ],
+      "embedding": "left",
+      "n_clusters": 7
+    },
+    "DI-SIM-C": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "tau": [
+        "<function avg_deg_taus at 0x7a0c8d937d80>",
+        {
+          "s": "[-1.  -0.5  0.   0.5  1. ]"
+        }
+      ],
+      "embedding": "combined",
+      "n_clusters": 7
+    },
+    "GSC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function teleporting_undirected_measure at 0x7a0cbd7eefc0>",
+        {
+          "alpha": "[0.  0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.  1.1 1.2 1.3 1.4 1.5]",
+          "t": "range(0, 26)"
+        }
+      ],
+      "laplacian_method": "norm",
+      "n_clusters": 7
+    },
+    "GSC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function teleporting_undirected_measure at 0x7a0cbd7eefc0>",
+        {
+          "alpha": "[0.  0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.  1.1 1.2 1.3 1.4 1.5]",
+          "t": "range(0, 26)"
+        }
+      ],
+      "laplacian_method": "unnorm",
+      "n_clusters": 7
+    },
+    "deg-GSC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function degree_measure at 0x7a0cbd7ef420>",
+        {
+          "gamma": "[0.   0.05 0.1  0.15 0.2  0.25 0.3  0.35 0.4  0.45 0.5  0.55 0.6  0.65\n 0.7  0.75 0.8  0.85 0.9  0.95 1.  ]"
+        }
+      ],
+      "laplacian_method": "norm",
+      "n_clusters": 7
+    },
+    "deg-GSC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function degree_measure at 0x7a0cbd7ef420>",
+        {
+          "gamma": "[0.   0.05 0.1  0.15 0.2  0.25 0.3  0.35 0.4  0.45 0.5  0.55 0.6  0.65\n 0.7  0.75 0.8  0.85 0.9  0.95 1.  ]"
+        }
+      ],
+      "laplacian_method": "unnorm",
+      "n_clusters": 7
+    },
+    "uniform-GSC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function uniform_measure at 0x7a0c8deb0220>",
+        {}
+      ],
+      "laplacian_method": "norm",
+      "n_clusters": 7
+    },
+    "uniform-GSC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function uniform_measure at 0x7a0c8deb0220>",
+        {}
+      ],
+      "laplacian_method": "unnorm",
+      "n_clusters": 7
+    },
+    "perron-GSC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function perron_vector_measure at 0x7a0c8d957880>",
+        {}
+      ],
+      "laplacian_method": "norm",
+      "n_clusters": 7
+    },
+    "perron-GSC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function perron_vector_measure at 0x7a0c8d957880>",
+        {}
+      ],
+      "laplacian_method": "unnorm",
+      "n_clusters": 7
+    }
+  },
+  "wdbc": {
+    "SC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": null,
+      "laplacian_method": "unnorm",
+      "standard": true,
+      "n_clusters": 2
+    },
+    "SC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": null,
+      "laplacian_method": "norm",
+      "standard": true,
+      "n_clusters": 2
+    },
+    "DSC+": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "gamma": "[0.   0.05 0.1  0.15 0.2  0.25 0.3  0.35 0.4  0.45 0.5  0.55 0.6  0.65\n 0.7  0.75 0.8  0.85 0.9  0.95]",
+      "n_clusters": 2
+    },
+    "DI-SIM-R": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "tau": [
+        "<function avg_deg_taus at 0x7a0c8d937d80>",
+        {
+          "s": "[-1.  -0.5  0.   0.5  1. ]"
+        }
+      ],
+      "embedding": "right",
+      "n_clusters": 2
+    },
+    "DI-SIM-L": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "tau": [
+        "<function avg_deg_taus at 0x7a0c8d937d80>",
+        {
+          "s": "[-1.  -0.5  0.   0.5  1. ]"
+        }
+      ],
+      "embedding": "left",
+      "n_clusters": 2
+    },
+    "DI-SIM-C": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "tau": [
+        "<function avg_deg_taus at 0x7a0c8d937d80>",
+        {
+          "s": "[-1.  -0.5  0.   0.5  1. ]"
+        }
+      ],
+      "embedding": "combined",
+      "n_clusters": 2
+    },
+    "GSC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function teleporting_undirected_measure at 0x7a0cbd7eefc0>",
+        {
+          "alpha": "[0.  0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.  1.1 1.2 1.3 1.4 1.5]",
+          "t": "range(0, 26)"
+        }
+      ],
+      "laplacian_method": "norm",
+      "n_clusters": 2
+    },
+    "GSC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function teleporting_undirected_measure at 0x7a0cbd7eefc0>",
+        {
+          "alpha": "[0.  0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.  1.1 1.2 1.3 1.4 1.5]",
+          "t": "range(0, 26)"
+        }
+      ],
+      "laplacian_method": "unnorm",
+      "n_clusters": 2
+    },
+    "deg-GSC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function degree_measure at 0x7a0cbd7ef420>",
+        {
+          "gamma": "[0.   0.05 0.1  0.15 0.2  0.25 0.3  0.35 0.4  0.45 0.5  0.55 0.6  0.65\n 0.7  0.75 0.8  0.85 0.9  0.95 1.  ]"
+        }
+      ],
+      "laplacian_method": "norm",
+      "n_clusters": 2
+    },
+    "deg-GSC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function degree_measure at 0x7a0cbd7ef420>",
+        {
+          "gamma": "[0.   0.05 0.1  0.15 0.2  0.25 0.3  0.35 0.4  0.45 0.5  0.55 0.6  0.65\n 0.7  0.75 0.8  0.85 0.9  0.95 1.  ]"
+        }
+      ],
+      "laplacian_method": "unnorm",
+      "n_clusters": 2
+    },
+    "uniform-GSC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function uniform_measure at 0x7a0c8deb0220>",
+        {}
+      ],
+      "laplacian_method": "norm",
+      "n_clusters": 2
+    },
+    "uniform-GSC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function uniform_measure at 0x7a0c8deb0220>",
+        {}
+      ],
+      "laplacian_method": "unnorm",
+      "n_clusters": 2
+    },
+    "perron-GSC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function perron_vector_measure at 0x7a0c8d957880>",
+        {}
+      ],
+      "laplacian_method": "norm",
+      "n_clusters": 2
+    },
+    "perron-GSC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function perron_vector_measure at 0x7a0c8d957880>",
+        {}
+      ],
+      "laplacian_method": "unnorm",
+      "n_clusters": 2
+    }
+  },
+  "olivetti_faces": {
+    "SC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": null,
+      "laplacian_method": "unnorm",
+      "standard": true,
+      "n_clusters": 40
+    },
+    "SC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": null,
+      "laplacian_method": "norm",
+      "standard": true,
+      "n_clusters": 40
+    },
+    "DSC+": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "gamma": "[0.   0.05 0.1  0.15 0.2  0.25 0.3  0.35 0.4  0.45 0.5  0.55 0.6  0.65\n 0.7  0.75 0.8  0.85 0.9  0.95]",
+      "n_clusters": 40
+    },
+    "DI-SIM-R": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "tau": [
+        "<function avg_deg_taus at 0x7a0c8d937d80>",
+        {
+          "s": "[-1.  -0.5  0.   0.5  1. ]"
+        }
+      ],
+      "embedding": "right",
+      "n_clusters": 40
+    },
+    "DI-SIM-L": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "tau": [
+        "<function avg_deg_taus at 0x7a0c8d937d80>",
+        {
+          "s": "[-1.  -0.5  0.   0.5  1. ]"
+        }
+      ],
+      "embedding": "left",
+      "n_clusters": 40
+    },
+    "DI-SIM-C": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "tau": [
+        "<function avg_deg_taus at 0x7a0c8d937d80>",
+        {
+          "s": "[-1.  -0.5  0.   0.5  1. ]"
+        }
+      ],
+      "embedding": "combined",
+      "n_clusters": 40
+    },
+    "GSC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function teleporting_undirected_measure at 0x7a0cbd7eefc0>",
+        {
+          "alpha": "[0.  0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.  1.1 1.2 1.3 1.4 1.5]",
+          "t": "range(0, 26)"
+        }
+      ],
+      "laplacian_method": "norm",
+      "n_clusters": 40
+    },
+    "GSC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function teleporting_undirected_measure at 0x7a0cbd7eefc0>",
+        {
+          "alpha": "[0.  0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.  1.1 1.2 1.3 1.4 1.5]",
+          "t": "range(0, 26)"
+        }
+      ],
+      "laplacian_method": "unnorm",
+      "n_clusters": 40
+    },
+    "deg-GSC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function degree_measure at 0x7a0cbd7ef420>",
+        {
+          "gamma": "[0.   0.05 0.1  0.15 0.2  0.25 0.3  0.35 0.4  0.45 0.5  0.55 0.6  0.65\n 0.7  0.75 0.8  0.85 0.9  0.95 1.  ]"
+        }
+      ],
+      "laplacian_method": "norm",
+      "n_clusters": 40
+    },
+    "deg-GSC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function degree_measure at 0x7a0cbd7ef420>",
+        {
+          "gamma": "[0.   0.05 0.1  0.15 0.2  0.25 0.3  0.35 0.4  0.45 0.5  0.55 0.6  0.65\n 0.7  0.75 0.8  0.85 0.9  0.95 1.  ]"
+        }
+      ],
+      "laplacian_method": "unnorm",
+      "n_clusters": 40
+    },
+    "uniform-GSC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function uniform_measure at 0x7a0c8deb0220>",
+        {}
+      ],
+      "laplacian_method": "norm",
+      "n_clusters": 40
+    },
+    "uniform-GSC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function uniform_measure at 0x7a0c8deb0220>",
+        {}
+      ],
+      "laplacian_method": "unnorm",
+      "n_clusters": 40
+    },
+    "perron-GSC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function perron_vector_measure at 0x7a0c8d957880>",
+        {}
+      ],
+      "laplacian_method": "norm",
+      "n_clusters": 40
+    },
+    "perron-GSC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function perron_vector_measure at 0x7a0c8d957880>",
+        {}
+      ],
+      "laplacian_method": "unnorm",
+      "n_clusters": 40
+    }
+  },
+  "mnist64": {
+    "SC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": null,
+      "laplacian_method": "unnorm",
+      "standard": true,
+      "n_clusters": 6
+    },
+    "SC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": null,
+      "laplacian_method": "norm",
+      "standard": true,
+      "n_clusters": 6
+    },
+    "DSC+": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "gamma": "[0.   0.05 0.1  0.15 0.2  0.25 0.3  0.35 0.4  0.45 0.5  0.55 0.6  0.65\n 0.7  0.75 0.8  0.85 0.9  0.95]",
+      "n_clusters": 6
+    },
+    "DI-SIM-R": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "tau": [
+        "<function avg_deg_taus at 0x7a0c8d937d80>",
+        {
+          "s": "[-1.  -0.5  0.   0.5  1. ]"
+        }
+      ],
+      "embedding": "right",
+      "n_clusters": 6
+    },
+    "DI-SIM-L": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "tau": [
+        "<function avg_deg_taus at 0x7a0c8d937d80>",
+        {
+          "s": "[-1.  -0.5  0.   0.5  1. ]"
+        }
+      ],
+      "embedding": "left",
+      "n_clusters": 6
+    },
+    "DI-SIM-C": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "tau": [
+        "<function avg_deg_taus at 0x7a0c8d937d80>",
+        {
+          "s": "[-1.  -0.5  0.   0.5  1. ]"
+        }
+      ],
+      "embedding": "combined",
+      "n_clusters": 6
+    },
+    "GSC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function teleporting_undirected_measure at 0x7a0cbd7eefc0>",
+        {
+          "alpha": "[0.  0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.  1.1 1.2 1.3 1.4 1.5]",
+          "t": "range(0, 26)"
+        }
+      ],
+      "laplacian_method": "norm",
+      "n_clusters": 6
+    },
+    "GSC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function teleporting_undirected_measure at 0x7a0cbd7eefc0>",
+        {
+          "alpha": "[0.  0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.  1.1 1.2 1.3 1.4 1.5]",
+          "t": "range(0, 26)"
+        }
+      ],
+      "laplacian_method": "unnorm",
+      "n_clusters": 6
+    },
+    "deg-GSC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function degree_measure at 0x7a0cbd7ef420>",
+        {
+          "gamma": "[0.   0.05 0.1  0.15 0.2  0.25 0.3  0.35 0.4  0.45 0.5  0.55 0.6  0.65\n 0.7  0.75 0.8  0.85 0.9  0.95 1.  ]"
+        }
+      ],
+      "laplacian_method": "norm",
+      "n_clusters": 6
+    },
+    "deg-GSC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function degree_measure at 0x7a0cbd7ef420>",
+        {
+          "gamma": "[0.   0.05 0.1  0.15 0.2  0.25 0.3  0.35 0.4  0.45 0.5  0.55 0.6  0.65\n 0.7  0.75 0.8  0.85 0.9  0.95 1.  ]"
+        }
+      ],
+      "laplacian_method": "unnorm",
+      "n_clusters": 6
+    },
+    "uniform-GSC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function uniform_measure at 0x7a0c8deb0220>",
+        {}
+      ],
+      "laplacian_method": "norm",
+      "n_clusters": 6
+    },
+    "uniform-GSC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function uniform_measure at 0x7a0c8deb0220>",
+        {}
+      ],
+      "laplacian_method": "unnorm",
+      "n_clusters": 6
+    },
+    "perron-GSC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function perron_vector_measure at 0x7a0c8d957880>",
+        {}
+      ],
+      "laplacian_method": "norm",
+      "n_clusters": 6
+    },
+    "perron-GSC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function perron_vector_measure at 0x7a0c8d957880>",
+        {}
+      ],
+      "laplacian_method": "unnorm",
+      "n_clusters": 6
+    }
+  },
+  "ph_recognition": {
+    "SC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": null,
+      "laplacian_method": "unnorm",
+      "standard": true,
+      "n_clusters": 15
+    },
+    "SC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": null,
+      "laplacian_method": "norm",
+      "standard": true,
+      "n_clusters": 15
+    },
+    "DSC+": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "gamma": "[0.   0.05 0.1  0.15 0.2  0.25 0.3  0.35 0.4  0.45 0.5  0.55 0.6  0.65\n 0.7  0.75 0.8  0.85 0.9  0.95]",
+      "n_clusters": 15
+    },
+    "DI-SIM-R": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "tau": [
+        "<function avg_deg_taus at 0x7a0c8d937d80>",
+        {
+          "s": "[-1.  -0.5  0.   0.5  1. ]"
+        }
+      ],
+      "embedding": "right",
+      "n_clusters": 15
+    },
+    "DI-SIM-L": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "tau": [
+        "<function avg_deg_taus at 0x7a0c8d937d80>",
+        {
+          "s": "[-1.  -0.5  0.   0.5  1. ]"
+        }
+      ],
+      "embedding": "left",
+      "n_clusters": 15
+    },
+    "DI-SIM-C": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "tau": [
+        "<function avg_deg_taus at 0x7a0c8d937d80>",
+        {
+          "s": "[-1.  -0.5  0.   0.5  1. ]"
+        }
+      ],
+      "embedding": "combined",
+      "n_clusters": 15
+    },
+    "GSC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function teleporting_undirected_measure at 0x7a0cbd7eefc0>",
+        {
+          "alpha": "[0.  0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.  1.1 1.2 1.3 1.4 1.5]",
+          "t": "range(0, 26)"
+        }
+      ],
+      "laplacian_method": "norm",
+      "n_clusters": 15
+    },
+    "GSC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function teleporting_undirected_measure at 0x7a0cbd7eefc0>",
+        {
+          "alpha": "[0.  0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.  1.1 1.2 1.3 1.4 1.5]",
+          "t": "range(0, 26)"
+        }
+      ],
+      "laplacian_method": "unnorm",
+      "n_clusters": 15
+    },
+    "deg-GSC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function degree_measure at 0x7a0cbd7ef420>",
+        {
+          "gamma": "[0.   0.05 0.1  0.15 0.2  0.25 0.3  0.35 0.4  0.45 0.5  0.55 0.6  0.65\n 0.7  0.75 0.8  0.85 0.9  0.95 1.  ]"
+        }
+      ],
+      "laplacian_method": "norm",
+      "n_clusters": 15
+    },
+    "deg-GSC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function degree_measure at 0x7a0cbd7ef420>",
+        {
+          "gamma": "[0.   0.05 0.1  0.15 0.2  0.25 0.3  0.35 0.4  0.45 0.5  0.55 0.6  0.65\n 0.7  0.75 0.8  0.85 0.9  0.95 1.  ]"
+        }
+      ],
+      "laplacian_method": "unnorm",
+      "n_clusters": 15
+    },
+    "uniform-GSC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function uniform_measure at 0x7a0c8deb0220>",
+        {}
+      ],
+      "laplacian_method": "norm",
+      "n_clusters": 15
+    },
+    "uniform-GSC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function uniform_measure at 0x7a0c8deb0220>",
+        {}
+      ],
+      "laplacian_method": "unnorm",
+      "n_clusters": 15
+    },
+    "perron-GSC-N": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function perron_vector_measure at 0x7a0c8d957880>",
+        {}
+      ],
+      "laplacian_method": "norm",
+      "n_clusters": 15
+    },
+    "perron-GSC-UN": {
+      "n_neighbors": [
+        "<function log_neighbors at 0x7a0c8e71d8a0>",
+        {
+          "factor": 1
+        }
+      ],
+      "random_state": 42,
+      "n_init": 100,
+      "affinity": "nearest_neighbors",
+      "n_it": 1,
+      "measure": [
+        "<function perron_vector_measure at 0x7a0c8d957880>",
+        {}
+      ],
+      "laplacian_method": "unnorm",
+      "n_clusters": 15
+    }
+  }
+}

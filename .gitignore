@@ -16,11 +16,6 @@ sklearn-env/
 papers/
 
 
-#web scraping
-.firecrawl/
-#results of experiments
-results/
-
 # IDE
 .vscode/
 .idea/
@@ -43,64 +38,20 @@ metric_analysis/
 complexity_analysis/
 latex/
 gsc-tmlr/
-figures/
+/figures/
 
 # OpenCode context (agent-specific, not shared)
 .opencode/
 .tmp/
 
 
-# Ignore specific files related to the grid imbalance benchmark
+# Benchmark-generated datasets
 datasets/grid_imbalance/
-datasets/degree_imbalance/
-datasets/degree_corrected_directed_sbm/
-
-# Ignore datasets not used by current experiments/
-datasets/citeseer/
-datasets/citeseer_lcc/
-datasets/control_chart/
-datasets/cora/
-datasets/cora_lcc/
-datasets/cora_ml/
-datasets/cora_ml_lcc/
-datasets/core_periphery_disbm_fixed/
-datasets/cornell/
-datasets/dolphins/
-datasets/glass/
-datasets/karate/
-datasets/migration/
-datasets/parkinsons/
-datasets/telegram/
-datasets/texas/
-datasets/vertebral/
-datasets/wiki_vote/
-datasets/wikics/
-datasets/wikics_lcc/
-datasets/wisconsin/
-datasets/yeast/
-datasets/digrac_directed/
-# Ignore LaTeX outputs
-
-*.tex
-
-# Ignore Runtimes benchmark outputs
-figures/runtimes/
-datasets/runtimes/
 datasets/runtimes_size_disbm/
-
-# Ignore specific files related to the Gaussian injection benchmark
 datasets/gaussian_injection_alpha_sigma/
+datasets/chain_flow/
+
+# Generated Gaussian-injection plots
 plots/imbalance/
 
 testings.ipynb
-
-# Macro for heatmaps
-plots/heatmaps/
-plots/heatmaps_uci.py
-plots/heatmaps_networks.py
-
-# Chain flow
-datasets/chain_flow/
-
-# Degree Corrected
-datasets/deg_corr/

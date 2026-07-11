@@ -1,0 +1,74 @@
+\begin{table}[p!]
+  \centering
+  \caption{\textbf{Comparison of clustering methods on network datasets.} (a-b) Unsupervised evaluation by optimizing GCH on Hellinger-embedded one-step random-walk profiles: the first table shows GCH scores, while the second shows the corresponding AMI scores. (c) Supervised evaluation by optimizing AMI directly. Optimized hyperparameters are shown in parentheses.}
+  \label{tab:network}
+  \begin{adjustbox}{width=\textwidth}
+  \begin{subtable}[t]{1.22\textwidth}
+    \centering
+    \caption{\textsc{unsupervised evaluation (gch scores | gch-optimized)}}
+    \label{tab:network_gch_gch}
+  \begin{tabular}{l|cccccc|cc}
+    \Xhline{2\arrayrulewidth}
+    \textbf{Dataset} & \textbf{SC$_{\text{un}}$} & \textbf{SC$_{\text{n}}$} & \textbf{DSC+}$\bestpar{\gamma}{GCH}$ & \textbf{DI-SIM$_{\text{R}}$}$\bestpar{s}{GCH}$ & \textbf{DI-SIM$_{\text{L}}$}$\bestpar{s}{GCH}$ & \textbf{DI-SIM$_{\text{C}}$}$\bestpar{s}{GCH}$ & \textbf{GSC$_{\text{un}}$}$\bestpar{t,\alpha}{GCH}$ & \textbf{GSC$_{\text{n}}$}$\bestpar{t,\alpha}{GCH}$ \\
+    \Xhline{2\arrayrulewidth}
+    Deg-Corr & 1.09 & 43.03 & 43.35 \hyperp{0.70} & 43.28 \hyperp{0.50} & \bestcell{43.35 \hyperp{-1.00}} & 43.35 \hyperp{-1.00} & 42.85 \hyperp{0, 0.0} & 42.76 \hyperp{0, 0.0} \\
+    DiSBM Chain & 13.90 & 25.85 & 14.26 \hyperp{0.20} & 29.57 \hyperp{-1.00} & 30.46 \hyperp{-1.00} & \bestcell{30.57 \hyperp{-1.00}} & 26.45 \hyperp{3, 0.2} & 30.56 \hyperp{6, 1.2} \\
+    Email-Eu-Core & 0.88 & 4.09 & 1.41 \hyperp{0.00} & 7.64 \hyperp{0.00} & \bestcell{8.49 \hyperp{-0.50}} & 8.40 \hyperp{-0.50} & 3.42 \hyperp{0, 1.6} & 3.59 \hyperp{0, 1.7} \\
+    Football & \bestcell{9.77} & \bestcell{9.77} & \bestcell{9.77 \hyperp{0.05}} & \bestcell{9.77 \hyperp{-1.00}} & \bestcell{9.77 \hyperp{-1.00}} & \bestcell{9.77 \hyperp{-1.00}} & \bestcell{9.77 \hyperp{0, 0.0}} & \bestcell{9.77 \hyperp{0, 0.0}} \\
+    PolBlogs & 1.18 & 1.18 & \bestcell{59.08 \hyperp{0.10}} & 28.14 \hyperp{-1.00} & 51.99 \hyperp{-1.00} & 49.98 \hyperp{-1.00} & 44.98 \hyperp{0, 0.0} & 44.19 \hyperp{2, 0.1} \\
+    PolBooks & 7.69 & 9.69 & 9.69 \hyperp{0.05} & \bestcell{10.00 \hyperp{-0.50}} & \bestcell{10.00 \hyperp{-0.50}} & \bestcell{10.00 \hyperp{-0.50}} & 9.73 \hyperp{1, 0.3} & 9.91 \hyperp{1, 1.7} \\
+    \Xhline{2\arrayrulewidth}
+    \textit{PRB}(GCH) & 0.40 & 0.72 & 0.77 & 0.89 & \bestcell{0.98} & 0.97 & 0.83 & 0.86 \\
+    \Xhline{2\arrayrulewidth}
+  \end{tabular}
+  \end{subtable}
+  \end{adjustbox}
+
+  \par\vspace*{1.5em}\par
+
+  \begin{adjustbox}{width=\textwidth}
+  \begin{subtable}[t]{1.22\textwidth}
+    \centering
+    \caption{\textsc{unsupervised evaluation (ami scores | gch-optimized)}}
+    \label{tab:network_ami_gch}
+  \begin{tabular}{l|cccccc|cc}
+    \Xhline{2\arrayrulewidth}
+    \textbf{Dataset} & \textbf{SC$_{\text{un}}$} & \textbf{SC$_{\text{n}}$} & \textbf{DSC+}$\bestpar{\gamma}{GCH}$ & \textbf{DI-SIM$_{\text{R}}$}$\bestpar{s}{GCH}$ & \textbf{DI-SIM$_{\text{L}}$}$\bestpar{s}{GCH}$ & \textbf{DI-SIM$_{\text{C}}$}$\bestpar{s}{GCH}$ & \textbf{GSC$_{\text{un}}$}$\bestpar{t,\alpha}{GCH}$ & \textbf{GSC$_{\text{n}}$}$\bestpar{t,\alpha}{GCH}$ \\
+    \Xhline{2\arrayrulewidth}
+    Deg-Corr & 0.00 & 0.99 & \bestcell{1.00 \hyperp{0.70}} & 0.69 \hyperp{0.50} & 0.98 \hyperp{-1.00} & \bestcell{1.00 \hyperp{-1.00}} & 0.99 \hyperp{0, 0.0} & 0.98 \hyperp{0, 0.0} \\
+    DiSBM Chain & 0.73 & 0.53 & 0.65 \hyperp{0.20} & 0.96 \hyperp{-1.00} & 0.97 \hyperp{-1.00} & \bestcell{1.00 \hyperp{-1.00}} & 0.73 \hyperp{3, 0.2} & 1.00 \hyperp{6, 1.2} \\
+    Email-Eu-Core & 0.00 & 0.46 & 0.03 \hyperp{0.00} & 0.49 \hyperp{0.00} & 0.46 \hyperp{-0.50} & \bestcell{0.50 \hyperp{-0.50}} & 0.37 \hyperp{0, 1.6} & 0.41 \hyperp{0, 1.7} \\
+    Football & \bestcell{0.90} & \bestcell{0.90} & \bestcell{0.90 \hyperp{0.05}} & \bestcell{0.90 \hyperp{-1.00}} & \bestcell{0.90 \hyperp{-1.00}} & \bestcell{0.90 \hyperp{-1.00}} & \bestcell{0.90 \hyperp{0, 0.0}} & \bestcell{0.90 \hyperp{0, 0.0}} \\
+    PolBlogs & 0.00 & 0.00 & \bestcell{0.77 \hyperp{0.10}} & 0.30 \hyperp{-1.00} & 0.47 \hyperp{-1.00} & 0.47 \hyperp{-1.00} & 0.54 \hyperp{0, 0.0} & 0.52 \hyperp{2, 0.1} \\
+    PolBooks & \bestcell{0.64} & 0.57 & 0.57 \hyperp{0.05} & 0.53 \hyperp{-0.50} & 0.53 \hyperp{-0.50} & 0.53 \hyperp{-0.50} & 0.55 \hyperp{1, 0.3} & 0.57 \hyperp{1, 1.7} \\
+    \Xhline{2\arrayrulewidth}
+    \textit{PRB}(AMI) & 0.46 & 0.72 & 0.76 & 0.81 & 0.88 & \bestcell{0.91} & 0.84 & 0.90 \\
+    \Xhline{2\arrayrulewidth}
+  \end{tabular}
+  \end{subtable}
+  \end{adjustbox}
+
+  \par\vspace*{1.5em}\par
+
+  \begin{adjustbox}{width=\textwidth}
+  \begin{subtable}[t]{1.22\textwidth}
+    \centering
+    \caption{\textsc{supervised evaluation (ami scores | ami-optimized)}}
+    \label{tab:network_ami_ami}
+  \begin{tabular}{l|cccccc|cc}
+    \Xhline{2\arrayrulewidth}
+    \textbf{Dataset} & \textbf{SC$_{\text{un}}$} & \textbf{SC$_{\text{n}}$} & \textbf{DSC+}$\bestpar{\gamma}{AMI}$ & \textbf{DI-SIM$_{\text{R}}$}$\bestpar{s}{AMI}$ & \textbf{DI-SIM$_{\text{L}}$}$\bestpar{s}{AMI}$ & \textbf{DI-SIM$_{\text{C}}$}$\bestpar{s}{AMI}$ & \textbf{GSC$_{\text{un}}$}$\bestpar{t,\alpha}{AMI}$ & \textbf{GSC$_{\text{n}}$}$\bestpar{t,\alpha}{AMI}$ \\
+    \Xhline{2\arrayrulewidth}
+    Deg-Corr & 0.00 & 0.99 & \bestcell{1.00 \hyperp{0.70}} & 0.97 \hyperp{-0.50} & 0.98 \hyperp{-1.00} & \bestcell{1.00 \hyperp{-1.00}} & 0.99 \hyperp{0, 0.0} & 0.98 \hyperp{0, 0.0} \\
+    DiSBM Chain & 0.73 & 0.53 & 0.65 \hyperp{0.90} & 0.96 \hyperp{-1.00} & 0.97 \hyperp{-1.00} & \bestcell{1.00 \hyperp{-1.00}} & 0.73 \hyperp{0, 0.0} & 1.00 \hyperp{6, 1.2} \\
+    Email-Eu-Core & 0.00 & 0.46 & 0.03 \hyperp{0.00} & \bestcell{0.53 \hyperp{-1.00}} & 0.46 \hyperp{-0.50} & 0.50 \hyperp{-1.00} & 0.37 \hyperp{0, 1.6} & 0.41 \hyperp{0, 1.7} \\
+    Football & \bestcell{0.90} & \bestcell{0.90} & \bestcell{0.90 \hyperp{0.05}} & \bestcell{0.90 \hyperp{-1.00}} & \bestcell{0.90 \hyperp{-1.00}} & \bestcell{0.90 \hyperp{-1.00}} & \bestcell{0.90 \hyperp{0, 0.0}} & \bestcell{0.90 \hyperp{0, 0.0}} \\
+    PolBlogs & 0.00 & 0.00 & \bestcell{0.77 \hyperp{0.10}} & 0.30 \hyperp{-1.00} & 0.47 \hyperp{-1.00} & 0.47 \hyperp{-1.00} & 0.54 \hyperp{0, 0.0} & 0.52 \hyperp{2, 0.1} \\
+    PolBooks & \bestcell{0.64} & 0.57 & 0.57 \hyperp{0.05} & 0.57 \hyperp{-1.00} & 0.57 \hyperp{-1.00} & 0.57 \hyperp{-1.00} & 0.58 \hyperp{8, 0.3} & 0.57 \hyperp{1, 1.7} \\
+    \Xhline{2\arrayrulewidth}
+    \textit{PRB}(AMI) & 0.46 & 0.71 & 0.76 & 0.87 & 0.89 & \bestcell{0.91} & 0.84 & 0.89 \\
+    \Xhline{2\arrayrulewidth}
+  \end{tabular}
+  \end{subtable}
+  \end{adjustbox}
+\end{table}

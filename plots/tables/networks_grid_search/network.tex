@@ -1,0 +1,77 @@
+\begin{table}[p!]
+  \centering
+  \caption{\textbf{Comparison of vertex measures on network datasets.} (a-b) Unsupervised evaluation by optimizing GCH on Hellinger-embedded one-step random-walk profiles: the first table shows GCH scores, while the second shows the corresponding AMI scores. (c) Supervised evaluation by optimizing AMI directly. Optimized hyperparameters are shown in parentheses.}
+  \label{tab:net:vertex_measures}
+  \begin{adjustbox}{width=\textwidth}
+  \begin{subtable}[t]{1.65\textwidth}
+    \centering
+    \caption{\textsc{unsupervised evaluation (gch scores | gch-optimized)}}
+    \label{tab:measures:network_gch_gch}
+  \begin{tabular}{l|cc|cc|cc|cc}
+    \Xhline{2\arrayrulewidth}
+      \multirow{2}{*}{\textbf{Dataset}} & \multicolumn{2}{c}{\textbf{$\nu_{t,\alpha}$}} & \multicolumn{2}{c}{\textbf{$\nu_\textnormal{deg}(\gamma)$}} & \multicolumn{2}{c}{\textbf{$\nu_\textnormal{unif}$}} & \multicolumn{2}{c}{\textbf{$\nu_\textnormal{Perron}$}} \\
+    & \textbf{GSC$_{\text{un}}$}$\bestpar{t,\alpha}{GCH}$ & \textbf{GSC$_{\text{n}}$}$\bestpar{t,\alpha}{GCH}$ & \textbf{deg-GSC$_{\text{un}}$}$\bestpar{\gamma}{GCH}$ & \textbf{deg-GSC$_{\text{n}}$}$\bestpar{\gamma}{GCH}$ & \textbf{uniform-GSC$_{\text{un}}$} & \textbf{uniform-GSC$_{\text{n}}$} & \textbf{perron-GSC$_{\text{un}}$} & \textbf{perron-GSC$_{\text{n}}$} \\
+    \Xhline{2\arrayrulewidth}
+  DiSBM Chain & 26.45 \hyperp{3, 0.2} & \bestcell{30.56 \hyperp{6, 1.2}} & 26.46 \hyperp{0.0} & 27.03 \hyperp{1.0} & 26.44 & 27.03 & 1.01 & 26.92 \\
+  Deg-Corr & \bestcell{42.85 \hyperp{0, 0.0}} & 42.76 \hyperp{0, 0.0} & 4.22 \hyperp{0.1} & 5.77 \hyperp{0.0} & \bestcell{42.85} & 42.76 & \bestcell{42.85} & 5.70 \\
+  Email-Eu-Core & 3.42 \hyperp{0, 1.6} & \bestcell{3.59 \hyperp{0, 1.7}} & 2.32 \hyperp{1.0} & 2.42 \hyperp{0.6} & 3.24 & 3.25 & 1.71 & 2.84 \\
+  Football & \bestcell{9.77 \hyperp{0, 0.0}} & \bestcell{9.77 \hyperp{0, 0.0}} & \bestcell{9.77 \hyperp{0.0}} & \bestcell{9.77 \hyperp{0.0}} & \bestcell{9.77} & \bestcell{9.77} & \bestcell{9.77} & \bestcell{9.77} \\
+  PolBlogs & \bestcell{44.98 \hyperp{0, 0.0}} & 44.19 \hyperp{2, 0.1} & 9.61 \hyperp{0.5} & 36.55 \hyperp{0.9} & \bestcell{44.98} & 37.81 & 4.76 & 3.40 \\
+  PolBooks & 9.73 \hyperp{1, 0.3} & \bestcell{9.91 \hyperp{1, 1.7}} & 3.21 \hyperp{0.0} & 9.81 \hyperp{0.0} & 9.69 & 9.69 & 9.69 & 9.81 \\
+  \Xhline{2\arrayrulewidth}
+  \textit{PRB}(GCH) & 0.97 & \bestcell{1.00} & 0.52 & 0.75 & 0.96 & 0.93 & 0.60 & 0.65 \\
+  \Xhline{2\arrayrulewidth}
+  \end{tabular}
+  \end{subtable}
+  \end{adjustbox}
+
+  \par\vspace*{1.5em}\par
+
+  \begin{adjustbox}{width=\textwidth}
+  \begin{subtable}[t]{1.61\textwidth}
+    \centering
+    \caption{\textsc{unsupervised evaluation (ami scores | gch-optimized)}}
+    \label{tab:measures:network_ami_gch}
+  \begin{tabular}{l|cc|cc|cc|cc}
+    \Xhline{2\arrayrulewidth}
+      \multirow{2}{*}{\textbf{Dataset}} & \multicolumn{2}{c}{\textbf{$\nu_{t,\alpha}$}} & \multicolumn{2}{c}{\textbf{$\nu_\textnormal{deg}(\gamma)$}} & \multicolumn{2}{c}{\textbf{$\nu_\textnormal{unif}$}} & \multicolumn{2}{c}{\textbf{$\nu_\textnormal{Perron}$}} \\
+    & \textbf{GSC$_{\text{un}}$}$\bestpar{t,\alpha}{GCH}$ & \textbf{GSC$_{\text{n}}$}$\bestpar{t,\alpha}{GCH}$ & \textbf{deg-GSC$_{\text{un}}$}$\bestpar{\gamma}{GCH}$ & \textbf{deg-GSC$_{\text{n}}$}$\bestpar{\gamma}{GCH}$ & \textbf{uniform-GSC$_{\text{un}}$} & \textbf{uniform-GSC$_{\text{n}}$} & \textbf{perron-GSC$_{\text{un}}$} & \textbf{perron-GSC$_{\text{n}}$} \\
+    \Xhline{2\arrayrulewidth}
+  DiSBM Chain & 0.73 \hyperp{3, 0.2} & \bestcell{1.00 \hyperp{6, 1.2}} & 0.73 \hyperp{0.0} & 0.58 \hyperp{1.0} & 0.73 & 0.58 & 0.00 & 0.57 \\
+  Deg-Corr & \bestcell{0.99 \hyperp{0, 0.0}} & 0.98 \hyperp{0, 0.0} & 0.07 \hyperp{0.1} & 0.10 \hyperp{0.0} & \bestcell{0.99} & 0.98 & \bestcell{0.99} & 0.10 \\
+  Email-Eu-Core & 0.37 \hyperp{0, 1.6} & \bestcell{0.41 \hyperp{0, 1.7}} & 0.27 \hyperp{1.0} & 0.31 \hyperp{0.6} & 0.35 & 0.39 & 0.15 & 0.35 \\
+  Football & \bestcell{0.90 \hyperp{0, 0.0}} & \bestcell{0.90 \hyperp{0, 0.0}} & \bestcell{0.90 \hyperp{0.0}} & \bestcell{0.90 \hyperp{0.0}} & \bestcell{0.90} & \bestcell{0.90} & \bestcell{0.90} & \bestcell{0.90} \\
+  PolBlogs & \bestcell{0.54 \hyperp{0, 0.0}} & 0.52 \hyperp{2, 0.1} & 0.05 \hyperp{0.5} & 0.40 \hyperp{0.9} & \bestcell{0.54} & 0.38 & 0.10 & 0.01 \\
+  PolBooks & 0.55 \hyperp{1, 0.3} & \bestcell{0.57 \hyperp{1, 1.7}} & 0.14 \hyperp{0.0} & 0.55 \hyperp{0.0} & 0.57 & 0.57 & 0.57 & 0.55 \\
+  \Xhline{2\arrayrulewidth}
+  \textit{PRB}(AMI) & 0.93 & \bestcell{1.00} & 0.47 & 0.69 & 0.93 & 0.87 & 0.59 & 0.59 \\
+  \Xhline{2\arrayrulewidth}
+  \end{tabular}
+  \end{subtable}
+  \end{adjustbox}
+
+  \par\vspace*{1.5em}\par
+
+  \begin{adjustbox}{width=\textwidth}
+  \begin{subtable}[t]{1.61\textwidth}
+    \centering
+    \caption{\textsc{supervised evaluation (ami scores | ami-optimized)}}
+    \label{tab:measures:network_ami_ami}
+  \begin{tabular}{l|cc|cc|cc|cc}
+    \Xhline{2\arrayrulewidth}
+      \multirow{2}{*}{\textbf{Dataset}} & \multicolumn{2}{c}{\textbf{$\nu_{t,\alpha}$}} & \multicolumn{2}{c}{\textbf{$\nu_\textnormal{deg}(\gamma)$}} & \multicolumn{2}{c}{\textbf{$\nu_\textnormal{unif}$}} & \multicolumn{2}{c}{\textbf{$\nu_\textnormal{Perron}$}} \\
+    & \textbf{GSC$_{\text{un}}$}$\bestpar{t,\alpha}{AMI}$ & \textbf{GSC$_{\text{n}}$}$\bestpar{t,\alpha}{AMI}$ & \textbf{deg-GSC$_{\text{un}}$}$\bestpar{\gamma}{AMI}$ & \textbf{deg-GSC$_{\text{n}}$}$\bestpar{\gamma}{AMI}$ & \textbf{uniform-GSC$_{\text{un}}$} & \textbf{uniform-GSC$_{\text{n}}$} & \textbf{perron-GSC$_{\text{un}}$} & \textbf{perron-GSC$_{\text{n}}$} \\
+    \Xhline{2\arrayrulewidth}
+  DiSBM Chain & 0.73 \hyperp{0, 0.0} & \bestcell{1.00 \hyperp{6, 1.2}} & 0.73 \hyperp{0.0} & 0.58 \hyperp{0.9} & 0.73 & 0.58 & 0.00 & 0.57 \\
+  Deg-Corr & \bestcell{0.99 \hyperp{0, 0.0}} & 0.98 \hyperp{0, 0.0} & 0.07 \hyperp{0.1} & 0.10 \hyperp{0.7} & \bestcell{0.99} & 0.98 & \bestcell{0.99} & 0.10 \\
+  Email-Eu-Core & 0.37 \hyperp{0, 1.6} & \bestcell{0.41 \hyperp{0, 1.7}} & 0.27 \hyperp{1.0} & 0.31 \hyperp{0.6} & 0.35 & 0.39 & 0.15 & 0.35 \\
+  Football & \bestcell{0.90 \hyperp{0, 0.0}} & \bestcell{0.90 \hyperp{0, 0.0}} & \bestcell{0.90 \hyperp{0.0}} & \bestcell{0.90 \hyperp{0.0}} & \bestcell{0.90} & \bestcell{0.90} & \bestcell{0.90} & \bestcell{0.90} \\
+  PolBlogs & \bestcell{0.54 \hyperp{0, 0.0}} & 0.52 \hyperp{2, 0.1} & 0.05 \hyperp{0.5} & 0.40 \hyperp{0.9} & \bestcell{0.54} & 0.38 & 0.10 & 0.01 \\
+  PolBooks & \bestcell{0.58 \hyperp{8, 0.3}} & 0.57 \hyperp{1, 1.7} & 0.14 \hyperp{0.0} & 0.55 \hyperp{0.0} & 0.57 & 0.57 & 0.57 & 0.55 \\
+  \Xhline{2\arrayrulewidth}
+  \textit{PRB}(AMI) & 0.94 & \bestcell{0.99} & 0.47 & 0.69 & 0.93 & 0.87 & 0.59 & 0.58 \\
+  \Xhline{2\arrayrulewidth}
+  \end{tabular}
+  \end{subtable}
+  \end{adjustbox}
+\end{table}

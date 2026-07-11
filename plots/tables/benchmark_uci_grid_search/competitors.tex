@@ -1,0 +1,83 @@
+\begin{table}[p!]
+  \centering
+  \caption{\textbf{Comparison of clustering methods on UCI datasets.} (a-b) Unsupervised evaluation by optimizing the CH criterion: the first table shows CH scores, while the second shows the corresponding AMI scores. (c) Supervised evaluation by optimizing AMI directly. Optimized hyperparameters are shown in parentheses.}
+  \label{tab:uci}
+  \begin{adjustbox}{width=\textwidth}
+  \begin{subtable}[t]{1.27\textwidth}
+    \centering
+    \caption{\textsc{unsupervised evaluation (ch scores | ch-optimized)}}
+    \label{tab:uci_ch_ch}
+  \begin{tabular}{l|cccccc|cc}
+    \Xhline{2\arrayrulewidth}
+    \textbf{Dataset} & \textbf{SC$_{\text{un}}$} & \textbf{SC$_{\text{n}}$} & \textbf{DSC+}$\bestpar{\gamma}{CH}$ & \textbf{DI-SIM$_{\text{R}}$}$\bestpar{s}{CH}$ & \textbf{DI-SIM$_{\text{L}}$}$\bestpar{s}{CH}$ & \textbf{DI-SIM$_{\text{C}}$}$\bestpar{s}{CH}$ & \textbf{GSC$_{\text{un}}$}$\bestpar{t,\alpha}{CH}$ & \textbf{GSC$_{\text{n}}$}$\bestpar{t,\alpha}{CH}$ \\
+    \Xhline{2\arrayrulewidth}
+    Breast Tissue & 50.98 & 47.79 & 26.66 \hyperp{0.05} & 54.22 \hyperp{-1.00} & 54.41 \hyperp{-0.50} & 54.27 \hyperp{-0.50} & \bestcell{54.78 \hyperp{1, 0.4}} & 52.04 \hyperp{10, 0.4} \\
+    Iris & 555.67 & 555.67 & 22.71 \hyperp{0.05} & 501.63 \hyperp{-1.00} & 496.70 \hyperp{-1.00} & 501.63 \hyperp{-1.00} & 555.67 \hyperp{0, 0.0} & \bestcell{558.06 \hyperp{7, 0.1}} \\
+    MNIST64 & 139.69 & 139.69 & 52.52 \hyperp{0.15} & 130.05 \hyperp{-0.50} & 159.46 \hyperp{-0.50} & 158.47 \hyperp{-0.50} & 139.69 \hyperp{0, 0.0} & \bestcell{161.11 \hyperp{16, 0.2}} \\
+    Olivetti Faces & 14.42 & 14.40 & 9.92 \hyperp{0.15} & 10.90 \hyperp{-1.00} & 13.63 \hyperp{0.00} & 13.29 \hyperp{-0.50} & 14.42 \hyperp{0, 0.0} & \bestcell{14.88 \hyperp{17, 0.1}} \\
+    PH Recognition & 436.85 & 436.85 & 8.87 \hyperp{0.30} & 25.12 \hyperp{-1.00} & 46.45 \hyperp{-1.00} & 44.65 \hyperp{-1.00} & 436.85 \hyperp{0, 0.0} & \bestcell{438.12 \hyperp{1, 0.2}} \\
+    Seeds & 247.31 & 247.31 & 151.03 \hyperp{0.20} & 230.54 \hyperp{-1.00} & 237.09 \hyperp{-1.00} & 231.10 \hyperp{-1.00} & 247.31 \hyperp{0, 0.0} & \bestcell{248.04 \hyperp{3, 0.1}} \\
+    Segmentation & 419.00 & 435.75 & 10.52 \hyperp{0.50} & 431.46 \hyperp{-1.00} & 467.61 \hyperp{-0.50} & 467.06 \hyperp{-0.50} & 419.00 \hyperp{0, 0.0} & \bestcell{507.94 \hyperp{12, 0.6}} \\
+    WDBC & 257.69 & 257.69 & 102.32 \hyperp{0.10} & 219.76 \hyperp{-1.00} & 257.29 \hyperp{-1.00} & 256.08 \hyperp{-1.00} & 257.69 \hyperp{0, 0.0} & \bestcell{258.74 \hyperp{22, 0.6}} \\
+    Wine & 70.37 & 70.37 & 70.43 \hyperp{0.05} & 69.39 \hyperp{-1.00} & 69.82 \hyperp{1.00} & 70.29 \hyperp{0.50} & 70.37 \hyperp{0, 0.0} & \bestcell{70.44 \hyperp{22, 0.1}} \\
+    \Xhline{2\arrayrulewidth}
+    \textit{PRB}(CH) & 0.95 & 0.95 & 0.40 & 0.79 & 0.86 & 0.86 & 0.96 & \bestcell{0.99} \\
+    \Xhline{2\arrayrulewidth}
+  \end{tabular}
+  \end{subtable}
+  \end{adjustbox}
+
+  \par\vspace*{1.5em}\par
+
+  \begin{adjustbox}{width=\textwidth}
+  \begin{subtable}[t]{1.22\textwidth}
+    \centering
+    \caption{\textsc{unsupervised evaluation (ami scores | ch-optimized)}}
+    \label{tab:uci_ami_ch}
+  \begin{tabular}{l|cccccc|cc}
+    \Xhline{2\arrayrulewidth}
+    \textbf{Dataset} & \textbf{SC$_{\text{un}}$} & \textbf{SC$_{\text{n}}$} & \textbf{DSC+}$\bestpar{\gamma}{CH}$ & \textbf{DI-SIM$_{\text{R}}$}$\bestpar{s}{CH}$ & \textbf{DI-SIM$_{\text{L}}$}$\bestpar{s}{CH}$ & \textbf{DI-SIM$_{\text{C}}$}$\bestpar{s}{CH}$ & \textbf{GSC$_{\text{un}}$}$\bestpar{t,\alpha}{CH}$ & \textbf{GSC$_{\text{n}}$}$\bestpar{t,\alpha}{CH}$ \\
+    \Xhline{2\arrayrulewidth}
+    Breast Tissue & 0.46 & 0.45 & 0.28 \hyperp{0.05} & 0.46 \hyperp{-1.00} & \bestcell{0.50 \hyperp{-0.50}} & 0.50 \hyperp{-0.50} & 0.48 \hyperp{1, 0.4} & 0.48 \hyperp{10, 0.4} \\
+    Iris & \bestcell{0.80} & \bestcell{0.80} & 0.35 \hyperp{0.05} & 0.75 \hyperp{-1.00} & 0.75 \hyperp{-1.00} & 0.75 \hyperp{-1.00} & \bestcell{0.80 \hyperp{0, 0.0}} & 0.77 \hyperp{7, 0.1} \\
+    MNIST64 & 0.91 & 0.91 & 0.42 \hyperp{0.15} & 0.81 \hyperp{-0.50} & 0.97 \hyperp{-0.50} & \bestcell{0.97 \hyperp{-0.50}} & 0.91 \hyperp{0, 0.0} & 0.95 \hyperp{16, 0.2} \\
+    Olivetti Faces & 0.70 & \bestcell{0.72} & 0.63 \hyperp{0.15} & 0.63 \hyperp{-1.00} & 0.71 \hyperp{0.00} & 0.69 \hyperp{-0.50} & 0.70 \hyperp{0, 0.0} & 0.70 \hyperp{17, 0.1} \\
+    PH Recognition & \bestcell{0.56} & \bestcell{0.56} & 0.16 \hyperp{0.30} & 0.25 \hyperp{-1.00} & 0.34 \hyperp{-1.00} & 0.34 \hyperp{-1.00} & \bestcell{0.56 \hyperp{0, 0.0}} & 0.56 \hyperp{1, 0.2} \\
+    Seeds & \bestcell{0.74} & \bestcell{0.74} & 0.61 \hyperp{0.20} & 0.71 \hyperp{-1.00} & 0.68 \hyperp{-1.00} & 0.70 \hyperp{-1.00} & \bestcell{0.74 \hyperp{0, 0.0}} & 0.74 \hyperp{3, 0.1} \\
+    Segmentation & 0.64 & \bestcell{0.64} & 0.06 \hyperp{0.50} & 0.63 \hyperp{-1.00} & 0.63 \hyperp{-0.50} & 0.62 \hyperp{-0.50} & 0.64 \hyperp{0, 0.0} & 0.61 \hyperp{12, 0.6} \\
+    WDBC & \bestcell{0.68} & \bestcell{0.68} & 0.46 \hyperp{0.10} & 0.64 \hyperp{-1.00} & 0.66 \hyperp{-1.00} & \bestcell{0.68 \hyperp{-1.00}} & \bestcell{0.68 \hyperp{0, 0.0}} & 0.62 \hyperp{22, 0.6} \\
+    Wine & 0.86 & 0.86 & 0.86 \hyperp{0.05} & \bestcell{0.86 \hyperp{-1.00}} & 0.83 \hyperp{1.00} & 0.84 \hyperp{0.50} & 0.86 \hyperp{0, 0.0} & 0.85 \hyperp{22, 0.1} \\
+    \Xhline{2\arrayrulewidth}
+    \textit{PRB}(AMI) & 0.98 & 0.98 & 0.58 & 0.88 & 0.93 & 0.93 & \bestcell{0.98} & 0.97 \\
+    \Xhline{2\arrayrulewidth}
+  \end{tabular}
+  \end{subtable}
+  \end{adjustbox}
+
+  \par\vspace*{1.5em}\par
+
+  \begin{adjustbox}{width=\textwidth}
+  \begin{subtable}[t]{1.22\textwidth}
+    \centering
+    \caption{\textsc{supervised evaluation (ami scores | ami-optimized)}}
+    \label{tab:uci_ami_ami}
+  \begin{tabular}{l|cccccc|cc}
+    \Xhline{2\arrayrulewidth}
+    \textbf{Dataset} & \textbf{SC$_{\text{un}}$} & \textbf{SC$_{\text{n}}$} & \textbf{DSC+}$\bestpar{\gamma}{AMI}$ & \textbf{DI-SIM$_{\text{R}}$}$\bestpar{s}{AMI}$ & \textbf{DI-SIM$_{\text{L}}$}$\bestpar{s}{AMI}$ & \textbf{DI-SIM$_{\text{C}}$}$\bestpar{s}{AMI}$ & \textbf{GSC$_{\text{un}}$}$\bestpar{t,\alpha}{AMI}$ & \textbf{GSC$_{\text{n}}$}$\bestpar{t,\alpha}{AMI}$ \\
+    \Xhline{2\arrayrulewidth}
+    Breast Tissue & 0.46 & 0.45 & 0.29 \hyperp{0.15} & 0.47 \hyperp{-0.50} & 0.50 \hyperp{-0.50} & 0.50 \hyperp{-0.50} & 0.51 \hyperp{21, 0.1} & \bestcell{0.51 \hyperp{8, 1.5}} \\
+    Iris & 0.80 & 0.80 & 0.35 \hyperp{0.05} & 0.76 \hyperp{-0.50} & 0.75 \hyperp{-1.00} & 0.75 \hyperp{-1.00} & 0.80 \hyperp{0, 0.0} & \bestcell{0.88 \hyperp{25, 0.8}} \\
+    MNIST64 & 0.91 & 0.91 & 0.42 \hyperp{0.80} & 0.86 \hyperp{-1.00} & 0.97 \hyperp{-0.50} & \bestcell{0.97 \hyperp{-0.50}} & 0.91 \hyperp{0, 0.0} & 0.97 \hyperp{17, 0.9} \\
+    Olivetti Faces & 0.70 & 0.72 & 0.63 \hyperp{0.15} & 0.63 \hyperp{-1.00} & 0.71 \hyperp{0.00} & 0.69 \hyperp{-0.50} & 0.70 \hyperp{0, 0.0} & \bestcell{0.74 \hyperp{2, 0.8}} \\
+    PH Recognition & \bestcell{0.56} & \bestcell{0.56} & 0.18 \hyperp{0.05} & 0.25 \hyperp{-1.00} & 0.34 \hyperp{-1.00} & 0.34 \hyperp{-1.00} & \bestcell{0.56 \hyperp{0, 0.0}} & \bestcell{0.56 \hyperp{0, 0.0}} \\
+    Seeds & 0.74 & 0.74 & 0.61 \hyperp{0.20} & 0.71 \hyperp{-1.00} & 0.69 \hyperp{-0.50} & 0.70 \hyperp{-1.00} & 0.74 \hyperp{0, 0.0} & \bestcell{0.77 \hyperp{2, 1.0}} \\
+    Segmentation & 0.64 & 0.64 & 0.07 \hyperp{0.95} & 0.63 \hyperp{-1.00} & 0.64 \hyperp{-1.00} & 0.64 \hyperp{-1.00} & 0.64 \hyperp{0, 0.0} & \bestcell{0.71 \hyperp{24, 1.5}} \\
+    WDBC & 0.68 & 0.68 & 0.46 \hyperp{0.10} & 0.64 \hyperp{-1.00} & 0.69 \hyperp{-0.50} & 0.69 \hyperp{-0.50} & 0.68 \hyperp{0, 0.0} & \bestcell{0.73 \hyperp{5, 0.8}} \\
+    Wine & 0.86 & 0.86 & 0.86 \hyperp{0.05} & \bestcell{0.95 \hyperp{0.00}} & 0.83 \hyperp{1.00} & 0.87 \hyperp{1.00} & 0.86 \hyperp{0, 0.0} & 0.86 \hyperp{0, 0.0} \\
+    \Xhline{2\arrayrulewidth}
+    \textit{PRB}(AMI) & 0.93 & 0.93 & 0.55 & 0.85 & 0.89 & 0.89 & 0.94 & \bestcell{0.99} \\
+    \Xhline{2\arrayrulewidth}
+  \end{tabular}
+  \end{subtable}
+  \end{adjustbox}
+\end{table}
