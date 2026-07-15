@@ -61,7 +61,7 @@ def teleporting_undirected_measure(
         mu = initialize_measure(adjacency_matrix)
     else:
         mu = np.ones(N) / N
-    # Build row-stochastic matrix P = D^{-1} A
+
     degree_vec = np.asarray(adjacency_matrix.sum(axis=1)).flatten()
     degree_vec[degree_vec == 0] = 1  # Avoid division by zero
 
@@ -95,9 +95,7 @@ def degree_measure(adjacency_matrix, gamma=0.5, epsilon=1e-8):
     - epsilon: A small value to avoid division by zero
     """
     is_sparse = sp.issparse(adjacency_matrix)
-    N = adjacency_matrix.shape[0]
 
-    # Compute in-degree and out-degree
     if is_sparse:
         in_degree = np.asarray(adjacency_matrix.sum(axis=0)).flatten()
         out_degree = np.asarray(adjacency_matrix.sum(axis=1)).flatten()
@@ -105,13 +103,10 @@ def degree_measure(adjacency_matrix, gamma=0.5, epsilon=1e-8):
         in_degree = adjacency_matrix.sum(axis=0)
         out_degree = adjacency_matrix.sum(axis=1)
 
-    # Combine the degrees
     nu = gamma * in_degree + (1 - gamma) * out_degree
 
-    # Normalize
     nu[nu <= 0] = epsilon
     nu /= nu.sum()
-
     return nu
 
 
@@ -144,9 +139,8 @@ def perron_vector_measure(adjacency_matrix, epsilon=1e-8):
     is_sparse = sp.issparse(adjacency_matrix)
     N = adjacency_matrix.shape[0]
 
-    # Build row-stochastic matrix P = D^{-1} A
     degree_vec = np.asarray(adjacency_matrix.sum(axis=1)).flatten()
-    degree_vec[degree_vec == 0] = 1  # Avoid division by zero
+    degree_vec[degree_vec == 0] = 1
 
     if is_sparse:
         P = sp.diags(1.0 / degree_vec) @ adjacency_matrix

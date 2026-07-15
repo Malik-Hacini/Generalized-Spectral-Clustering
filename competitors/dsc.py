@@ -67,7 +67,6 @@ class DSC:
             )
         n = self.adjacency_matrix.shape[0]
 
-        # Step 1: Normalize rows to get transition matrix P
         d_out = np.asarray(self.adjacency_matrix.sum(axis=1)).ravel()
         d_out[d_out <= 0] = self.epsilon  # prevent division by zero
         if sp.issparse(self.adjacency_matrix):
@@ -75,10 +74,8 @@ class DSC:
         else:
             P = self.adjacency_matrix / d_out[:, None]
 
-        # Step 2: Teleportation-based smoothing (like in PageRank)
         P_teleport = np.ones((n, n)) / n
         P_smooth = self.gamma * P + (1 - self.gamma) * P_teleport
-        # Step 3: Compute stationary distribution π with power iteration
         pi = np.ones(n) / n
 
         for _ in range(self.max_iter):
@@ -88,7 +85,6 @@ class DSC:
             pi = pi_next
         pi = pi / np.sum(pi)
         pi = np.asarray(pi).flatten()
-        # Step 4: Symmetric operator Θ
         pi[pi <= 0] = self.epsilon
         Pi_sqrt = np.diag(np.sqrt(pi))
         Pi_inv_sqrt = np.diag(1.0 / np.sqrt(pi))
