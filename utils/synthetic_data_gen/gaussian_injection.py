@@ -36,12 +36,13 @@ def _gaussian_injection(
         The injected kNN graph.
     """
     distances_to_center = pairwise_distances(X_blobs, injection_center).ravel()
-    injection_weights = np.exp(-(distances_to_center**2) / (2 * sigma_injection**2))
+
+    v = np.exp(-distances_to_center / (2 * sigma_injection))
+    injection_weights = np.outer(v, v)        # shape (n, n), K_ij = exp(-(d_i+d_j)/2sigma)
 
     # Natural Gaussian affinity between points
     distances = pairwise_distances(X_blobs)
     natural_affinity = np.exp(-(distances**2) / (2 * bandwidth**2))
-    # injected_affinity = injection_weights[:, None] * natural_affinity
     injected_affinity = alpha * injection_weights + (1 - alpha) * natural_affinity
 
     np.fill_diagonal(injected_affinity, 0.0)
@@ -52,10 +53,9 @@ def _gaussian_injection(
     for i in range(n):
         nn_idx = np.argpartition(injected_affinity[i], -n_neighbors)[-n_neighbors:]
         k_nn_graph[i, nn_idx] = injected_affinity[i, nn_idx]
-    # Normalize injection_weights to have the same max as natural_affinity for better blending
-    injection_weights = injection_weights / np.max(injection_weights)
-    natural_affinity = natural_affinity / np.max(natural_affinity)
-    injected_graph = 0.5 * (k_nn_graph + k_nn_graph.T)
+
+    # injected_graph = 0.5 * (k_nn_graph + k_nn_graph.T)
+    injected_graph = k_nn_graph
     return injected_graph
 
 def generate_gaussian_injection(
