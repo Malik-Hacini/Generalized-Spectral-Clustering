@@ -51,6 +51,11 @@ datasets/runtimes_size_disbm/
 datasets/gaussian_injection_alpha_sigma/
 datasets/chain_flow/
 
+# Generated benchmark results
+results/benchmark_chain_flow_grid_search/
+results/benchmark_gaussian_injection_alpha_sigma_grid_search/
+results/benchmark_grid_imbalance_grid_search/
+
 # Generated Gaussian-injection plots
 plots/imbalance/
 
