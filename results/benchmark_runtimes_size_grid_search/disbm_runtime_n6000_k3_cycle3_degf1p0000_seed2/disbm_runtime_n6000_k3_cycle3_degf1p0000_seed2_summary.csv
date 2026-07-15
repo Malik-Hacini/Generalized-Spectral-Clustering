@@ -1,0 +1,4 @@
+method,runtime_seconds,ami_mean_across_grid,ami_std_across_grid,ami_best_mean,ami_best_std
+SC-UN,17.2708,0.999,0.0,0.999,0.0
+GSC-UN,214.4875,0.72,0.378,0.99,0.378
+GSC-UN-NoTune,17.1694,0.987,0.0,0.987,0.0
