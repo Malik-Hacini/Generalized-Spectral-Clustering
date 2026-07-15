@@ -74,7 +74,7 @@ class DSC:
             P = sp.diags(1.0 / d_out) @ self.adjacency_matrix
         else:
             P = self.adjacency_matrix / d_out[:, None]
-            
+
         # Step 2: Teleportation-based smoothing (like in PageRank)
         P_teleport = np.ones((n, n)) / n
         P_smooth = self.gamma * P + (1 - self.gamma) * P_teleport
@@ -89,12 +89,13 @@ class DSC:
         pi = pi / np.sum(pi)
         pi = np.asarray(pi).flatten()
         # Step 4: Symmetric operator Θ
+        pi[pi <= 0] = self.epsilon
         Pi_sqrt = np.diag(np.sqrt(pi))
         Pi_inv_sqrt = np.diag(1.0 / np.sqrt(pi))
         Theta = 0.5 * (
             Pi_sqrt @ P_smooth @ Pi_inv_sqrt + Pi_inv_sqrt @ P_smooth.T @ Pi_sqrt
         )
-        # Step 5: Chung Laplacian
+
         L_dir = np.eye(n) - Theta
 
         return L_dir
