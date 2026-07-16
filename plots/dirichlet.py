@@ -80,7 +80,9 @@ def build_directed_knn_graph(data: np.ndarray, labels: np.ndarray) -> sp.csr_mat
         distances = np.linalg.norm(
             data[source_indices, None, :] - data[sink_indices, :][None, :, :], axis=2
         )
-        source_local, sink_local = np.unravel_index(np.argmin(distances), distances.shape)
+        source_local, sink_local = np.unravel_index(
+            np.argmin(distances), distances.shape
+        )
         adjacency[source_indices[source_local], sink_indices[sink_local]] = 1.0
 
     return adjacency.tocsr()
@@ -174,7 +176,9 @@ def plot_stationary_distribution(
 
 def build_partition_functions(labels: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     cluster_values = {0: -1.0, 1: 0.0, 2: 1.0}
-    true_partition = np.asarray([cluster_values[label] for label in labels], dtype=float)
+    true_partition = np.asarray(
+        [cluster_values[label] for label in labels], dtype=float
+    )
 
     rng = np.random.default_rng(42)
     mixed_labels = labels.copy()

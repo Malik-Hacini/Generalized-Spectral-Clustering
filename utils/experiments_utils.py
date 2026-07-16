@@ -183,7 +183,7 @@ def experiment(
         )
         elapsed = time.time() - start_time
         logger.success(
-            f"{mode.capitalize().replace('_',' ')} experiment '{experiment_name}' completed and saved successfully to '{save_path}' in {elapsed:.2f} seconds."
+            f"{mode.capitalize().replace('_', ' ')} experiment '{experiment_name}' completed and saved successfully to '{save_path}' in {elapsed:.2f} seconds."
         )
     except Exception as e:
         raise IOError(f"Failed to save experiment results: {str(e)}")
@@ -890,7 +890,9 @@ def _compute_clustering_scores(y_true, y_pred, metrics, X, metric_params=None):
             if metric_kwargs is None:
                 metric_kwargs = {}
             if not isinstance(metric_kwargs, dict):
-                raise ValueError(f"Metric parameters for '{metric}' must be a dict or None")
+                raise ValueError(
+                    f"Metric parameters for '{metric}' must be a dict or None"
+                )
 
             if metric not in metric_available:
                 raise ValueError(f"Unknown metric: {metric}")

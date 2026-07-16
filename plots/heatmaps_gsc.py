@@ -19,7 +19,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.colors import LinearSegmentedColormap
 
-from plots.common import configure_paper_style, project_path, resolve_output_dir, validate_selection
+from plots.common import (
+    configure_paper_style,
+    project_path,
+    resolve_output_dir,
+    validate_selection,
+)
 
 
 PALETTE = ["#072AC8", "#9A44C5", "#ff459c", "#F96C39"]
@@ -133,7 +138,9 @@ def main() -> None:
 
     dataset_dirs = sorted(path for path in results_dir.iterdir() if path.is_dir())
     dataset_names = [path.name for path in dataset_dirs]
-    selected_datasets = set(validate_selection(dataset_names, args.datasets, "datasets"))
+    selected_datasets = set(
+        validate_selection(dataset_names, args.datasets, "datasets")
+    )
 
     for dataset_dir in dataset_dirs:
         if dataset_dir.name not in selected_datasets:
@@ -141,7 +148,9 @@ def main() -> None:
 
         method_dirs = sorted(path for path in dataset_dir.iterdir() if path.is_dir())
         method_names = [path.name for path in method_dirs]
-        selected_methods = set(validate_selection(method_names, args.methods, "methods"))
+        selected_methods = set(
+            validate_selection(method_names, args.methods, "methods")
+        )
 
         for method_dir in method_dirs:
             method_name = method_dir.name
@@ -155,7 +164,9 @@ def main() -> None:
             for metric in args.metrics:
                 metric_upper = metric.upper()
                 metric_lower = metric.lower()
-                grid, t_values, alpha_values, best_t, best_alpha = load_metric_grid(results_file, metric_lower)
+                grid, t_values, alpha_values, best_t, best_alpha = load_metric_grid(
+                    results_file, metric_lower
+                )
                 output_file = (
                     output_dir
                     / metric_upper

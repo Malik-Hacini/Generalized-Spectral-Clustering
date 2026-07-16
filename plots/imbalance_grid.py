@@ -19,7 +19,14 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from plots.common import configure_paper_style, plot_method_lines, project_path, resolve_output_dir, summarize_mean_std, validate_selection
+from plots.common import (
+    configure_paper_style,
+    plot_method_lines,
+    project_path,
+    resolve_output_dir,
+    summarize_mean_std,
+    validate_selection,
+)
 
 # Configurable default methods to plot (None = all methods)
 DEFAULT_METHODS_TO_PLOT = [
@@ -43,7 +50,9 @@ def load_grid_imbalance_results(results_path: str | Path):
         method_name = best_file.parent.name
         dataset_name = best_file.parent.parent.name
 
-        square_match = re.match(r"grid_(\d+)x(\d+)_high(\d+)_low(\d+)_seed(\d+)$", dataset_name)
+        square_match = re.match(
+            r"grid_(\d+)x(\d+)_high(\d+)_low(\d+)_seed(\d+)$", dataset_name
+        )
         tuple_match = re.match(
             r"grid_\((\d+),\s*(\d+)\)x\((\d+),\s*(\d+)\)_high(\d+)_low(\d+)_seed(\d+)$",
             dataset_name,
@@ -95,13 +104,19 @@ def load_grid_imbalance_results(results_path: str | Path):
     return pd.DataFrame(rows)
 
 
-def plot_imbalance_results(df: pd.DataFrame, output_file: Path, show_legend: bool = True) -> None:
+def plot_imbalance_results(
+    df: pd.DataFrame, output_file: Path, show_legend: bool = True
+) -> None:
     summary = summarize_mean_std(df, ["method", "ratio"], "ami").sort_values("ratio")
 
     fig, ax = plt.subplots()
-    plot_method_lines(ax, summary, "ratio", "ami_mean", y_std_col="ami_std", show_legend=show_legend)
+    plot_method_lines(
+        ax, summary, "ratio", "ami_mean", y_std_col="ami_std", show_legend=show_legend
+    )
 
-    ax.set_xlabel(r"Density Ratio ($n_{\mathrm{low}} / n_{\mathrm{high}}$)", fontsize=12)
+    ax.set_xlabel(
+        r"Density Ratio ($n_{\mathrm{low}} / n_{\mathrm{high}}$)", fontsize=12
+    )
     ax.set_ylabel("AMI Score", fontsize=12)
     ax.grid(True, alpha=0.3, linestyle="--")
     plt.tight_layout()
@@ -111,7 +126,9 @@ def plot_imbalance_results(df: pd.DataFrame, output_file: Path, show_legend: boo
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Plot results from grid-imbalance benchmark")
+    parser = argparse.ArgumentParser(
+        description="Plot results from grid-imbalance benchmark"
+    )
     parser.add_argument(
         "--results-dir",
         type=str,
@@ -150,11 +167,17 @@ def main() -> None:
     selected_methods = validate_selection(all_methods, args.methods, "methods")
     df = df[df["method"].isin(selected_methods)].copy()
     print(f"Filtered to {len(selected_methods)} method(s): {selected_methods}")
-    grid_sizes = sorted(df[["grid_rows", "grid_cols"]].drop_duplicates().itertuples(index=False, name=None))
+    grid_sizes = sorted(
+        df[["grid_rows", "grid_cols"]]
+        .drop_duplicates()
+        .itertuples(index=False, name=None)
+    )
     print(f"Grid sizes found: {grid_sizes}")
 
     for grid_rows, grid_cols in grid_sizes:
-        df_grid = df[(df["grid_rows"] == grid_rows) & (df["grid_cols"] == grid_cols)].copy()
+        df_grid = df[
+            (df["grid_rows"] == grid_rows) & (df["grid_cols"] == grid_cols)
+        ].copy()
         print(f"\n{'=' * 60}")
         print(f"Processing grid size: {grid_rows}x{grid_cols}")
         print(f"{'=' * 60}")
@@ -163,7 +186,9 @@ def main() -> None:
 
         output_file = output_dir / f"grid_imbalance_{grid_rows}x{grid_cols}.pdf"
         show_legend = (grid_rows, grid_cols) == (2, 1)
-        plot_imbalance_results(pd.DataFrame(df_grid), output_file, show_legend=show_legend)
+        plot_imbalance_results(
+            pd.DataFrame(df_grid), output_file, show_legend=show_legend
+        )
 
     print(f"\n{'=' * 60}")
     print(f"All plots saved to: {output_dir}/")

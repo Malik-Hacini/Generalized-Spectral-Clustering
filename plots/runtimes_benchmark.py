@@ -18,10 +18,19 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from plots.common import configure_runtime_style, ordered_methods, project_path, resolve_output_dir, styles_for_methods, validate_selection
+from plots.common import (
+    configure_runtime_style,
+    ordered_methods,
+    project_path,
+    resolve_output_dir,
+    styles_for_methods,
+    validate_selection,
+)
 
 
-DEFAULT_RESULTS_CSV = Path("results/benchmark_uci_grid_search/benchmark_uci_runtimes.csv")
+DEFAULT_RESULTS_CSV = Path(
+    "results/benchmark_uci_grid_search/benchmark_uci_runtimes.csv"
+)
 LOG_COLLISION_THRESHOLD = 0.055
 COLLISION_X_STEP = 0.09
 DEFAULT_PRIMARY_GSC_METHODS = {"GSC", "GSC-N", "GSC-UN"}
@@ -45,7 +54,9 @@ def parse_args() -> argparse.Namespace:
             "(GSC, GSC-N, GSC-UN), excluding GSC variants."
         ),
     )
-    parser.add_argument("--datasets", nargs="+", default=None, help="Datasets to include.")
+    parser.add_argument(
+        "--datasets", nargs="+", default=None, help="Datasets to include."
+    )
     parser.add_argument(
         "--output-dir",
         default=None,
@@ -65,20 +76,30 @@ def _default_title(results_csv: Path) -> str:
     return f"{benchmark_name.replace('_', ' ').title()} Runtime Comparison"
 
 
-def _default_output_stem(results_csv: Path, output_dir: Path, output_name: str | None) -> Path:
+def _default_output_stem(
+    results_csv: Path, output_dir: Path, output_name: str | None
+) -> Path:
     benchmark_name = results_csv.stem.replace("_runtimes", "")
-    stem = output_name if output_name is not None else f"{benchmark_name}_runtime_comparison"
+    stem = (
+        output_name
+        if output_name is not None
+        else f"{benchmark_name}_runtime_comparison"
+    )
     return output_dir / stem
 
 
-def load_runtime_data(results_csv: Path, methods: list[str] | None, datasets: list[str] | None) -> pd.DataFrame:
+def load_runtime_data(
+    results_csv: Path, methods: list[str] | None, datasets: list[str] | None
+) -> pd.DataFrame:
     df = pd.read_csv(results_csv)
     if "dataset" not in df.columns:
         raise ValueError(f"Missing 'dataset' column in {results_csv}")
     if "n" not in df.columns:
         raise ValueError(f"Missing 'n' column in {results_csv}")
 
-    available_methods = [column for column in df.columns if column not in {"dataset", "n"}]
+    available_methods = [
+        column for column in df.columns if column not in {"dataset", "n"}
+    ]
     if methods is None:
         selected_methods = [
             method
@@ -98,7 +119,9 @@ def load_runtime_data(results_csv: Path, methods: list[str] | None, datasets: li
     df = df.set_index("dataset")
     dataset_sample_counts = df["n"].astype(int).to_dict()
     df = df[selected_methods]
-    dataset_order = sorted(selected_datasets, key=lambda dataset_name: dataset_sample_counts[dataset_name])
+    dataset_order = sorted(
+        selected_datasets, key=lambda dataset_name: dataset_sample_counts[dataset_name]
+    )
     df = df.loc[dataset_order].reset_index()
 
     long_df = df.melt(
@@ -111,11 +134,17 @@ def load_runtime_data(results_csv: Path, methods: list[str] | None, datasets: li
     if long_df.empty:
         raise ValueError("No runtime values remain after filtering.")
     if (long_df["runtime_seconds"] <= 0).any():
-        raise ValueError("All runtime values must be strictly positive for log-scale plotting.")
+        raise ValueError(
+            "All runtime values must be strictly positive for log-scale plotting."
+        )
 
     long_df["n_samples"] = long_df["dataset"].map(dataset_sample_counts)
-    long_df["dataset"] = pd.Categorical(long_df["dataset"], categories=dataset_order, ordered=True)
-    long_df["method"] = pd.Categorical(long_df["method"], categories=selected_methods, ordered=True)
+    long_df["dataset"] = pd.Categorical(
+        long_df["dataset"], categories=dataset_order, ordered=True
+    )
+    long_df["method"] = pd.Categorical(
+        long_df["method"], categories=selected_methods, ordered=True
+    )
     return long_df.sort_values(["dataset", "method"])
 
 
@@ -130,7 +159,10 @@ def _collision_offsets(log_values: np.ndarray) -> np.ndarray:
     start = 0
     while start < len(sorted_values):
         end = start + 1
-        while end < len(sorted_values) and sorted_values[end] - sorted_values[end - 1] <= LOG_COLLISION_THRESHOLD:
+        while (
+            end < len(sorted_values)
+            and sorted_values[end] - sorted_values[end - 1] <= LOG_COLLISION_THRESHOLD
+        ):
             end += 1
         group_size = end - start
         if group_size > 1:
@@ -177,7 +209,6 @@ def plot_runtimes(long_df: pd.DataFrame, title: str):
         runtime_values = np.asarray(dataset_df["runtime_seconds"], dtype=float)
         dataset_df["x"] = base_x + _collision_offsets(np.log10(runtime_values))
 
-
         for _, row in dataset_df.iterrows():
             method = str(row["method"])
             ax.scatter(
@@ -204,7 +235,8 @@ def plot_runtimes(long_df: pd.DataFrame, title: str):
 
     legend_handles = [
         mlines.Line2D(
-            [], [],  # ← important: no line data at all
+            [],
+            [],  # ← important: no line data at all
             marker=method_styles[method]["marker"],
             linestyle="None",  # ← explicitly no line
             markerfacecolor=method_styles[method]["color"],
@@ -223,7 +255,7 @@ def plot_runtimes(long_df: pd.DataFrame, title: str):
         # columnspacing=1.1,
         borderaxespad=0.0,
         handletextpad=0.4,
-        numpoints = 1,
+        numpoints=1,
     )
 
     # fig.suptitle(title, y=1.05)

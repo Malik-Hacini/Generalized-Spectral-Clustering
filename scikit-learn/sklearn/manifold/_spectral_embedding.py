@@ -295,7 +295,7 @@ def spectral_embedding(
         random_state=random_state,
         eigen_tol=eigen_tol,
         laplacian_method=laplacian_method,
-        drop_first=drop_first
+        drop_first=drop_first,
     )
 
 
@@ -309,9 +309,9 @@ def _spectral_embedding(
     drop_first=True,
     standard=False,
     laplacian_method="random_walk",
-    measure=None
+    measure=None,
 ):
-    #adjacency = check_symmetric(adjacency)
+    # adjacency = check_symmetric(adjacency)
 
     if eigen_solver == "amg":
         try:
@@ -333,10 +333,10 @@ def _spectral_embedding(
         warnings.warn(
             "Graph is not fully connected, spectral embedding may not work as expected."
         )
-   
+
     laplacian_obj = Laplacian(adjacency, standard=standard, measure=measure)
     if laplacian_method == "norm":
-        laplacian, dd = laplacian_obj.normalized()  
+        laplacian, dd = laplacian_obj.normalized()
     elif laplacian_method == "random_walk":
         laplacian, dd = laplacian_obj.random_walk()
     else:
@@ -499,7 +499,7 @@ def _spectral_embedding(
                 laplacian, X, tol=tol, largest=False, maxiter=2000
             )
             embedding = diffusion_map.T[:n_components]
-            if laplacian_method=="norm":
+            if laplacian_method == "norm":
                 # recover u = D^-1/2 x from the eigenvector output x
                 embedding = embedding / dd
             if embedding.shape[0] == 1:

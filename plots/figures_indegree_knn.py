@@ -21,17 +21,30 @@ import scipy.sparse as sp
 from sklearn.neighbors import kneighbors_graph
 
 from competitors.neighbors import log_neighbors
-from plots.common import configure_paper_style, project_path, resolve_kind_dir, validate_selection
+from plots.common import (
+    configure_paper_style,
+    project_path,
+    resolve_kind_dir,
+    validate_selection,
+)
 from utils.file_manager import load_dataset
 
 BAR_COLOR = "#072AC8"
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Plot in-degree distributions of dataset k-NN graphs.")
-    parser.add_argument("--datasets", nargs="+", required=True, help="Datasets to plot.")
-    parser.add_argument("--factor", type=float, default=1.0, help="Factor used in log_neighbors.")
-    parser.add_argument("--datasets-dir", default="datasets", help="Datasets directory.")
+    parser = argparse.ArgumentParser(
+        description="Plot in-degree distributions of dataset k-NN graphs."
+    )
+    parser.add_argument(
+        "--datasets", nargs="+", required=True, help="Datasets to plot."
+    )
+    parser.add_argument(
+        "--factor", type=float, default=1.0, help="Factor used in log_neighbors."
+    )
+    parser.add_argument(
+        "--datasets-dir", default="datasets", help="Datasets directory."
+    )
     parser.add_argument(
         "--output-dir",
         default=None,
@@ -50,7 +63,13 @@ def plot_indegree_distribution(indegree: np.ndarray, output_file: Path) -> None:
     frequencies = counts / indegree.size
 
     fig, ax = plt.subplots(figsize=(3.2, 2.4), layout="constrained")
-    ax.bar(np.arange(len(frequencies)), frequencies, width=0.8, color=BAR_COLOR, edgecolor=BAR_COLOR)
+    ax.bar(
+        np.arange(len(frequencies)),
+        frequencies,
+        width=0.8,
+        color=BAR_COLOR,
+        edgecolor=BAR_COLOR,
+    )
     ax.set_xlim(-0.5, len(frequencies) - 0.5)
     ax.set_xlabel("In-degree")
     ax.set_ylabel("Frequency")
@@ -65,15 +84,21 @@ def main() -> None:
     configure_paper_style(plt)
 
     datasets_dir = project_path(args.datasets_dir)
-    available_datasets = sorted(path.name for path in datasets_dir.iterdir() if path.is_dir())
-    selected_datasets = validate_selection(available_datasets, args.datasets, "datasets")
+    available_datasets = sorted(
+        path.name for path in datasets_dir.iterdir() if path.is_dir()
+    )
+    selected_datasets = validate_selection(
+        available_datasets, args.datasets, "datasets"
+    )
     output_dir = resolve_kind_dir(args.output_dir, "figures")
     suffix = factor_label(args.factor)
 
     for dataset in selected_datasets:
         X, _ = load_dataset(str(datasets_dir), dataset)
         if sp.issparse(X):
-            raise ValueError(f"Dataset '{dataset}' is a graph dataset; expected point-cloud data.")
+            raise ValueError(
+                f"Dataset '{dataset}' is a graph dataset; expected point-cloud data."
+            )
 
         k = log_neighbors(X, factor=args.factor)
         graph = kneighbors_graph(X, n_neighbors=k, include_self=False)

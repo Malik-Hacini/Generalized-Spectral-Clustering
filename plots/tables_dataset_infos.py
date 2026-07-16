@@ -119,6 +119,7 @@ SYNTHETIC_DATASET_SPECS = {
 # Graph loading
 # ---------------------------------------------------------------------------
 
+
 def _load_graph_npz(path: Path) -> tuple[sp.csr_matrix, np.ndarray | None]:
     data = np.load(path, allow_pickle=True)
     A = sp.csr_matrix(
@@ -129,7 +130,9 @@ def _load_graph_npz(path: Path) -> tuple[sp.csr_matrix, np.ndarray | None]:
     return A, labels
 
 
-def load_dataset_graph(datasets_root: Path, name: str) -> tuple[sp.csr_matrix, np.ndarray | None]:
+def load_dataset_graph(
+    datasets_root: Path, name: str
+) -> tuple[sp.csr_matrix, np.ndarray | None]:
     """Load a dataset graph; build default k-NN graph for point-cloud datasets."""
     dataset_dir = datasets_root / name
     if not dataset_dir.is_dir():
@@ -139,7 +142,9 @@ def load_dataset_graph(datasets_root: Path, name: str) -> tuple[sp.csr_matrix, n
     if graph_file.exists():
         return _load_graph_npz(graph_file)
 
-    data, labels = load_dataset(str(datasets_root), name, split="train", label_col="labels")
+    data, labels = load_dataset(
+        str(datasets_root), name, split="train", label_col="labels"
+    )
 
     if sp.issparse(data):
         A = sp.csr_matrix(data)
@@ -178,13 +183,19 @@ def ensure_dataset_exists(datasets_root: Path, name: str) -> None:
         return
 
     adjacency_matrix, labels = spec["builder"](**spec["params"])
-    save_graph_dataset(adjacency_matrix=adjacency_matrix, labels=labels, path=str(datasets_root), name=name)
+    save_graph_dataset(
+        adjacency_matrix=adjacency_matrix,
+        labels=labels,
+        path=str(datasets_root),
+        name=name,
+    )
     print(f"  Generated synthetic dataset: {name}")
 
 
 # ---------------------------------------------------------------------------
 # Statistics
 # ---------------------------------------------------------------------------
+
 
 def _gini(values: np.ndarray) -> float:
     """Gini coefficient of a non-negative array."""
@@ -239,7 +250,7 @@ def compute_stats(A: sp.csr_matrix, labels: np.ndarray | None) -> dict:
     # Reciprocity: fraction of edges (i→j) for which j→i also exists
     A_T = A_bin.T.tocsr()
     mutual = A_bin.multiply(A_T)
-    n_mutual_directed = int(mutual.nnz)   # counts both (i,j) and (j,i) sides
+    n_mutual_directed = int(mutual.nnz)  # counts both (i,j) and (j,i) sides
     reciprocity = n_mutual_directed / n_edges if n_edges > 0 else 0.0
 
     # Cluster-level reciprocity
@@ -309,9 +320,9 @@ def _fmt(value, fmt: str = ".0f") -> str:
 def generate_dataset_table(
     rows: list[dict],
     caption: str = r"\textbf{Dataset statistics.} For each real dataset, we report the number of samples $N$, "
-                   r"the number of edges $|E|$, the number of classes $K$, the numbers of weakly and strongly "
-                   r"connected components (\#WCC and \#SCC), the in-degree Gini coefficient, edge reciprocity, "
-                   r"and cluster-level reciprocity. Network datasets are indicated by a '*'.",
+    r"the number of edges $|E|$, the number of classes $K$, the numbers of weakly and strongly "
+    r"connected components (\#WCC and \#SCC), the in-degree Gini coefficient, edge reciprocity, "
+    r"and cluster-level reciprocity. Network datasets are indicated by a '*'.",
     label: str = "tab:dataset_stats",
 ) -> str:
     col_spec = r"l|ccc|cc|ccc"
@@ -348,11 +359,13 @@ def generate_dataset_table(
         ]
         lines.append("    " + " & ".join(cells) + r" \\")
 
-    lines.extend([
-        r"    \Xhline{2\arrayrulewidth}",
-        r"  \end{tabular}",
-        r"\end{table}",
-    ])
+    lines.extend(
+        [
+            r"    \Xhline{2\arrayrulewidth}",
+            r"  \end{tabular}",
+            r"\end{table}",
+        ]
+    )
 
     return "\n".join(lines)
 
@@ -361,8 +374,11 @@ def generate_dataset_table(
 # Main
 # ---------------------------------------------------------------------------
 
+
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Generate LaTeX dataset statistics table")
+    parser = argparse.ArgumentParser(
+        description="Generate LaTeX dataset statistics table"
+    )
     parser.add_argument(
         "--datasets",
         nargs="*",
@@ -418,7 +434,8 @@ def main() -> None:
         names = DEFAULT_DATASETS
     else:
         names = sorted(
-            d.name for d in datasets_root.iterdir()
+            d.name
+            for d in datasets_root.iterdir()
             if d.is_dir() and (d / "graph.npz").exists()
         )
 

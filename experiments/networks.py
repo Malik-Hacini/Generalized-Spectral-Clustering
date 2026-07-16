@@ -16,21 +16,14 @@ save_path = project_path("results")
 experiment_name = "networks"
 mode = "grid_search"  # Either "score", "grid_search" or "viz" when all datasets are 2D.
 metrics = ("ami", "graph_ch")  # Valid metrics: "ami", "ari", "nmi", "ch"
-n_jobs = (
-    -1
-)  # Number of parallel jobs (set to 1 for single-threaded execution, -1 to use all available cores)
+n_jobs = -1  # Number of parallel jobs (set to 1 for single-threaded execution, -1 to use all available cores)
 verbose = True
 
 """
 Datasets and methods configuration:
 """
 load_path = project_path("datasets")
-dataset_names = [
-    "polblogs",
-    "football",
-    "email_eu_core",
-    "polbooks"
-]
+dataset_names = ["polblogs", "football", "email_eu_core", "polbooks"]
 
 """
 Synthetic directed-network datasets with fixed parameters for the paper/document.
@@ -48,18 +41,17 @@ synthetic_network_specs = [
         },
     },
     {
-      "name": "Deg-corr",
-      "builder": degree_corrected_directed_sbm,
-      "params": {
-          "block_sizes": [500, 500, 500],
-          "p_intra": 0.05,
-          "p_inter": 0.01,
-          "power_law_exponents": (1.8, 3.5, 3.5),
-          "block_degree_scales": (2.5, 0.7, 0.7),
-          "seed": 42,
-      },
-
-    }
+        "name": "Deg-corr",
+        "builder": degree_corrected_directed_sbm,
+        "params": {
+            "block_sizes": [500, 500, 500],
+            "p_intra": 0.05,
+            "p_inter": 0.01,
+            "power_law_exponents": (1.8, 3.5, 3.5),
+            "block_degree_scales": (2.5, 0.7, 0.7),
+            "seed": 42,
+        },
+    },
 ]
 
 for spec in synthetic_network_specs:

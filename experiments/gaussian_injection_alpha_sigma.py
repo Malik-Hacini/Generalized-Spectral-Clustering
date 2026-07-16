@@ -38,13 +38,13 @@ Gaussian injection benchmark configuration:
 """
 n_samples = 900
 centers = ((-2.0, 0.0), (0.0, 2.0), (2.0, 0.0))
-std = 0.5
-n_neighbors = 10
+std = 1
+n_neighbors = 0.5
 injection_center = ((-2.0, 0.0),)
-bandwidth = 2.0
+bandwidth = 1.0
 
 fixed_alpha_list = [0.5]
-fixed_sigma_injection_list = [0.8, 1.0]
+fixed_sigma_injection_list = [0.5, 0.8]
 
 # Sweep parameters
 alpha_values = np.arange(0.0, 1.01, 0.1)
@@ -63,7 +63,7 @@ for alpha in alpha_values:
 
 sigma_alpha_combos = sorted(sigma_alpha_combos)
 
-#----- Dataset gen. -------
+# ----- Dataset gen. -------
 
 load_path = project_path("datasets/gaussian_injection_alpha_sigma")
 Path(load_path).mkdir(parents=True, exist_ok=True)
@@ -157,7 +157,7 @@ method_params = [
         },
     ),
     ("Chung", {"gamma": 1}),
-      (
+    (
         "DI-SIM-R",
         {
             "embedding": "right",

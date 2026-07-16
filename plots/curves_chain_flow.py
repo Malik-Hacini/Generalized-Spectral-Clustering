@@ -20,7 +20,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from plots.common import configure_paper_style, plot_method_lines, project_path, resolve_output_file, summarize_mean_std, validate_selection
+from plots.common import (
+    configure_paper_style,
+    plot_method_lines,
+    project_path,
+    resolve_output_file,
+    summarize_mean_std,
+    validate_selection,
+)
 
 # Set to None to include all methods, or a list such as ["GSC-N", "SC-N", "DSC+"].
 DEFAULT_METHODS_TO_PLOT = [
@@ -122,7 +129,9 @@ def plot_chain_flow_results(df: pd.DataFrame, output_file: Path, x_col: str) -> 
     plot_method_lines(ax, summary, x_col, "ami_mean", y_std_col="ami_std")
 
     if x_col == "flow_ratio":
-        ax.set_xlabel(r"Flow Ratio ($p_{\mathrm{forward}} / p_{\mathrm{backward}}$)", fontsize=12)
+        ax.set_xlabel(
+            r"Flow Ratio ($p_{\mathrm{forward}} / p_{\mathrm{backward}}$)", fontsize=12
+        )
     else:
         ax.set_xlabel(r"Forward Flow Strength ($\rho$)", fontsize=12)
     ax.set_ylabel("AMI", fontsize=12)
@@ -134,7 +143,9 @@ def plot_chain_flow_results(df: pd.DataFrame, output_file: Path, x_col: str) -> 
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Plot results from chain-flow benchmark")
+    parser = argparse.ArgumentParser(
+        description="Plot results from chain-flow benchmark"
+    )
     parser.add_argument(
         "--results-dir",
         type=str,

@@ -15,11 +15,14 @@ from ..manifold._spectral_embedding import _spectral_embedding
 from ..metrics.pairwise import KERNEL_PARAMS, pairwise_kernels
 from ..neighbors import NearestNeighbors, kneighbors_graph
 from ..utils import as_float_array, check_random_state
-from ..utils._param_validation import Interval, StrOptions, validate_params, _resolve_callable_param
+from ..utils._param_validation import (
+    Interval,
+    StrOptions,
+    validate_params,
+    _resolve_callable_param,
+)
 from ..utils.validation import validate_data
 from ._kmeans import k_means
-
-
 
 
 def cluster_qr(vectors):
@@ -642,10 +645,7 @@ class SpectralClustering(ClusterMixin, BaseEstimator):
         "n_jobs": [Integral, None],
         "verbose": ["verbose"],
         "standard": [bool],
-        "laplacian_method": [
-            callable,
-            StrOptions({"random_walk", "unnorm", "norm"})
-        ],
+        "laplacian_method": [callable, StrOptions({"random_walk", "unnorm", "norm"})],
         "measure": [tuple, None],
     }
 
@@ -679,7 +679,7 @@ class SpectralClustering(ClusterMixin, BaseEstimator):
         self.n_init = n_init
         self.gamma = gamma
         self.affinity = affinity
-        self.n_neighbors =n_neighbors
+        self.n_neighbors = n_neighbors
         self.eigen_tol = eigen_tol
         self.assign_labels = assign_labels
         self.degree = degree
@@ -740,7 +740,10 @@ class SpectralClustering(ClusterMixin, BaseEstimator):
             "nearest_neighbors",
             "rbf_nearest_neighbors",
         }:
-            if precomputed_connectivity.shape[0] != X.shape[0] or precomputed_connectivity.shape[1] != X.shape[0]:
+            if (
+                precomputed_connectivity.shape[0] != X.shape[0]
+                or precomputed_connectivity.shape[1] != X.shape[0]
+            ):
                 raise ValueError(
                     "precomputed_connectivity must have shape (n_samples, n_samples) matching X."
                 )
@@ -792,7 +795,7 @@ class SpectralClustering(ClusterMixin, BaseEstimator):
                 self.affinity_matrix_ = pairwise_kernels(
                     X, metric=self.affinity, filter_params=True, **params
                 )
-        
+
         # Symmetrize the affinity matrix IFF using standard SC
         if connectivity is not None:
             if self.standard:
@@ -800,18 +803,15 @@ class SpectralClustering(ClusterMixin, BaseEstimator):
             else:
                 self.affinity_matrix_ = connectivity
 
-
-
         random_state = check_random_state(self.random_state)
         n_components = (
             self.n_clusters if self.n_components is None else self.n_components
         )
-        
-        #Resolve the measure parameter
+
+        # Resolve the measure parameter
         context_measure_kwargs = {"X": X, "adjacency_matrix": self.affinity_matrix_}
         resolved_measure = _resolve_callable_param(self.measure, context_measure_kwargs)
-        
-        
+
         # We now obtain the real valued solution matrix to the
         # relaxed Ncut problem, solving the eigenvalue problem
         # L_sym x = lambda x  and recovering u = D^-1/2 x.

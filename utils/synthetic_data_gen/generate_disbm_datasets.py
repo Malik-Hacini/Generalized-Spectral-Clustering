@@ -171,12 +171,17 @@ def degree_corrected_directed_sbm(
     base_block_matrix = np.full((K, K), p_inter, dtype=float)
     np.fill_diagonal(base_block_matrix, p_intra)
 
-    labels = np.concatenate([
-        np.full(size, block_id, dtype=int) for block_id, size in enumerate(block_sizes)
-    ])
+    labels = np.concatenate(
+        [
+            np.full(size, block_id, dtype=int)
+            for block_id, size in enumerate(block_sizes)
+        ]
+    )
 
     propensities = []
-    for size, alpha, scale in zip(block_sizes, power_law_exponents, block_degree_scales):
+    for size, alpha, scale in zip(
+        block_sizes, power_law_exponents, block_degree_scales
+    ):
         raw = rng.pareto(alpha, size=size) + 1.0
         normalized = raw / raw.mean()
         propensities.append(scale * normalized)

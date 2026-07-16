@@ -57,16 +57,21 @@ def _apply_polynomial_filter(P, filter_coeffs, is_sparse):
 
     if is_sparse:
         weighted_powers = [
-            weights[i] * sp.linalg.matrix_power(P, int(power)) for i, power in enumerate(powers)
+            weights[i] * sp.linalg.matrix_power(P, int(power))
+            for i, power in enumerate(powers)
         ]
         if len(weighted_powers) == 1:
             return weighted_powers[0]
 
         stacked = sp.vstack(weighted_powers, format="csr")
-        reducer = sp.kron(np.ones((1, len(weighted_powers))), sp.eye(n, format="csr"), format="csr")
+        reducer = sp.kron(
+            np.ones((1, len(weighted_powers))), sp.eye(n, format="csr"), format="csr"
+        )
 
         return reducer @ stacked
 
-    matrix_powers = np.stack([np.linalg.matrix_power(P, int(power)) for power in powers], axis=0)
+    matrix_powers = np.stack(
+        [np.linalg.matrix_power(P, int(power)) for power in powers], axis=0
+    )
 
     return np.tensordot(weights, matrix_powers, axes=(0, 0))

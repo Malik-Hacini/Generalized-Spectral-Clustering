@@ -19,22 +19,28 @@ matplotlib.use("Agg")
 
 import matplotlib.pyplot as plt
 
-from plots.common import configure_paper_style, resolve_output_file, style_for_method, validate_selection
+from plots.common import (
+    configure_paper_style,
+    resolve_output_file,
+    style_for_method,
+    validate_selection,
+)
 
 DEFAULT_FULL_RESULTS_CSV = (
     "results/benchmark_runtimes_size_grid_search/benchmark_runtimes_size_runtimes.csv"
 )
-DEFAULT_PREPROCESSING_RESULTS_CSV = (
-    "results/benchmark_runtimes_size_preprocessing/benchmark_runtimes_size_preprocessing_runtimes.csv"
-)
-
+DEFAULT_PREPROCESSING_RESULTS_CSV = "results/benchmark_runtimes_size_preprocessing/benchmark_runtimes_size_preprocessing_runtimes.csv"
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Plot preprocessing and full runtimes vs dataset size."
     )
-    parser.add_argument("--full-results-csv", default=DEFAULT_FULL_RESULTS_CSV, help="Path to full runtime CSV.")
+    parser.add_argument(
+        "--full-results-csv",
+        default=DEFAULT_FULL_RESULTS_CSV,
+        help="Path to full runtime CSV.",
+    )
     parser.add_argument(
         "--preprocessing-results-csv",
         default=DEFAULT_PREPROCESSING_RESULTS_CSV,
@@ -60,8 +66,9 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-
-def plot_preprocessing_vs_full(full_summary, preprocessing_summary, methods: list[str], title: str | None):
+def plot_preprocessing_vs_full(
+    full_summary, preprocessing_summary, methods: list[str], title: str | None
+):
     fig, ax = plt.subplots()
     all_n_values = []
     for method in methods:
@@ -82,7 +89,9 @@ def plot_preprocessing_vs_full(full_summary, preprocessing_summary, methods: lis
                 label=f"{style['label']} full",
             )
 
-        preprocessing_df = preprocessing_summary[preprocessing_summary["method"] == method]
+        preprocessing_df = preprocessing_summary[
+            preprocessing_summary["method"] == method
+        ]
         if not preprocessing_df.empty:
             n_values = preprocessing_df["n"].to_numpy(dtype=float)
             all_n_values.extend(n_values.tolist())
@@ -112,19 +121,24 @@ def plot_preprocessing_vs_full(full_summary, preprocessing_summary, methods: lis
     return fig
 
 
-
 def main() -> None:
     args = parse_args()
     configure_paper_style(plt)
 
     full_df, full_methods = load_runtime_table(args.full_results_csv)
-    preprocessing_df, preprocessing_methods = load_runtime_table(args.preprocessing_results_csv)
-    common_methods = [method for method in full_methods if method in preprocessing_methods]
+    preprocessing_df, preprocessing_methods = load_runtime_table(
+        args.preprocessing_results_csv
+    )
+    common_methods = [
+        method for method in full_methods if method in preprocessing_methods
+    ]
     methods = validate_selection(common_methods, args.methods, "methods")
 
     full_summary = summarize_by_size(full_df, methods)
     preprocessing_summary = summarize_by_size(preprocessing_df, methods)
-    fig = plot_preprocessing_vs_full(full_summary, preprocessing_summary, methods, args.title)
+    fig = plot_preprocessing_vs_full(
+        full_summary, preprocessing_summary, methods, args.title
+    )
 
     output_file = resolve_output_file(
         output_dir=args.output_dir,

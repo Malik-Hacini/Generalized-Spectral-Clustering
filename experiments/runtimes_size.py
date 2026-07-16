@@ -82,11 +82,16 @@ def _block_sizes(n_nodes: int) -> list[int]:
     return sizes
 
 
-def _scale_probability_matrix(block_sizes: list[int], target_degree: float) -> np.ndarray:
+def _scale_probability_matrix(
+    block_sizes: list[int], target_degree: float
+) -> np.ndarray:
     sizes = np.asarray(block_sizes, dtype=float)
     unit_degree = 0.0
     for block, size in enumerate(sizes):
-        row_sum = float(np.dot(block_probability_weights[block], sizes) - block_probability_weights[block, block])
+        row_sum = float(
+            np.dot(block_probability_weights[block], sizes)
+            - block_probability_weights[block, block]
+        )
         unit_degree += size * row_sum
     unit_degree /= float(np.sum(sizes))
     scale = 0.0 if unit_degree == 0.0 else target_degree / unit_degree
@@ -98,7 +103,9 @@ def _generate_runtime_disbm(n_nodes: int, seed: int):
     target_degree = degree_factor * np.log(n_nodes)
     for attempt in range(max_generation_tries):
         probability_matrix = _scale_probability_matrix(block_sizes, target_degree)
-        adjacency_matrix, labels = directed_sbm(block_sizes, probability_matrix, seed=seed + attempt)
+        adjacency_matrix, labels = directed_sbm(
+            block_sizes, probability_matrix, seed=seed + attempt
+        )
         adjacency_matrix = sp.csr_matrix(adjacency_matrix)
         undirected = (adjacency_matrix + adjacency_matrix.T).sign().tocsr()
         if connected_components(undirected, directed=False, return_labels=False) == 1:

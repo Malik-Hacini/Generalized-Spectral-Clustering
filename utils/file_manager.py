@@ -252,9 +252,9 @@ def save_dataset(
     The saved dataset can be loaded using load_dataset(path, name).
     """
     data, labels = np.asarray(data), np.asarray(labels)
-    assert (
-        data.shape[0] == labels.shape[0]
-    ), "data and labels must have same number of samples"
+    assert data.shape[0] == labels.shape[0], (
+        "data and labels must have same number of samples"
+    )
 
     if feature_cols is None:
         if data.ndim == 1:

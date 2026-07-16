@@ -23,7 +23,6 @@ n_jobs = -1
 verbose = True
 
 
-
 n_seeds = 50
 datasets_path = Path(project_path("datasets/grid_imbalance"))
 
@@ -108,14 +107,16 @@ def format_grid_size(grid_size: tuple[int, int]) -> str:
     return f"{grid_size[0]}x{grid_size[1]}"
 
 
-def generate_datasets(n_high:int, grid_size: tuple[int, int]) -> list[str]:
+def generate_datasets(n_high: int, grid_size: tuple[int, int]) -> list[str]:
     datasets_path.mkdir(parents=True, exist_ok=True)
     print(f"Generating grid-imbalance datasets for {format_grid_size(grid_size)}...")
     dataset_names = []
     n_low_values = [n_high // 15, n_high // 10, n_high // 5, n_high // 3, n_high // 2]
     for n_low in n_low_values:
         for seed in range(n_seeds):
-            dataset_name = f"grid_{format_grid_size(grid_size)}_high{n_high}_low{n_low}_seed{seed}"
+            dataset_name = (
+                f"grid_{format_grid_size(grid_size)}_high{n_high}_low{n_low}_seed{seed}"
+            )
             dataset_path = datasets_path / dataset_name
             needs_generation = (
                 not dataset_path.exists()

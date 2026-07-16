@@ -53,9 +53,7 @@ def grid_imbalance(grid_size, n_high, n_low, seed=42):
                 n_points = n_low
                 cov = [[1, 0], [0, 1]]
             cluster_data = np.random.multivariate_normal(
-                mean=[center_x, center_y],
-                cov=cov,
-                size=n_points
+                mean=[center_x, center_y], cov=cov, size=n_points
             )
             cluster_data_list.append(cluster_data)
             ground_truth_labels.extend([cluster_id] * n_points)

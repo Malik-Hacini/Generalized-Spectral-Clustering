@@ -1558,7 +1558,9 @@ def has_fit_parameter(estimator, parameter):
     )
 
 
-def check_symmetric(array, *, tol=1e-10, raise_warning=True, raise_exception=False, return_bool=False):
+def check_symmetric(
+    array, *, tol=1e-10, raise_warning=True, raise_exception=False, return_bool=False
+):
     """Make sure that array is 2D, square and symmetric.
 
     If the array is not symmetric, then a symmetrized version is returned.
@@ -1579,7 +1581,7 @@ def check_symmetric(array, *, tol=1e-10, raise_warning=True, raise_exception=Fal
 
     raise_exception : bool, default=False
         If True then raise an exception if array is not symmetric.
-    
+
     return_bool : bool, default=False
         If True, return a boolean indicating whether the array is symmetric
         instead of returning the symmetrized array.
@@ -1619,7 +1621,7 @@ def check_symmetric(array, *, tol=1e-10, raise_warning=True, raise_exception=Fal
         symmetric = np.all(abs(diff.data) < tol)
     else:
         symmetric = np.allclose(array, array.T, atol=tol)
-    if return_bool :
+    if return_bool:
         return symmetric
     if not symmetric:
         if raise_exception:
@@ -1677,6 +1679,7 @@ def _is_fitted(estimator, attributes=None, all_or_any=all):
         v for v in vars(estimator) if v.endswith("_") and not v.startswith("__")
     ]
     return len(fitted_attrs) > 0
+
 
 def check_is_fitted(estimator, attributes=None, *, msg=None, all_or_any=all):
     """Perform is_fitted validation for estimator.

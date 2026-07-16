@@ -64,6 +64,7 @@ class DiSim:
     DI-SIM clustering algorithm.
     The matrix A is symmetrically normalized with in- and out-degrees raised to the power of tau, then decomposed via SVD. Clustering is performed on the left, right, or combined singular vectors.
     """
+
     def __init__(
         self,
         n_clusters,
@@ -119,7 +120,9 @@ class DiSim:
         self.embedding = self._compute_embedding(X)
 
         clusterer = KMeans(
-            n_clusters=self.n_clusters, random_state=self.random_state, n_init=self.n_init
+            n_clusters=self.n_clusters,
+            random_state=self.random_state,
+            n_init=self.n_init,
         )
         clusterer.fit(self.embedding)
         self.labels_ = clusterer.labels_

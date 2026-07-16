@@ -67,7 +67,9 @@ def load_results_with_params(
 ):
     score_rows = []
     param_rows = []
-    for dataset_name, method_name, best_results in load_best_result_entries(results_dir):
+    for dataset_name, method_name, best_results in load_best_result_entries(
+        results_dir
+    ):
         optimize_metric = _resolve_available_metric(best_results, optimize_by)
         if optimize_metric is None:
             continue
@@ -84,14 +86,22 @@ def load_results_with_params(
 
         params: dict[str, Any] = {"dataset": dataset_name, "method": method_name}
         measure = optimized_data.get("measure")
-        if isinstance(measure, list) and len(measure) >= 2 and isinstance(measure[1], dict):
+        if (
+            isinstance(measure, list)
+            and len(measure) >= 2
+            and isinstance(measure[1], dict)
+        ):
             params.update(measure[1])
         if "gamma" in optimized_data:
             params["gamma"] = optimized_data["gamma"]
         if "tau" in optimized_data:
             tau_value = optimized_data["tau"]
             # DI-SIM stores callable taus as ["<function ...>", {"s": value}].
-            if isinstance(tau_value, (list, tuple)) and len(tau_value) >= 2 and isinstance(tau_value[1], dict):
+            if (
+                isinstance(tau_value, (list, tuple))
+                and len(tau_value) >= 2
+                and isinstance(tau_value[1], dict)
+            ):
                 tau_kwargs = tau_value[1]
                 if "tau" in tau_kwargs:
                     params["tau"] = tau_kwargs["tau"]
@@ -146,14 +156,29 @@ def _prb_label(show_metric: str) -> str:
     return _optimize_label(show_metric)
 
 
-def _dataset_collection_label(datasets: list[str], optimize_by: str, show_metric: str) -> str:
-    network_datasets = {"DiSBM_Chain", "Deg-corr", "email_eu_core", "football", "polblogs", "polbooks"}
-    if optimize_by == "graph_ch" or show_metric == "graph_ch" or any(dataset in network_datasets for dataset in datasets):
+def _dataset_collection_label(
+    datasets: list[str], optimize_by: str, show_metric: str
+) -> str:
+    network_datasets = {
+        "DiSBM_Chain",
+        "Deg-corr",
+        "email_eu_core",
+        "football",
+        "polblogs",
+        "polbooks",
+    }
+    if (
+        optimize_by == "graph_ch"
+        or show_metric == "graph_ch"
+        or any(dataset in network_datasets for dataset in datasets)
+    ):
         return "network datasets"
     return "UCI datasets"
 
 
-def _method_header(display: str, method: str, show_params: bool, optimize_by: str) -> str:
+def _method_header(
+    display: str, method: str, show_params: bool, optimize_by: str
+) -> str:
     """Build method header, adding bestpar annotation for parameterized methods."""
     base = rf"\textbf{{{display}}}"
     if not show_params:
@@ -184,7 +209,9 @@ def generate_competitors_tabular(
     dataset_order: list | None = None,
     strict: bool = False,
 ):
-    score_df, params_df = load_results_with_params(results_path, optimize_by, show_metric)
+    score_df, params_df = load_results_with_params(
+        results_path, optimize_by, show_metric
+    )
     if score_df.empty:
         raise ValueError(
             f"No results found for optimization by {optimize_by} with metric {show_metric}"
@@ -203,20 +230,33 @@ def generate_competitors_tabular(
 
     # Add a visual split between non-GSC baselines and GSC variants.
     gsc_start_idx = next(
-        (i for i, method in enumerate(methods_config) if method["name"].startswith("GSC")),
+        (
+            i
+            for i, method in enumerate(methods_config)
+            if method["name"].startswith("GSC")
+        ),
         len(methods_config),
     )
     if 0 < gsc_start_idx < len(methods_config):
-        column_spec = "l|" + "c" * gsc_start_idx + "|" + "c" * (len(methods_config) - gsc_start_idx)
+        column_spec = (
+            "l|"
+            + "c" * gsc_start_idx
+            + "|"
+            + "c" * (len(methods_config) - gsc_start_idx)
+        )
     else:
         column_spec = "l|" + "c" * len(methods_config)
 
     pivot_scores = score_df.pivot(index="dataset", columns="method", values="score")
     params_pivot = params_df.set_index(["dataset", "method"])
     if dataset_order:
-        missing_datasets = [dataset for dataset in dataset_order if dataset not in pivot_scores.index]
+        missing_datasets = [
+            dataset for dataset in dataset_order if dataset not in pivot_scores.index
+        ]
         if missing_datasets:
-            raise ValueError(f"Missing requested datasets in results: {missing_datasets}")
+            raise ValueError(
+                f"Missing requested datasets in results: {missing_datasets}"
+            )
         datasets = dataset_order
     else:
         datasets = sorted(pivot_scores.index)
@@ -248,19 +288,35 @@ def generate_competitors_tabular(
         row_values: list[tuple[float | None, str]] = []
         for method_info in methods_config:
             method = method_info["name"]
-            if method in pivot_scores.columns and dataset in pivot_scores.index and pd.notna(pivot_scores.loc[dataset, method]):
+            if (
+                method in pivot_scores.columns
+                and dataset in pivot_scores.index
+                and pd.notna(pivot_scores.loc[dataset, method])
+            ):
                 score_val = cast(float, pivot_scores.loc[dataset, method])
                 param_str = ""
-                if method_info["show_params"] and (dataset, method) in params_pivot.index:
-                    param_str = format_params_string(params_pivot.loc[(dataset, method)], method)
-                row_values.append((score_val, f"{_format_score_value(score_val, show_metric)}{param_str}"))
+                if (
+                    method_info["show_params"]
+                    and (dataset, method) in params_pivot.index
+                ):
+                    param_str = format_params_string(
+                        params_pivot.loc[(dataset, method)], method
+                    )
+                row_values.append(
+                    (
+                        score_val,
+                        f"{_format_score_value(score_val, show_metric)}{param_str}",
+                    )
+                )
             else:
                 row_values.append((None, "--"))
 
         available_values = [val for val, _ in row_values if val is not None]
         max_val = max(available_values) if available_values else None
         for val, cell_str in row_values:
-            is_best = val is not None and max_val is not None and abs(val - max_val) < 1e-4
+            is_best = (
+                val is not None and max_val is not None and abs(val - max_val) < 1e-4
+            )
             row_parts.append(f"\\bestcell{{{cell_str}}}" if is_best else cell_str)
         lines.append("    " + " & ".join(row_parts) + r" \\")
 
@@ -272,7 +328,9 @@ def generate_competitors_tabular(
         dataset_values: dict[str, float] = {
             method: cast(float, pivot_scores.loc[dataset, method])
             for method in all_methods
-            if method in pivot_scores.columns and dataset in pivot_scores.index and pd.notna(pivot_scores.loc[dataset, method])
+            if method in pivot_scores.columns
+            and dataset in pivot_scores.index
+            and pd.notna(pivot_scores.loc[dataset, method])
         }
         if not dataset_values:
             continue
@@ -283,7 +341,9 @@ def generate_competitors_tabular(
             competitiveness[method].append(value / best_value)
 
     prb_values = [
-        (sum(competitiveness[method]) / len(competitiveness[method])) if competitiveness[method] else 0.0
+        (sum(competitiveness[method]) / len(competitiveness[method]))
+        if competitiveness[method]
+        else 0.0
         for method in all_methods
     ]
     best_prb = max(prb_values)
@@ -295,7 +355,8 @@ def generate_competitors_tabular(
     lines.append(
         "    "
         + " & ".join([rf"\textit{{PRB}}({_prb_label(show_metric)})"] + prb_cells)
-        + r" \\")
+        + r" \\"
+    )
     lines.extend([r"    \Xhline{2\arrayrulewidth}", r"  \end{tabular}"])
     return "\n".join(lines)
 
@@ -313,7 +374,9 @@ def generate_competitors_table(
     metric_note = ""
     if collection_label == "network datasets":
         metric_note = r" Graph-CH (GCH) is computed on Hellinger-embedded random-walk diffusion profiles."
-    tabular = generate_competitors_tabular(results_path, optimize_by, show_metric, dataset_order)
+    tabular = generate_competitors_tabular(
+        results_path, optimize_by, show_metric, dataset_order
+    )
     return "\n".join(
         [
             r"\begin{table}",
@@ -339,9 +402,27 @@ def generate_competitors_paper_table(
 ) -> str:
     if paper_table == "uci":
         specs = [
-            ("unsupervised evaluation (ch scores | ch-optimized)", "tab:uci_ch_ch", r"1.27\textwidth", "ch", "ch"),
-            ("unsupervised evaluation (ami scores | ch-optimized)", "tab:uci_ami_ch", r"1.22\textwidth", "ch", "ami"),
-            ("supervised evaluation (ami scores | ami-optimized)", "tab:uci_ami_ami", r"1.22\textwidth", "ami", "ami"),
+            (
+                "unsupervised evaluation (ch scores | ch-optimized)",
+                "tab:uci_ch_ch",
+                r"1.27\textwidth",
+                "ch",
+                "ch",
+            ),
+            (
+                "unsupervised evaluation (ami scores | ch-optimized)",
+                "tab:uci_ami_ch",
+                r"1.22\textwidth",
+                "ch",
+                "ami",
+            ),
+            (
+                "supervised evaluation (ami scores | ami-optimized)",
+                "tab:uci_ami_ami",
+                r"1.22\textwidth",
+                "ami",
+                "ami",
+            ),
         ]
         caption = (
             r"\textbf{Comparison of clustering methods on UCI datasets.} "
@@ -352,9 +433,27 @@ def generate_competitors_paper_table(
         label = "tab:uci"
     else:
         specs = [
-            ("unsupervised evaluation (gch scores | gch-optimized)", "tab:network_gch_gch", r"1.22\textwidth", "graph_ch", "graph_ch"),
-            ("unsupervised evaluation (ami scores | gch-optimized)", "tab:network_ami_gch", r"1.22\textwidth", "graph_ch", "ami"),
-            ("supervised evaluation (ami scores | ami-optimized)", "tab:network_ami_ami", r"1.22\textwidth", "ami", "ami"),
+            (
+                "unsupervised evaluation (gch scores | gch-optimized)",
+                "tab:network_gch_gch",
+                r"1.22\textwidth",
+                "graph_ch",
+                "graph_ch",
+            ),
+            (
+                "unsupervised evaluation (ami scores | gch-optimized)",
+                "tab:network_ami_gch",
+                r"1.22\textwidth",
+                "graph_ch",
+                "ami",
+            ),
+            (
+                "supervised evaluation (ami scores | ami-optimized)",
+                "tab:network_ami_ami",
+                r"1.22\textwidth",
+                "ami",
+                "ami",
+            ),
         ]
         caption = (
             r"\textbf{Comparison of clustering methods on network datasets.} "
@@ -365,21 +464,62 @@ def generate_competitors_paper_table(
         label = "tab:network"
 
     subtables = [
-        (subcaption, sublabel, width, generate_competitors_tabular(results_path, optimize_by, show_metric, dataset_order, strict=True))
+        (
+            subcaption,
+            sublabel,
+            width,
+            generate_competitors_tabular(
+                results_path, optimize_by, show_metric, dataset_order, strict=True
+            ),
+        )
         for subcaption, sublabel, width, optimize_by, show_metric in specs
     ]
     return render_composite_table(caption, label, subtables)
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Generate LaTeX table comparing GSC methods with competitors")
-    parser.add_argument("--results-dir", type=str, default="results/benchmark_uci_grid_search", help="Path to results directory")
-    parser.add_argument("--optimize-by", type=str, default=None, help="Metric used for optimization (ami, ch, graph_ch)")
-    parser.add_argument("--show-metric", type=str, default=None, help="Metric displayed in table cells (ami, ch, graph_ch)")
-    parser.add_argument("--output-dir", type=str, default=None, help="Output directory. Defaults to plots/tables/<experiment_name>/.")
-    parser.add_argument("--output-name", type=str, default=None, help="Output filename. Defaults to competitors_<opt_metric>_show_<metric>.tex.")
-    parser.add_argument("--datasets", nargs="+", default=None, help="Order of datasets in table")
-    parser.add_argument("--paper-table", choices=("uci", "network"), default=None, help="Generate the complete composite table used by the paper.")
+    parser = argparse.ArgumentParser(
+        description="Generate LaTeX table comparing GSC methods with competitors"
+    )
+    parser.add_argument(
+        "--results-dir",
+        type=str,
+        default="results/benchmark_uci_grid_search",
+        help="Path to results directory",
+    )
+    parser.add_argument(
+        "--optimize-by",
+        type=str,
+        default=None,
+        help="Metric used for optimization (ami, ch, graph_ch)",
+    )
+    parser.add_argument(
+        "--show-metric",
+        type=str,
+        default=None,
+        help="Metric displayed in table cells (ami, ch, graph_ch)",
+    )
+    parser.add_argument(
+        "--output-dir",
+        type=str,
+        default=None,
+        help="Output directory. Defaults to plots/tables/<experiment_name>/.",
+    )
+    parser.add_argument(
+        "--output-name",
+        type=str,
+        default=None,
+        help="Output filename. Defaults to competitors_<opt_metric>_show_<metric>.tex.",
+    )
+    parser.add_argument(
+        "--datasets", nargs="+", default=None, help="Order of datasets in table"
+    )
+    parser.add_argument(
+        "--paper-table",
+        choices=("uci", "network"),
+        default=None,
+        help="Generate the complete composite table used by the paper.",
+    )
     args = parser.parse_args()
 
     valid_metrics = {"ami", "ch", "graph_ch"}
@@ -389,9 +529,13 @@ def main() -> None:
         raise ValueError("--show-metric must be one of: ami, ch, graph_ch")
 
     if (args.optimize_by is None) ^ (args.show_metric is None):
-        raise ValueError("Provide both --optimize-by and --show-metric, or neither to generate default 3 tables.")
+        raise ValueError(
+            "Provide both --optimize-by and --show-metric, or neither to generate default 3 tables."
+        )
     if args.paper_table and (args.optimize_by or args.show_metric):
-        raise ValueError("--paper-table cannot be combined with --optimize-by/--show-metric")
+        raise ValueError(
+            "--paper-table cannot be combined with --optimize-by/--show-metric"
+        )
     if args.paper_table:
         if not args.datasets:
             raise ValueError("--paper-table requires an explicit --datasets order")
@@ -403,7 +547,9 @@ def main() -> None:
             "competitors.tex",
         )
         output_file.write_text(
-            generate_competitors_paper_table(args.results_dir, args.paper_table, args.datasets)
+            generate_competitors_paper_table(
+                args.results_dir, args.paper_table, args.datasets
+            )
         )
         print(f"LaTeX table saved to: {output_file}")
         return
@@ -417,7 +563,9 @@ def main() -> None:
 
     # Keep order stable while removing duplicates.
     default_specs = list(dict.fromkeys(default_specs))
-    table_specs = [(args.optimize_by, args.show_metric)] if args.optimize_by else default_specs
+    table_specs = (
+        [(args.optimize_by, args.show_metric)] if args.optimize_by else default_specs
+    )
 
     for optimize_by, show_metric in table_specs:
         output_file = resolve_output_file(

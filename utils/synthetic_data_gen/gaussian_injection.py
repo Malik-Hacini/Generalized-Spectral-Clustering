@@ -37,8 +37,8 @@ def _gaussian_injection(
     """
     distances_to_center = pairwise_distances(X_blobs, injection_center).ravel()
 
-    v = np.exp(-distances_to_center / (2 * sigma_injection))
-    injection_weights = np.outer(v, v)        # shape (n, n), K_ij = exp(-(d_i+d_j)/2sigma)
+    v = np.exp(-(distances_to_center**2) / (2 * sigma_injection**2))
+    injection_weights = np.outer(v, v)
 
     # Natural Gaussian affinity between points
     distances = pairwise_distances(X_blobs)
@@ -47,7 +47,7 @@ def _gaussian_injection(
 
     np.fill_diagonal(injected_affinity, 0.0)
 
-    # kNN is computed after injection: keep top-k strongest injected affinities per row
+    # kNN is computed after injection.
     n = injected_affinity.shape[0]
     k_nn_graph = np.zeros_like(injected_affinity)
     for i in range(n):
@@ -57,6 +57,7 @@ def _gaussian_injection(
     # injected_graph = 0.5 * (k_nn_graph + k_nn_graph.T)
     injected_graph = k_nn_graph
     return injected_graph
+
 
 def generate_gaussian_injection(
     n_samples=900,
@@ -100,7 +101,11 @@ def generate_gaussian_injection(
         Ground-truth cluster labels.
     """
     X_blobs, labels = make_blobs(
-        n_samples=n_samples, centers=centers, cluster_std=std, random_state=seed, return_centers=False
+        n_samples=n_samples,
+        centers=centers,
+        cluster_std=std,
+        random_state=seed,
+        return_centers=False,
     )
     injected_graph = _gaussian_injection(
         X_blobs,

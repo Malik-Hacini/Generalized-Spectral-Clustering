@@ -94,7 +94,9 @@ for flow_strength in flow_strengths:
             print(f"  Skipped (missing graph.npz): {dataset_name}")
 
 if not dataset_names:
-    raise RuntimeError("No valid datasets were generated/found under datasets/chain_flow")
+    raise RuntimeError(
+        "No valid datasets were generated/found under datasets/chain_flow"
+    )
 
 print(f"Total datasets: {len(dataset_names)}")
 

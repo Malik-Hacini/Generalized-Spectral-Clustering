@@ -66,14 +66,29 @@ def _prb_label(show_metric: str) -> str:
     return _optimize_label(show_metric)
 
 
-def _dataset_collection_label(datasets: list[str], optimize_by: str, show_metric: str) -> str:
-    network_datasets = {"DiSBM_Chain", "Deg-corr", "email_eu_core", "football", "polblogs", "polbooks"}
-    if optimize_by == "graph_ch" or show_metric == "graph_ch" or any(dataset in network_datasets for dataset in datasets):
+def _dataset_collection_label(
+    datasets: list[str], optimize_by: str, show_metric: str
+) -> str:
+    network_datasets = {
+        "DiSBM_Chain",
+        "Deg-corr",
+        "email_eu_core",
+        "football",
+        "polblogs",
+        "polbooks",
+    }
+    if (
+        optimize_by == "graph_ch"
+        or show_metric == "graph_ch"
+        or any(dataset in network_datasets for dataset in datasets)
+    ):
         return "network datasets"
     return "UCI datasets"
 
 
-def _method_header(display: str, method: str, show_params: bool, optimize_by: str) -> str:
+def _method_header(
+    display: str, method: str, show_params: bool, optimize_by: str
+) -> str:
     base = rf"\textbf{{{display}}}"
     if not show_params:
         return base
@@ -93,7 +108,9 @@ def load_results_with_params(
 ):
     score_rows = []
     param_rows = []
-    for dataset_name, method_name, best_results in load_best_result_entries(results_dir):
+    for dataset_name, method_name, best_results in load_best_result_entries(
+        results_dir
+    ):
         optimize_metric = _resolve_available_metric(best_results, optimize_by)
         if optimize_metric is None:
             continue
@@ -110,7 +127,11 @@ def load_results_with_params(
 
         params = {"dataset": dataset_name, "method": method_name}
         measure = optimized_data.get("measure")
-        if isinstance(measure, list) and len(measure) >= 2 and isinstance(measure[1], dict):
+        if (
+            isinstance(measure, list)
+            and len(measure) >= 2
+            and isinstance(measure[1], dict)
+        ):
             params.update(measure[1])
         for key in ["gamma", "tau"]:
             if key in optimized_data:
@@ -124,7 +145,11 @@ def format_params_string(row, method):
     if method in ["GSC-N", "GSC-UN"] and "t" in row and "alpha" in row:
         if pd.notna(row["t"]) and pd.notna(row["alpha"]):
             return f" \\hyperp{{{int(row['t'])}, {row['alpha']:.1f}}}"
-    elif method in ["deg-GSC-N", "deg-GSC-UN"] and "gamma" in row and pd.notna(row["gamma"]):
+    elif (
+        method in ["deg-GSC-N", "deg-GSC-UN"]
+        and "gamma" in row
+        and pd.notna(row["gamma"])
+    ):
         return f" \\hyperp{{{row['gamma']:.1f}}}"
     return ""
 
@@ -136,35 +161,60 @@ def generate_measures_tabular(
     dataset_order: list | None = None,
     strict: bool = False,
 ):
-    score_df, params_df = load_results_with_params(results_path, optimize_by, show_metric)
+    score_df, params_df = load_results_with_params(
+        results_path, optimize_by, show_metric
+    )
     if score_df.empty:
         raise ValueError(
             f"No results found for optimization by {optimize_by} with metric {show_metric}"
         )
 
     method_groups = {
-        "teleporting": {"methods": ["GSC-UN", "GSC-N"], "header": r"$\nu_{t,\alpha}$", "show_params": True},
-        "degree": {"methods": ["deg-GSC-UN", "deg-GSC-N"], "header": r"$\nu_\textnormal{deg}(\gamma)$", "show_params": True},
-        "uniform": {"methods": ["uniform-GSC-UN", "uniform-GSC-N"], "header": r"$\nu_\textnormal{unif}$", "show_params": False},
-        "perron": {"methods": ["perron-GSC-UN", "perron-GSC-N"], "header": r"$\nu_\textnormal{Perron}$", "show_params": False},
+        "teleporting": {
+            "methods": ["GSC-UN", "GSC-N"],
+            "header": r"$\nu_{t,\alpha}$",
+            "show_params": True,
+        },
+        "degree": {
+            "methods": ["deg-GSC-UN", "deg-GSC-N"],
+            "header": r"$\nu_\textnormal{deg}(\gamma)$",
+            "show_params": True,
+        },
+        "uniform": {
+            "methods": ["uniform-GSC-UN", "uniform-GSC-N"],
+            "header": r"$\nu_\textnormal{unif}$",
+            "show_params": False,
+        },
+        "perron": {
+            "methods": ["perron-GSC-UN", "perron-GSC-N"],
+            "header": r"$\nu_\textnormal{Perron}$",
+            "show_params": False,
+        },
     }
 
     pivot_scores = score_df.pivot(index="dataset", columns="method", values="score")
     params_pivot = params_df.set_index(["dataset", "method"])
     if dataset_order:
-        missing_datasets = [dataset for dataset in dataset_order if dataset not in pivot_scores.index]
+        missing_datasets = [
+            dataset for dataset in dataset_order if dataset not in pivot_scores.index
+        ]
         if missing_datasets:
-            raise ValueError(f"Missing requested datasets in results: {missing_datasets}")
+            raise ValueError(
+                f"Missing requested datasets in results: {missing_datasets}"
+            )
         datasets = dataset_order
     else:
         datasets = sorted(pivot_scores.index)
     if strict:
-        expected_methods = [method for group in method_groups.values() for method in group["methods"]]
+        expected_methods = [
+            method for group in method_groups.values() for method in group["methods"]
+        ]
         missing_results = [
             f"{dataset}/{method}"
             for dataset in datasets
             for method in expected_methods
-            if method not in pivot_scores.columns or pd.isna(pivot_scores.loc[dataset, method])
+            if method not in pivot_scores.columns
+            or pd.isna(pivot_scores.loc[dataset, method])
         ]
         if missing_results:
             raise ValueError(f"Missing requested method results: {missing_results}")
@@ -182,8 +232,14 @@ def generate_measures_tabular(
     header2_parts = []
     for group_info in method_groups.values():
         for method in group_info["methods"]:
-            display_name = method.replace("GSC-UN", r"GSC$_{\text{un}}$").replace("GSC-N", r"GSC$_{\text{n}}$")
-            header2_parts.append(_method_header(display_name, method, group_info["show_params"], optimize_by))
+            display_name = method.replace("GSC-UN", r"GSC$_{\text{un}}$").replace(
+                "GSC-N", r"GSC$_{\text{n}}$"
+            )
+            header2_parts.append(
+                _method_header(
+                    display_name, method, group_info["show_params"], optimize_by
+                )
+            )
     lines.append("    & " + " & ".join(header2_parts) + r" \\")
     lines.append(r"    \Xhline{2\arrayrulewidth}")
 
@@ -192,31 +248,51 @@ def generate_measures_tabular(
         row_values: list[tuple[float | None, str]] = []
         for group_info in method_groups.values():
             for method in group_info["methods"]:
-                if method in pivot_scores.columns and dataset in pivot_scores.index and pd.notna(pivot_scores.loc[dataset, method]):
+                if (
+                    method in pivot_scores.columns
+                    and dataset in pivot_scores.index
+                    and pd.notna(pivot_scores.loc[dataset, method])
+                ):
                     score_val = cast(float, pivot_scores.loc[dataset, method])
                     param_str = ""
-                    if group_info["show_params"] and (dataset, method) in params_pivot.index:
-                        param_str = format_params_string(params_pivot.loc[(dataset, method)], method)
-                    row_values.append((score_val, f"{_format_score_value(score_val, show_metric)}{param_str}"))
+                    if (
+                        group_info["show_params"]
+                        and (dataset, method) in params_pivot.index
+                    ):
+                        param_str = format_params_string(
+                            params_pivot.loc[(dataset, method)], method
+                        )
+                    row_values.append(
+                        (
+                            score_val,
+                            f"{_format_score_value(score_val, show_metric)}{param_str}",
+                        )
+                    )
                 else:
                     row_values.append((None, "--"))
 
         available_values = [val for val, _ in row_values if val is not None]
         max_val = max(available_values) if available_values else None
         for val, cell_str in row_values:
-            is_best = val is not None and max_val is not None and abs(val - max_val) < 1e-4
+            is_best = (
+                val is not None and max_val is not None and abs(val - max_val) < 1e-4
+            )
             row_parts.append(f"\\bestcell{{{cell_str}}}" if is_best else cell_str)
         lines.append("  " + " & ".join(row_parts) + r" \\")
 
     lines.append(r"  \Xhline{2\arrayrulewidth}")
-    all_methods = [method for group in method_groups.values() for method in group["methods"]]
+    all_methods = [
+        method for group in method_groups.values() for method in group["methods"]
+    ]
 
     competitiveness = {method: [] for method in all_methods}
     for dataset in datasets:
         dataset_values = {
             method: cast(float, pivot_scores.loc[dataset, method])
             for method in all_methods
-            if method in pivot_scores.columns and dataset in pivot_scores.index and pd.notna(pivot_scores.loc[dataset, method])
+            if method in pivot_scores.columns
+            and dataset in pivot_scores.index
+            and pd.notna(pivot_scores.loc[dataset, method])
         }
         if not dataset_values:
             continue
@@ -227,7 +303,9 @@ def generate_measures_tabular(
             competitiveness[method].append(value / best_value)
 
     prb_values = [
-        (sum(competitiveness[method]) / len(competitiveness[method])) if competitiveness[method] else 0.0
+        (sum(competitiveness[method]) / len(competitiveness[method]))
+        if competitiveness[method]
+        else 0.0
         for method in all_methods
     ]
     best_prb = max(prb_values)
@@ -239,7 +317,8 @@ def generate_measures_tabular(
     lines.append(
         "  "
         + " & ".join([rf"\textit{{PRB}}({_prb_label(show_metric)})"] + prb_cells)
-        + r" \\")
+        + r" \\"
+    )
     lines.extend([r"  \Xhline{2\arrayrulewidth}", r"  \end{tabular}"])
     return "\n".join(lines)
 
@@ -256,8 +335,12 @@ def generate_measures_table(
     show_label = _optimize_label(show_metric)
     metric_note = ""
     if collection_label == "network datasets":
-        metric_note = r" GCH is computed on Hellinger-embedded one-step random-walk profiles."
-    tabular = generate_measures_tabular(results_path, optimize_by, show_metric, dataset_order)
+        metric_note = (
+            r" GCH is computed on Hellinger-embedded one-step random-walk profiles."
+        )
+    tabular = generate_measures_tabular(
+        results_path, optimize_by, show_metric, dataset_order
+    )
     return "\n".join(
         [
             r"\begin{table}",
@@ -283,9 +366,27 @@ def generate_measures_paper_table(
 ) -> str:
     if paper_table == "uci":
         specs = [
-            ("unsupervised evaluation (ch scores | ch-optimized)", "tab:measures:uci_ch_ch", r"1.65\textwidth", "ch", "ch"),
-            ("unsupervised evaluation (ami scores | ch-optimized)", "tab:measures:uci_ami_ch", r"1.65\textwidth", "ch", "ami"),
-            ("supervised evaluation (ami scores | ami-optimized)", "tab:measures:uci_ami_ami", r"1.65\textwidth", "ami", "ami"),
+            (
+                "unsupervised evaluation (ch scores | ch-optimized)",
+                "tab:measures:uci_ch_ch",
+                r"1.65\textwidth",
+                "ch",
+                "ch",
+            ),
+            (
+                "unsupervised evaluation (ami scores | ch-optimized)",
+                "tab:measures:uci_ami_ch",
+                r"1.65\textwidth",
+                "ch",
+                "ami",
+            ),
+            (
+                "supervised evaluation (ami scores | ami-optimized)",
+                "tab:measures:uci_ami_ami",
+                r"1.65\textwidth",
+                "ami",
+                "ami",
+            ),
         ]
         caption = (
             r"\textbf{Comparison of vertex measures on UCI datasets.} "
@@ -296,9 +397,27 @@ def generate_measures_paper_table(
         label = "tab:vertex_measures"
     else:
         specs = [
-            ("unsupervised evaluation (gch scores | gch-optimized)", "tab:measures:network_gch_gch", r"1.65\textwidth", "graph_ch", "graph_ch"),
-            ("unsupervised evaluation (ami scores | gch-optimized)", "tab:measures:network_ami_gch", r"1.61\textwidth", "graph_ch", "ami"),
-            ("supervised evaluation (ami scores | ami-optimized)", "tab:measures:network_ami_ami", r"1.61\textwidth", "ami", "ami"),
+            (
+                "unsupervised evaluation (gch scores | gch-optimized)",
+                "tab:measures:network_gch_gch",
+                r"1.65\textwidth",
+                "graph_ch",
+                "graph_ch",
+            ),
+            (
+                "unsupervised evaluation (ami scores | gch-optimized)",
+                "tab:measures:network_ami_gch",
+                r"1.61\textwidth",
+                "graph_ch",
+                "ami",
+            ),
+            (
+                "supervised evaluation (ami scores | ami-optimized)",
+                "tab:measures:network_ami_ami",
+                r"1.61\textwidth",
+                "ami",
+                "ami",
+            ),
         ]
         caption = (
             r"\textbf{Comparison of vertex measures on network datasets.} "
@@ -309,21 +428,62 @@ def generate_measures_paper_table(
         label = "tab:net:vertex_measures"
 
     subtables = [
-        (subcaption, sublabel, width, generate_measures_tabular(results_path, optimize_by, show_metric, dataset_order, strict=True))
+        (
+            subcaption,
+            sublabel,
+            width,
+            generate_measures_tabular(
+                results_path, optimize_by, show_metric, dataset_order, strict=True
+            ),
+        )
         for subcaption, sublabel, width, optimize_by, show_metric in specs
     ]
     return render_composite_table(caption, label, subtables)
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Generate LaTeX table for AMI scores with different vertex measures")
-    parser.add_argument("--results-dir", type=str, default="results/benchmark_uci_grid_search", help="Path to results directory")
-    parser.add_argument("--optimize-by", type=str, default=None, help="Metric used for optimization (ami, ch, graph_ch)")
-    parser.add_argument("--show-metric", type=str, default=None, help="Metric displayed in table cells (ami, ch, graph_ch)")
-    parser.add_argument("--output-dir", type=str, default=None, help="Output directory. Defaults to plots/tables/<experiment_name>/.")
-    parser.add_argument("--output-name", type=str, default=None, help="Output filename. Defaults to measures_<opt_metric>_show_<metric>.tex.")
-    parser.add_argument("--datasets", nargs="+", default=None, help="Order of datasets in table")
-    parser.add_argument("--paper-table", choices=("uci", "network"), default=None, help="Generate the complete composite table used by the paper.")
+    parser = argparse.ArgumentParser(
+        description="Generate LaTeX table for AMI scores with different vertex measures"
+    )
+    parser.add_argument(
+        "--results-dir",
+        type=str,
+        default="results/benchmark_uci_grid_search",
+        help="Path to results directory",
+    )
+    parser.add_argument(
+        "--optimize-by",
+        type=str,
+        default=None,
+        help="Metric used for optimization (ami, ch, graph_ch)",
+    )
+    parser.add_argument(
+        "--show-metric",
+        type=str,
+        default=None,
+        help="Metric displayed in table cells (ami, ch, graph_ch)",
+    )
+    parser.add_argument(
+        "--output-dir",
+        type=str,
+        default=None,
+        help="Output directory. Defaults to plots/tables/<experiment_name>/.",
+    )
+    parser.add_argument(
+        "--output-name",
+        type=str,
+        default=None,
+        help="Output filename. Defaults to measures_<opt_metric>_show_<metric>.tex.",
+    )
+    parser.add_argument(
+        "--datasets", nargs="+", default=None, help="Order of datasets in table"
+    )
+    parser.add_argument(
+        "--paper-table",
+        choices=("uci", "network"),
+        default=None,
+        help="Generate the complete composite table used by the paper.",
+    )
     args = parser.parse_args()
 
     valid_metrics = {"ami", "ch", "graph_ch"}
@@ -333,9 +493,13 @@ def main() -> None:
         raise ValueError("--show-metric must be one of: ami, ch, graph_ch")
 
     if (args.optimize_by is None) ^ (args.show_metric is None):
-        raise ValueError("Provide both --optimize-by and --show-metric, or neither to generate default tables.")
+        raise ValueError(
+            "Provide both --optimize-by and --show-metric, or neither to generate default tables."
+        )
     if args.paper_table and (args.optimize_by or args.show_metric):
-        raise ValueError("--paper-table cannot be combined with --optimize-by/--show-metric")
+        raise ValueError(
+            "--paper-table cannot be combined with --optimize-by/--show-metric"
+        )
     if args.paper_table:
         if not args.datasets:
             raise ValueError("--paper-table requires an explicit --datasets order")
@@ -347,7 +511,9 @@ def main() -> None:
             f"{args.paper_table}.tex",
         )
         output_file.write_text(
-            generate_measures_paper_table(args.results_dir, args.paper_table, args.datasets)
+            generate_measures_paper_table(
+                args.results_dir, args.paper_table, args.datasets
+            )
         )
         print(f"LaTeX table saved to: {output_file}")
         return
@@ -359,7 +525,9 @@ def main() -> None:
     if "ch" in available_metrics:
         default_specs.extend([("ch", "ch"), ("ch", "ami")])
     default_specs = list(dict.fromkeys(default_specs))
-    table_specs = [(args.optimize_by, args.show_metric)] if args.optimize_by else default_specs
+    table_specs = (
+        [(args.optimize_by, args.show_metric)] if args.optimize_by else default_specs
+    )
 
     for optimize_by, show_metric in table_specs:
         output_file = resolve_output_file(

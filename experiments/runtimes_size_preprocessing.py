@@ -48,11 +48,9 @@ def _sc_un_preprocessing(adjacency_matrix) -> None:
     Laplacian(symmetric_adjacency, standard=True, measure=None).unnormalized()
 
 
-
 def _gsc_un_preprocessing(adjacency_matrix, alpha: float, t: int) -> None:
     measure = teleporting_undirected_measure(adjacency_matrix, alpha=alpha, t=t)
     Laplacian(adjacency_matrix, standard=False, measure=measure).unnormalized()
-
 
 
 def _run_method_preprocessing(adjacency_matrix, method_name: str) -> float:
@@ -74,7 +72,6 @@ def _run_method_preprocessing(adjacency_matrix, method_name: str) -> float:
     return time.perf_counter() - start
 
 
-
 def benchmark_preprocessing(dataset_names: list[str]) -> pd.DataFrame:
     rows = []
     for dataset_name in dataset_names:
@@ -84,7 +81,6 @@ def benchmark_preprocessing(dataset_names: list[str]) -> pd.DataFrame:
             row[method_name] = _run_method_preprocessing(adjacency_matrix, method_name)
         rows.append(row)
     return pd.DataFrame(rows)
-
 
 
 def save_runtime_csv(runtime_df: pd.DataFrame) -> Path:
@@ -100,7 +96,9 @@ if __name__ == "__main__":
     dataset_names = size_benchmark.generate_datasets()
 
     print("Running one warm-up preprocessing pass to reduce first-run timing bias...")
-    warmup_adjacency, _ = load_dataset(size_benchmark.datasets_path, warmup_dataset_name)
+    warmup_adjacency, _ = load_dataset(
+        size_benchmark.datasets_path, warmup_dataset_name
+    )
     for method_name in METHODS:
         _run_method_preprocessing(warmup_adjacency, method_name)
 

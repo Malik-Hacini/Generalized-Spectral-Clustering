@@ -32,7 +32,10 @@ from plots.common import (
 )
 
 
-DEFAULT_RESULTS_CSV = "results/benchmark_runtimes_size_grid_search/benchmark_runtimes_size_runtimes.csv"
+DEFAULT_RESULTS_CSV = (
+    "results/benchmark_runtimes_size_grid_search/benchmark_runtimes_size_runtimes.csv"
+)
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -89,7 +92,9 @@ def load_runtime_table(
         raise ValueError("No method columns selected.")
 
     df = pd.DataFrame(df[["dataset", "n"] + selected_methods].copy())
-    df["n"] = pd.Series(pd.to_numeric(df["n"], errors="raise"), index=df.index, dtype="int64")
+    df["n"] = pd.Series(
+        pd.to_numeric(df["n"], errors="raise"), index=df.index, dtype="int64"
+    )
 
     for m in selected_methods:
         df[m] = pd.to_numeric(df[m], errors="coerce")
@@ -111,7 +116,9 @@ def summarize_by_size(df: pd.DataFrame, methods: list[str]) -> pd.DataFrame:
 
 def plot_runtime_lines(summary: pd.DataFrame, methods: list[str], title: str) -> None:
     fig, ax = plt.subplots()
-    plot_method_lines(ax, summary, "n", "runtime_median", methods=methods, legend_kwargs={})
+    plot_method_lines(
+        ax, summary, "n", "runtime_median", methods=methods, legend_kwargs={}
+    )
     ax.set_xlabel(r"Number of points ($n$)")
     ax.set_ylabel(r"Runtime (s)")
     ax.grid(True, alpha=0.35)

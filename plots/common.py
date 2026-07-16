@@ -25,16 +25,61 @@ DEFAULT_METHOD_ORDER = [
 ]
 
 METHOD_STYLES: dict[str, dict[str, str]] = {
-    "SC-UN": {"color": "#FF8C69", "linestyle": ":", "marker": "D", "label": r"SC$_\textnormal{un}$"},
-    "SC-N": {"color": "#FF6347", "linestyle": "--", "marker": "o", "label": r"SC$_\textnormal{n}$"},
-    "DSC+": {"color": "#27A727", "linestyle": "-.", "marker": "^", "label": r"DSC$\textnormal{+}$"},
+    "SC-UN": {
+        "color": "#FF8C69",
+        "linestyle": ":",
+        "marker": "D",
+        "label": r"SC$_\textnormal{un}$",
+    },
+    "SC-N": {
+        "color": "#FF6347",
+        "linestyle": "--",
+        "marker": "o",
+        "label": r"SC$_\textnormal{n}$",
+    },
+    "DSC+": {
+        "color": "#27A727",
+        "linestyle": "-.",
+        "marker": "^",
+        "label": r"DSC$\textnormal{+}$",
+    },
     "Chung": {"color": "#008F00", "linestyle": ":", "marker": "v", "label": r"Chung"},
-    "DI-SIM-R": {"color": "#7A3E9D", "linestyle": "-", "marker": "P", "label": r"DI-SIM$_\textnormal{R}$"},
-    "DI-SIM-L": {"color": "#A55CC2", "linestyle": "--", "marker": "X", "label": r"DI-SIM$_\textnormal{L}$"},
-    "DI-SIM-C": {"color": "#C084D8", "linestyle": "-.", "marker": "*", "label": r"DI-SIM$_\textnormal{C}$"},
-    "GSC-UN": {"color": "#4C9AFF", "linestyle": "--", "marker": "P", "label": r"GSC$_\textnormal{un}$"},
-    "GSC-N": {"color": "#072AC8", "linestyle": "-", "marker": "s", "label": r"GSC$_\textnormal{n}$"},
-    "GSC-UN-NoTune": {"color": "#264DF7", "linestyle": "-.", "marker": "^", "label": r"GSC$_\textnormal{un}$ (w/o tuning)"},
+    "DI-SIM-R": {
+        "color": "#7A3E9D",
+        "linestyle": "-",
+        "marker": "P",
+        "label": r"DI-SIM$_\textnormal{R}$",
+    },
+    "DI-SIM-L": {
+        "color": "#A55CC2",
+        "linestyle": "--",
+        "marker": "X",
+        "label": r"DI-SIM$_\textnormal{L}$",
+    },
+    "DI-SIM-C": {
+        "color": "#C084D8",
+        "linestyle": "-.",
+        "marker": "*",
+        "label": r"DI-SIM$_\textnormal{C}$",
+    },
+    "GSC-UN": {
+        "color": "#4C9AFF",
+        "linestyle": "--",
+        "marker": "P",
+        "label": r"GSC$_\textnormal{un}$",
+    },
+    "GSC-N": {
+        "color": "#072AC8",
+        "linestyle": "-",
+        "marker": "s",
+        "label": r"GSC$_\textnormal{n}$",
+    },
+    "GSC-UN-NoTune": {
+        "color": "#264DF7",
+        "linestyle": "-.",
+        "marker": "^",
+        "label": r"GSC$_\textnormal{un}$ (w/o tuning)",
+    },
 }
 
 DATASET_DISPLAY_NAMES = {
@@ -99,8 +144,14 @@ def experiment_name(source: str | Path) -> str:
     return source_path.name if source_path.is_dir() else source_path.parent.name
 
 
-def resolve_output_dir(output_dir: str | Path | None, kind: str, source: str | Path) -> Path:
-    output_path = PLOTS_ROOT / kind / experiment_name(source) if output_dir is None else project_path(output_dir)
+def resolve_output_dir(
+    output_dir: str | Path | None, kind: str, source: str | Path
+) -> Path:
+    output_path = (
+        PLOTS_ROOT / kind / experiment_name(source)
+        if output_dir is None
+        else project_path(output_dir)
+    )
     output_path.mkdir(parents=True, exist_ok=True)
     return output_path
 
@@ -121,7 +172,9 @@ def resolve_output_file(
     return resolve_output_dir(output_dir, kind, source) / (output_name or default_name)
 
 
-def validate_selection(available: list[str], selected: list[str] | None, label: str) -> list[str]:
+def validate_selection(
+    available: list[str], selected: list[str] | None, label: str
+) -> list[str]:
     if selected is None:
         return available
     missing = [item for item in selected if item not in available]
@@ -130,7 +183,9 @@ def validate_selection(available: list[str], selected: list[str] | None, label: 
     return selected
 
 
-def ordered_methods(available_methods: Iterable[str], preferred_order: list[str] | None = None) -> list[str]:
+def ordered_methods(
+    available_methods: Iterable[str], preferred_order: list[str] | None = None
+) -> list[str]:
     preferred = DEFAULT_METHOD_ORDER if preferred_order is None else preferred_order
     available = list(dict.fromkeys(available_methods))
     selected = [method for method in preferred if method in available]
@@ -155,8 +210,12 @@ def styles_for_methods(methods: Iterable[str]) -> dict[str, dict[str, str]]:
     return {method: style_for_method(method) for method in methods}
 
 
-def summarize_mean_std(df: pd.DataFrame, group_cols: list[str], value_col: str, prefix: str | None = None) -> pd.DataFrame:
-    summary = df.groupby(group_cols)[value_col].agg(["mean", "std", "count"]).reset_index()
+def summarize_mean_std(
+    df: pd.DataFrame, group_cols: list[str], value_col: str, prefix: str | None = None
+) -> pd.DataFrame:
+    summary = (
+        df.groupby(group_cols)[value_col].agg(["mean", "std", "count"]).reset_index()
+    )
     label = value_col if prefix is None else prefix
     summary.columns = [*group_cols, f"{label}_mean", f"{label}_std", "count"]
     return summary
@@ -193,11 +252,24 @@ def plot_method_lines(
             alpha=1,
         )
         if y_std_col is not None:
-            y_std = np.nan_to_num(np.asarray(method_data[y_std_col], dtype=float), nan=0.0)
-            ax.fill_between(x_values, y_values - y_std, y_values + y_std, color=style["color"], alpha=0.2)
+            y_std = np.nan_to_num(
+                np.asarray(method_data[y_std_col], dtype=float), nan=0.0
+            )
+            ax.fill_between(
+                x_values,
+                y_values - y_std,
+                y_values + y_std,
+                color=style["color"],
+                alpha=0.2,
+            )
 
     if show_legend:
-        ax.legend(numpoints=1, handlelength=3, handletextpad=0.8, **(legend_kwargs or {"loc": "best", "fontsize": 10, "framealpha": 0.95}))
+        ax.legend(
+            numpoints=1,
+            handlelength=3,
+            handletextpad=0.8,
+            **(legend_kwargs or {"loc": "best", "fontsize": 10, "framealpha": 0.95}),
+        )
 
 
 def configure_paper_style(plt) -> None:
@@ -256,6 +328,10 @@ def load_best_result_entries(results: str | Path):
         raise ValueError(f"No best_results.json files found in {results_dir}")
 
     return [
-        (best_file.parent.parent.name, best_file.parent.name, json.loads(best_file.read_text()))
+        (
+            best_file.parent.parent.name,
+            best_file.parent.name,
+            json.loads(best_file.read_text()),
+        )
         for best_file in best_result_files
     ]

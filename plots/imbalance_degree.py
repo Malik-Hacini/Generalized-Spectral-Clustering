@@ -19,7 +19,14 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from plots.common import configure_paper_style, plot_method_lines, project_path, resolve_output_dir, summarize_mean_std, validate_selection
+from plots.common import (
+    configure_paper_style,
+    plot_method_lines,
+    project_path,
+    resolve_output_dir,
+    summarize_mean_std,
+    validate_selection,
+)
 
 
 def _parse_prob_token(token: str) -> float:
@@ -145,7 +152,9 @@ def plot_degree_imbalance_results(df: pd.DataFrame, output_file: Path):
     summary = summarize_mean_std(df, ["method", "ratio"], "ami").sort_values("ratio")
     fig, ax = plt.subplots()
     plot_method_lines(ax, summary, "ratio", "ami_mean", y_std_col="ami_std")
-    ax.set_xlabel(r"Degree Imbalance Ratio ($p_{\mathrm{low}} / p_{\mathrm{high}}$)", fontsize=12)
+    ax.set_xlabel(
+        r"Degree Imbalance Ratio ($p_{\mathrm{low}} / p_{\mathrm{high}}$)", fontsize=12
+    )
     ax.set_ylabel("AMI Score", fontsize=12)
     ax.grid(True, alpha=0.3, linestyle="--")
     plt.tight_layout()
@@ -162,12 +171,21 @@ def print_summary_statistics(df: pd.DataFrame):
     print("=" * 80)
     print()
 
-    overall = df.groupby("method").agg({"ami": ["mean", "std", "min", "max", "count"]}).round(4)
+    overall = (
+        df.groupby("method")
+        .agg({"ami": ["mean", "std", "min", "max", "count"]})
+        .round(4)
+    )
     print("Overall AMI Statistics by Method:")
     print(overall)
     print()
 
-    by_ratio = df.groupby(["ratio", "method"])["ami"].agg(["mean", "std"]).unstack("method").round(4)
+    by_ratio = (
+        df.groupby(["ratio", "method"])["ami"]
+        .agg(["mean", "std"])
+        .unstack("method")
+        .round(4)
+    )
     print("AMI by Degree Imbalance Ratio:")
     print(by_ratio)
     print()
@@ -181,7 +199,9 @@ def print_summary_statistics(df: pd.DataFrame):
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Plot results from degree-imbalance benchmark")
+    parser = argparse.ArgumentParser(
+        description="Plot results from degree-imbalance benchmark"
+    )
     parser.add_argument(
         "--results-dir",
         type=str,
@@ -194,8 +214,15 @@ def main() -> None:
         default=None,
         help="Output directory. Defaults to plots/imbalance/<experiment_name>/.",
     )
-    parser.add_argument("--methods", nargs="+", default=None, help="Methods to plot (default: all methods)")
-    parser.add_argument("--show-stats", action="store_true", help="Print summary statistics")
+    parser.add_argument(
+        "--methods",
+        nargs="+",
+        default=None,
+        help="Methods to plot (default: all methods)",
+    )
+    parser.add_argument(
+        "--show-stats", action="store_true", help="Print summary statistics"
+    )
 
     args = parser.parse_args()
     configure_paper_style(plt)
@@ -212,7 +239,9 @@ def main() -> None:
     print(f"Loaded {len(df)} result entries")
     print(f"Methods: {sorted(df['method'].unique())}")
 
-    selected_methods = validate_selection(sorted(df["method"].unique()), args.methods, "methods")
+    selected_methods = validate_selection(
+        sorted(df["method"].unique()), args.methods, "methods"
+    )
     df = df[df["method"].isin(selected_methods)].copy()
 
     settings = sorted(

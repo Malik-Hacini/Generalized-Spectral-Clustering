@@ -1,5 +1,4 @@
 class ExperimentLogger:
-
     def __init__(self, verbose=True):
         self.verbose = verbose
 

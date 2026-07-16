@@ -24,7 +24,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from plots.common import configure_paper_style, plot_method_lines, project_path, resolve_output_dir, summarize_mean_std, validate_selection
+from plots.common import (
+    configure_paper_style,
+    plot_method_lines,
+    project_path,
+    resolve_output_dir,
+    summarize_mean_std,
+    validate_selection,
+)
 
 
 # Default parameters: edit here for your usual plotting setup.
@@ -36,18 +43,17 @@ DEFAULT_FIXED_SIGMA = 0.8
 DEFAULT_FIXED_ALPHA = 0.5
 DEFAULT_SHOW_STD = True
 # Set to None to include all methods, or provide a list to filter plotted methods.
-DEFAULT_METHODS_TO_PLOT = [
-  "GSC-N",
-  "SC-N",
-  "DSC+"
-]
+DEFAULT_METHODS_TO_PLOT = ["GSC-N", "SC-N", "DSC+"]
+
 
 def _parse_float_token(token: str) -> float:
     """Parse float tokens formatted as 1p2300 -> 1.2300."""
     return float(token.replace("p", "."))
 
 
-def _extract_ami_value(best_results: dict, optimize_by: str = "graph_ch") -> float | None:
+def _extract_ami_value(
+    best_results: dict, optimize_by: str = "graph_ch"
+) -> float | None:
     """Extract AMI score from a best-results payload for a chosen optimization metric."""
     metric_payload = best_results.get(optimize_by)
     if not isinstance(metric_payload, dict):
@@ -298,7 +304,9 @@ def main() -> None:
 
     if args.methods is not None:
         available_methods = sorted(df["method"].astype(str).unique().tolist())
-        selected_methods = validate_selection(available_methods, args.methods, "methods")
+        selected_methods = validate_selection(
+            available_methods, args.methods, "methods"
+        )
         df = df[df["method"].isin(selected_methods)].copy()
 
     print(f"Loaded {len(df)} entries")
@@ -309,11 +317,15 @@ def main() -> None:
 
     # AMI vs alpha for fixed sigma
     if not args.skip_alpha_plot:
-        df_alpha = pd.DataFrame(df[np.isclose(df["sigma"], args.fixed_sigma, atol=tol)]).copy()
+        df_alpha = pd.DataFrame(
+            df[np.isclose(df["sigma"], args.fixed_sigma, atol=tol)]
+        ).copy()
         if df_alpha.empty:
             print(f"No rows found for sigma={args.fixed_sigma}. Skipping alpha plot.")
         else:
-            summary_alpha = summarize_mean_std(pd.DataFrame(df_alpha), ["method", "alpha"], "ami")
+            summary_alpha = summarize_mean_std(
+                pd.DataFrame(df_alpha), ["method", "alpha"], "ami"
+            )
 
             alpha_out = output_dir / (
                 f"gaussian_injection_ami_mean_std_vs_alpha_sigma{args.fixed_sigma:.4f}_{args.optimize_by}.pdf"
@@ -331,11 +343,15 @@ def main() -> None:
 
     # AMI vs sigma for fixed alpha
     if not args.skip_sigma_plot:
-        df_sigma = pd.DataFrame(df[np.isclose(df["alpha"], args.fixed_alpha, atol=tol)]).copy()
+        df_sigma = pd.DataFrame(
+            df[np.isclose(df["alpha"], args.fixed_alpha, atol=tol)]
+        ).copy()
         if df_sigma.empty:
             print(f"No rows found for alpha={args.fixed_alpha}. Skipping sigma plot.")
         else:
-            summary_sigma = summarize_mean_std(pd.DataFrame(df_sigma), ["method", "sigma"], "ami")
+            summary_sigma = summarize_mean_std(
+                pd.DataFrame(df_sigma), ["method", "sigma"], "ami"
+            )
 
             sigma_out = output_dir / (
                 f"gaussian_injection_ami_mean_std_vs_sigma_alpha{args.fixed_alpha:.4f}_{args.optimize_by}.pdf"
