@@ -39,12 +39,12 @@ Gaussian injection benchmark configuration:
 n_samples = 900
 centers = ((-2.0, 0.0), (0.0, 2.0), (2.0, 0.0))
 std = 1
-n_neighbors = 0.5
+n_neighbors = 6
 injection_center = ((-2.0, 0.0),)
-bandwidth = 1.0
+bandwidth = 1.0  # if None, the bandwidth is set using the basic heuristic: bandwidth = mean(pairwise_distances(X_blobs))
 
 fixed_alpha_list = [0.5]
-fixed_sigma_injection_list = [0.5, 0.8]
+fixed_sigma_injection_list = [0.8, 1]
 
 # Sweep parameters
 alpha_values = np.arange(0.0, 1.01, 0.1)

@@ -39,7 +39,7 @@ DEFAULT_RESULTS_DIR = "results/benchmark_gaussian_injection_alpha_sigma_grid_sea
 DEFAULT_OUTPUT_DIR = None
 DEFAULT_OPTIMIZE_BY = "graph_ch"
 DEFAULT_INCLUDE_GSC_AMI_SUPERVISED = False
-DEFAULT_FIXED_SIGMA = 0.8
+DEFAULT_FIXED_SIGMA = 0.5
 DEFAULT_FIXED_ALPHA = 0.5
 DEFAULT_SHOW_STD = True
 # Set to None to include all methods, or provide a list to filter plotted methods.
@@ -197,7 +197,6 @@ def _plot_mean_std_lines(
 
     ax.set_xlabel(xlabel, fontsize=12)
 
-    # ax.set_title(title, fontsize=13, fontweight="bold")
     ax.grid(alpha=0.3, which="both")
     plt.tight_layout()
 

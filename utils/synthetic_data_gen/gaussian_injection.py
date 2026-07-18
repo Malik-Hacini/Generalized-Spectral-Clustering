@@ -7,6 +7,7 @@ One cluster is artificially injected with higher edge weights using a Gaussian i
 import numpy as np
 from pathlib import Path
 from sklearn.metrics import pairwise_distances  # type: ignore
+from scipy.spatial.distance import pdist, squareform # type: ignore
 from sklearn.datasets import make_blobs  # type: ignore
 
 
@@ -35,13 +36,13 @@ def _gaussian_injection(
     injected_graph : ndarray of shape (n_samples, n_samples)
         The injected kNN graph.
     """
-    distances_to_center = pairwise_distances(X_blobs, injection_center).ravel()
 
-    v = np.exp(-(distances_to_center**2) / (2 * sigma_injection**2))
-    injection_weights = np.outer(v, v)
+    distances_to_center = pairwise_distances(X_blobs, injection_center).ravel()
+    injection_weights = np.exp(-(distances_to_center ** 2) / (2 * sigma_injection ** 2))
 
     # Natural Gaussian affinity between points
-    distances = pairwise_distances(X_blobs)
+    distances = squareform(pdist(X_blobs, metric='euclidean'))
+    bandwidth = np.max([i[i > 0].min() for i in distances]) if bandwidth is None else bandwidth
     natural_affinity = np.exp(-(distances**2) / (2 * bandwidth**2))
     injected_affinity = alpha * injection_weights + (1 - alpha) * natural_affinity
 
@@ -109,10 +110,10 @@ def generate_gaussian_injection(
     )
     injected_graph = _gaussian_injection(
         X_blobs,
-        n_neighbors,
-        injection_center,
-        sigma_injection,
-        alpha,
-        bandwidth,
+        n_neighbors=n_neighbors,
+        injection_center=injection_center,
+        sigma_injection=sigma_injection,
+        bandwidth=bandwidth,
+        alpha=alpha,
     )
     return injected_graph, labels, X_blobs
