@@ -1,6 +1,6 @@
 # Generalized Spectral Clustering
 
-This repository serves as the official implementation for the paper [Generalized Dirichlet Energy and Graph Laplacians for Clustering Directed and Undirected Graphs](https://arxiv.org/abs/2203.03221) by Sevi et. al, TMLR 2026.
+This repository serves as the official implementation for the paper [Generalized Dirichlet Energy and Graph Laplacians for Clustering Directed and Undirected Graphs](https://arxiv.org/abs/2203.03221) by Harry Sevi, Gwendal Debaussart-Joenic, Malik Hacini and Argyris Kalogeratos, TMLR 2026.
 It provides a robust Python implementation of the Generalized Spectral Clustering (GSC) algorithm via a custom scikit-learn fork. This implementation thus uses SOTA algorithms and is optimized for parallel computing on CPU via JIT compilation.
 
 It also provides a flexible framework for custom clustering experiments.
