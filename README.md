@@ -2,7 +2,7 @@
 
 > **This repository is actively maintained thus may evolve in the future. For reproducibility concerns, you will find the exact code used to build the paper upon publication under the paper_state branch.**
 
-Official implementation for the paper [Generalized Dirichlet Energy and Graph Laplacians for Clustering Directed and Undirected Graphs](https://arxiv.org/abs/2203.03221) by Harry Sevi, Gwendal Debaussart-Joenic, Malik Hacini, Matthieu Jonckheere and Argyris Kalogeratos, TMLR 2026.
+Official implementation for the paper [Generalized Dirichlet Energy and Graph Laplacians for Clustering Directed and Undirected Graphs](https://openreview.net/pdf?id=AA6D7fJ9PN) by Harry Sevi, Gwendal Debaussart-Joniec, Malik Hacini, Matthieu Jonckheere and Argyris Kalogeratos, TMLR 2026.
 
 
 It provides a robust Python implementation of the Generalized Spectral Clustering (GSC) algorithm via a custom scikit-learn fork. This implementation thus uses SOTA algorithms and is optimized for parallel computing on CPU via JIT compilation.
@@ -65,3 +65,19 @@ Detailed guidelines for adding custom components are included in the [competitor
 ## License
 
 This repository is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## Citation
+
+If you use this code in your research, please cite the following paper:
+
+```bibtex
+@article{
+sevi2026generalized,
+title={Generalized Dirichlet Energy and Graph Laplacians for Clustering Directed and Undirected Graphs},
+author={Harry Sevi and Gwendal Debaussart-Joniec and Malik Hacini and Matthieu Jonckheere and Argyris Kalogeratos},
+journal={Transactions on Machine Learning Research},
+issn={2835-8856},
+year={2026},
+url={https://openreview.net/forum?id=AA6D7fJ9PN},
+}
+```
